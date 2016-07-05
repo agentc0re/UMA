@@ -29,7 +29,10 @@ namespace UMA
 
 		public IEnumerable<int> BoneHashes { get { return GetBoneHashes(); } }
 
-		protected bool updating;
+        //DynamicUMADna:: DynamicUMADnaConverterCustomizer Editor interface needs to have an array of bone names
+        public string[] BoneNames { get { return GetBoneNames(); } }
+
+        protected bool updating;
 		protected int frame;
 		/// <value>The hash for the root bone of the skeleton.</value>
 		public int rootBoneHash { get; protected set; }
@@ -262,8 +265,20 @@ namespace UMA
 				yield return hash;
 			}
 		}
+        //DynamicUMADna:: a method to return a string of bonenames for use in editor intefaces
+        private string[] GetBoneNames()
+        {
+            string[] boneNames = new string[boneHashData.Count];
+            int index = 0;
+            foreach (KeyValuePair<int, BoneData> kp in boneHashData)
+            {
+                boneNames[index] = kp.Value.boneTransform.gameObject.name;
+                index++;
+            }
+            return boneNames;
+        }
 
-		public virtual void Set(int nameHash, Vector3 position, Vector3 scale, Quaternion rotation)
+        public virtual void Set(int nameHash, Vector3 position, Vector3 scale, Quaternion rotation)
 		{
 			BoneData db;
 			if (boneHashData.TryGetValue(nameHash, out db))
@@ -327,13 +342,31 @@ namespace UMA
 			}
 		}
 
-		/// <summary>
-		/// Sets the rotation of a bone.
+        /// <summary>
+		/// DynamicUMADnaConverterBahaviour:: Sets the scale of a bone relatively.
 		/// This method silently fails if the bone doesn't exist! (Desired behaviour in DNA converters due to LOD/Occlusion)
 		/// </summary>
 		/// <param name="nameHash">Name hash.</param>
-		/// <param name="rotation">Rotation.</param>
-		public virtual void SetRotation(int nameHash, Quaternion rotation)
+		/// <param name="scale">Scale.</param>
+		public virtual void SetScaleRelative(int nameHash, Vector3 scale)
+        {
+            BoneData db;
+            if (boneHashData.TryGetValue(nameHash, out db))
+            {
+                db.accessedFrame = frame;
+                var fullScale = scale;
+                fullScale.Scale(db.boneTransform.localScale);
+                db.boneTransform.localScale = fullScale;
+            }
+        }
+
+        /// <summary>
+        /// Sets the rotation of a bone.
+        /// This method silently fails if the bone doesn't exist! (Desired behaviour in DNA converters due to LOD/Occlusion)
+        /// </summary>
+        /// <param name="nameHash">Name hash.</param>
+        /// <param name="rotation">Rotation.</param>
+        public virtual void SetRotation(int nameHash, Quaternion rotation)
 		{
 			BoneData db;
 			if (boneHashData.TryGetValue(nameHash, out db))
@@ -343,16 +376,33 @@ namespace UMA
 			}
 		}
 
-		/// <summary>
-		/// Lerp the specified bone toward a new position, rotation, and scale.
+        /// <summary>
+		/// DynamicUMADnaConverterBahaviour:: Sets the rotation of a bone relative to its initial rotation.
 		/// This method silently fails if the bone doesn't exist! (Desired behaviour in DNA converters due to LOD/Occlusion)
 		/// </summary>
 		/// <param name="nameHash">Name hash.</param>
-		/// <param name="position">Position.</param>
-		/// <param name="scale">Scale.</param>
 		/// <param name="rotation">Rotation.</param>
-		/// <param name="weight">Weight.</param>
-		public virtual void Lerp(int nameHash, Vector3 position, Vector3 scale, Quaternion rotation, float weight)
+		public virtual void SetRotationRelative(int nameHash, Quaternion rotation, float weight /*, bool hasAnimator = true*/)
+        {
+            BoneData db;
+            if (boneHashData.TryGetValue(nameHash, out db))
+            {
+                db.accessedFrame = frame;
+                Quaternion fullRotation = db.boneTransform.localRotation * rotation;
+                db.boneTransform.localRotation = Quaternion.Slerp(db.boneTransform.localRotation, fullRotation, weight);
+            }
+        }
+
+        /// <summary>
+        /// Lerp the specified bone toward a new position, rotation, and scale.
+        /// This method silently fails if the bone doesn't exist! (Desired behaviour in DNA converters due to LOD/Occlusion)
+        /// </summary>
+        /// <param name="nameHash">Name hash.</param>
+        /// <param name="position">Position.</param>
+        /// <param name="scale">Scale.</param>
+        /// <param name="rotation">Rotation.</param>
+        /// <param name="weight">Weight.</param>
+        public virtual void Lerp(int nameHash, Vector3 position, Vector3 scale, Quaternion rotation, float weight)
 		{
 			BoneData db;
 			if (boneHashData.TryGetValue(nameHash, out db))
