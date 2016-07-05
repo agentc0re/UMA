@@ -13,8 +13,13 @@ namespace UMA
 			var umaDna = umaData.GetDna<UMADnaHumanoid>();
 			if (umaDna == null)
 			{
-				Debug.LogError("Failed to add Capsule Collider to: " + umaData.name);
-				return;
+                var umaDnaD = umaData.GetDna<DynamicUMADna>();//Dont know what to do about this- this will never work because its added as a type hash which is random
+                if (umaDnaD == null)
+                {
+                    umaDnaD = new DynamicUMADna();
+                    //Debug.LogError("Failed to add Capsule Collider to: " + umaData.name);
+                    //return;
+                }
 			}
 
 			var rigid = umaData.gameObject.GetComponent<Rigidbody>();
