@@ -19,6 +19,7 @@ namespace UMAEditor
    {
         //DynamicUMADna:: the following dictionary also needs to use dnaTypeHashes now
         private readonly Dictionary<int, DNASingleEditor> _dnaValues = new Dictionary<int, DNASingleEditor>();
+        private readonly int[] _dnaTypeHashes;
         private readonly Type[] _dnaTypes;
       private readonly string[] _dnaTypeNames;
       public int viewDna = 0;
@@ -58,7 +59,7 @@ namespace UMAEditor
                 {
                     _dnaTypeNames[i] = entryType.Name;
                 }
-                _dnaValues[entryType] = new DNASingleEditor(entry);
+                _dnaValues[entry.GetDnaTypeHash()] = new DNASingleEditor(entry);
          }
       }
 
