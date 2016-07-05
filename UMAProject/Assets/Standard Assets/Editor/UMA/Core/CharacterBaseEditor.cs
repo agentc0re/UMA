@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
 
 using System;
 using System.Collections.Generic;
@@ -17,8 +17,9 @@ namespace UMAEditor
 {
    public class DNAMasterEditor
    {
-      private readonly Dictionary<Type, DNASingleEditor> _dnaValues = new Dictionary<Type, DNASingleEditor>();
-      private readonly Type[] _dnaTypes;
+        //DynamicUMADna:: the following dictionary also needs to use dnaTypeHashes now
+        private readonly Dictionary<int, DNASingleEditor> _dnaValues = new Dictionary<int, DNASingleEditor>();
+        private readonly Type[] _dnaTypes;
       private readonly string[] _dnaTypeNames;
       public int viewDna = 0;
       public UMAData.UMARecipe recipe;
@@ -30,7 +31,9 @@ namespace UMAEditor
          UMADnaBase[] allDna = recipe.GetAllDna();
 
          _dnaTypes = new Type[allDna.Length];
-         _dnaTypeNames = new string[allDna.Length];
+            //DynamicUMADna:: we need the hashes here too
+            _dnaTypeHashes = new int[allDna.Length];
+            _dnaTypeNames = new string[allDna.Length];
 
          for (int i = 0; i < allDna.Length; i++)
          {
@@ -38,8 +41,24 @@ namespace UMAEditor
             var entryType = entry.GetType();
 
             _dnaTypes[i] = entryType;
-            _dnaTypeNames[i] = entryType.Name;
-            _dnaValues[entryType] = new DNASingleEditor(entry);
+                //DynamicUMADna:: we need to use typehashes now
+                _dnaTypeHashes[i] = entry.GetDnaTypeHash();
+                if (entryType.ToString().IndexOf("DynamicUMADna") > -1)
+                {
+                    if (((DynamicUMADnaBase)entry).dnaAsset != null)
+                    {
+                        _dnaTypeNames[i] = ((DynamicUMADnaBase)entry).dnaAsset.name + " (DynamicUMADna)";
+                    }
+                    else
+                    {
+                        _dnaTypeNames[i] = "Default " + i + " (DynamicUMADna)";
+                    }
+                }
+                else
+                {
+                    _dnaTypeNames[i] = entryType.Name;
+                }
+                _dnaValues[entryType] = new DNASingleEditor(entry);
          }
       }
 
@@ -56,8 +75,9 @@ namespace UMAEditor
          {
             if (viewDna >= 0)
             {
-               recipe.RemoveDna(_dnaTypes[viewDna]);
-               if (viewDna >= _dnaTypes.Length - 1) viewDna--;
+                    //DynamicUMADna:: This needs to use the hash
+                    recipe.RemoveDna(_dnaTypeHashes[viewDna]);
+                    if (viewDna >= _dnaTypes.Length - 1) viewDna--;
                GUI.enabled = true;
                GUILayout.EndHorizontal();
                _dnaDirty = true;
@@ -70,11 +90,11 @@ namespace UMAEditor
 
          if (viewDna >= 0)
          {
-            Type dnaType = _dnaTypes[viewDna];
-
-            if (_dnaValues[dnaType].OnGUI())
-            {
-               _dnaDirty = true;
+                //DynamicUMADna:: We need to use _dnaTypeHashes now
+                int dnaTypeHash = _dnaTypeHashes[viewDna];
+                if (_dnaValues[dnaTypeHash].OnGUI())
+                {
+                    _dnaDirty = true;
                return true;
             }
          }
@@ -102,35 +122,69 @@ namespace UMAEditor
 
       public DNASingleEditor(UMADnaBase dna)
       {
-         var fields = dna.GetType().GetFields();
-
-         foreach (FieldInfo field in fields)
-         {
-            if (field.FieldType != typeof(float))
+            //DynamicUMADna:: needs a different set up
+            if (dna.GetType().ToString().IndexOf("DynamicUMADna") > -1)
             {
-               continue;
+                string[] dnaNames = ((DynamicUMADnaBase)dna).Names;
+                for (int i = 0; i < dnaNames.Length; i++)
+                {
+                    string fieldName = ObjectNames.NicifyVariableName(dnaNames[i]);
+                    string groupName = "Other";
+                    string[] chunks = fieldName.Split(' ');
+                    if (chunks.Length > 1)
+                    {
+                        groupName = chunks[0];
+                        fieldName = fieldName.Substring(groupName.Length + 1);
+                    }
+
+                    DNAGroupEditor group;
+                    _groups.TryGetValue(groupName, out @group);
+
+                    if (group == null)
+                    {
+                        @group = new DNAGroupEditor(groupName);
+                        _groups.Add(groupName, @group);
+                    }
+
+                    var entry = new DNAFieldEditor(fieldName, dnaNames[i], dna.GetValue(i), dna);
+
+                    @group.Add(entry);
+                }
+                foreach (var group in _groups.Values)
+                    @group.Sort();
             }
-
-            string fieldName;
-            string groupName;
-            GetNamesFromField(field, out fieldName, out groupName);
-
-            DNAGroupEditor group;
-            _groups.TryGetValue(groupName, out @group);
-
-            if (group == null)
+            else
             {
-               @group = new DNAGroupEditor(groupName);
-               _groups.Add(groupName,  @group);
+                var fields = dna.GetType().GetFields();
+
+                foreach (FieldInfo field in fields)
+                {
+                    if (field.FieldType != typeof(float))
+                    {
+                        continue;
+                    }
+
+                    string fieldName;
+                    string groupName;
+                    GetNamesFromField(field, out fieldName, out groupName);
+
+                    DNAGroupEditor group;
+                    _groups.TryGetValue(groupName, out @group);
+
+                    if (group == null)
+                    {
+                        @group = new DNAGroupEditor(groupName);
+                        _groups.Add(groupName, @group);
+                    }
+
+                    var entry = new DNAFieldEditor(fieldName, field, dna);
+
+                    @group.Add(entry);
+                }
+
+                foreach (var group in _groups.Values)
+                    @group.Sort();
             }
-
-            var entry = new DNAFieldEditor(fieldName, field, dna);
-
-            @group.Add(entry);
-         }
-
-         foreach (var group in _groups.Values)
-            @group.Sort();
       }
 
       private static void GetNamesFromField(FieldInfo field, out string fieldName, out string groupName)
@@ -206,10 +260,21 @@ namespace UMAEditor
       public static Comparer comparer = new Comparer();
       private readonly UMADnaBase _dna;
       private readonly FieldInfo _field;
-      private readonly string _name;
+        //DynamicUmaDna:: requires the following
+        private readonly string _realName;
+        private readonly string _name;
       private readonly float _value;
 
-      public DNAFieldEditor(string name, FieldInfo field, UMADnaBase dna)
+        //DynamicUmaDna:: needs a different constructor
+        public DNAFieldEditor(string name, string realName, float value, UMADnaBase dna)
+        {
+            _name = name;
+            _realName = realName;
+            _dna = dna;
+
+            _value = value;
+        }
+        public DNAFieldEditor(string name, FieldInfo field, UMADnaBase dna)
       {
          _name = name;
          _field = field;
@@ -225,8 +290,16 @@ namespace UMAEditor
 
          if (newValue != _value)
          {
-            _field.SetValue(_dna, newValue);
-            return true;
+                //DynamicUmaDna:: we need a different setter
+                if (_dna.GetType().ToString().IndexOf("DynamicUMADna") > -1)
+                {
+                    ((DynamicUMADnaBase)_dna).SetValue(_realName, newValue);
+                }
+                else
+                {
+                    _field.SetValue(_dna, newValue);
+                }
+                return true;
          }
 
          return false;
@@ -466,8 +539,11 @@ namespace UMAEditor
       {
          bool changed = false;
 
-         // Have to be able to assign a race on a new recipe.
-         RaceData newRace = (RaceData)EditorGUILayout.ObjectField("RaceData",_recipe.raceData,typeof(RaceData),false);
+            //DynamicCharacterSystem:: Wardrobe recipes dont need a race set here as they have their own list of compatible races
+            //Its also better if a race IS NOT SET so that we dont get warnings when rendering about things being incompatible
+            //It would be great to disable the following in that case but unfortunately _recipe is UMAData.UMARecipe - so we cant fix this right now...
+            // Have to be able to assign a race on a new recipe.
+            RaceData newRace = (RaceData)EditorGUILayout.ObjectField("RaceData",_recipe.raceData,typeof(RaceData),false);
          if (_recipe.raceData == null) {
             GUIHelper.BeginVerticalPadded (10, new Color (0.55f, 0.25f, 0.25f));    
             GUILayout.Label ("Warning: No race data is set!");
