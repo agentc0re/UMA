@@ -632,8 +632,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 305676972}
   m_HandleRect: {fileID: 305676970}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 1
+  m_Value: 0.5
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1865,17 +1865,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af723046b087198438ac4a32f7c25186, type: 2}
   - {fileID: 11400000, guid: 2aa0d5cae5c57a146ad6e43889520c12, type: 2}
   - {fileID: 11400000, guid: 70b61d5f511fec649a7f297690b022a1, type: 2}
-  - {fileID: 11400000, guid: 6a69bfc2077db884b8222ce2056b00b2, type: 2}
-  - {fileID: 11400000, guid: f23acecfb9866f94887dff118fa19a43, type: 2}
-  - {fileID: 11400000, guid: e8a4eeaba5c6d154da6403b8bedc5007, type: 2}
-  - {fileID: 11400000, guid: 0756e24ac1058274aa66a121bceab5e3, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 11400000, guid: 29644edbda94cd94baecf85f3c7bf194, type: 2}
-  - {fileID: 11400000, guid: 7baf687f2f056474b859e70288d972eb, type: 2}
-  - {fileID: 11400000, guid: 263d4cfb26ac41146beefaba8a842884, type: 2}
-  - {fileID: 11400000, guid: 7c4c6c146d660134da563a694738c990, type: 2}
-  - {fileID: 11400000, guid: c08906acc3dc10e4d95de2df28321eb4, type: 2}
-  - {fileID: 11400000, guid: d68d771a20cc5424aa800529469fa1b8, type: 2}
-  - {fileID: 11400000, guid: a728c5969e168984eb6bccc516c307e9, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 11400000, guid: 25df90b5e017453499c48fdb9051267c, type: 2}
   - {fileID: 11400000, guid: 335dc3fe2bdb9a24ea853d1023a2ab3e, type: 2}
   - {fileID: 11400000, guid: bc97a0ea4a9277443a7680b85479aa32, type: 2}
@@ -3226,18 +3226,6 @@ MonoBehaviour:
       _recipe: {fileID: 11400000, guid: 7d854ee186b4cb8499257fc6c7433be0, type: 2}
       _compatibleRaces:
       - ToonFemale
-    - _recipeName: StarcasterMale
-      _recipe: {fileID: 11400000, guid: 2f3ea69d4dca02f46a03cbd281a87204, type: 2}
-      _compatibleRaces:
-      - ToonMale
-    - _recipeName: ToonHair2
-      _recipe: {fileID: 11400000, guid: 7f3c22be42c5ef14b82ac5b36109f044, type: 2}
-      _compatibleRaces:
-      - ToonMale
-    - _recipeName: ToonMaleUnderwear1
-      _recipe: {fileID: 11400000, guid: 6a45190d2a9563d4bb0b6f713b1641ec, type: 2}
-      _compatibleRaces:
-      - ToonMale
     - _recipeName: FemaleHair1-Res
       _recipe: {fileID: 11400000, guid: c80ee805aa5b13c4bb0eb211433f2fba, type: 2}
       _compatibleRaces:
@@ -3251,10 +3239,6 @@ MonoBehaviour:
       type: 2}
     animators:
     - raceName: ToonFemale
-      animatorControllerName: IdleTest-w-head
-      animatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
-        type: 2}
-    - raceName: ToonMale
       animatorControllerName: IdleTest-w-head
       animatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
         type: 2}
@@ -3614,18 +3598,6 @@ MonoBehaviour:
       _recipe: {fileID: 11400000, guid: 7d854ee186b4cb8499257fc6c7433be0, type: 2}
       _compatibleRaces:
       - ToonFemale
-    - _recipeName: StarcasterMale
-      _recipe: {fileID: 11400000, guid: 2f3ea69d4dca02f46a03cbd281a87204, type: 2}
-      _compatibleRaces:
-      - ToonMale
-    - _recipeName: ToonHair2
-      _recipe: {fileID: 11400000, guid: 7f3c22be42c5ef14b82ac5b36109f044, type: 2}
-      _compatibleRaces:
-      - ToonMale
-    - _recipeName: ToonMaleUnderwear1
-      _recipe: {fileID: 11400000, guid: 6a45190d2a9563d4bb0b6f713b1641ec, type: 2}
-      _compatibleRaces:
-      - ToonMale
     - _recipeName: FemaleHair1-Res
       _recipe: {fileID: 11400000, guid: c80ee805aa5b13c4bb0eb211433f2fba, type: 2}
       _compatibleRaces:
@@ -3639,10 +3611,6 @@ MonoBehaviour:
       type: 2}
     animators:
     - raceName: ToonFemale
-      animatorControllerName: IdleTest-w-head
-      animatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
-        type: 2}
-    - raceName: ToonMale
       animatorControllerName: IdleTest-w-head
       animatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
         type: 2}
@@ -7191,18 +7159,6 @@ MonoBehaviour:
       _recipe: {fileID: 11400000, guid: 7d854ee186b4cb8499257fc6c7433be0, type: 2}
       _compatibleRaces:
       - ToonFemale
-    - _recipeName: StarcasterMale
-      _recipe: {fileID: 11400000, guid: 2f3ea69d4dca02f46a03cbd281a87204, type: 2}
-      _compatibleRaces:
-      - ToonMale
-    - _recipeName: ToonHair2
-      _recipe: {fileID: 11400000, guid: 7f3c22be42c5ef14b82ac5b36109f044, type: 2}
-      _compatibleRaces:
-      - ToonMale
-    - _recipeName: ToonMaleUnderwear1
-      _recipe: {fileID: 11400000, guid: 6a45190d2a9563d4bb0b6f713b1641ec, type: 2}
-      _compatibleRaces:
-      - ToonMale
     - _recipeName: FemaleHair1-Res
       _recipe: {fileID: 11400000, guid: c80ee805aa5b13c4bb0eb211433f2fba, type: 2}
       _compatibleRaces:
@@ -7216,10 +7172,6 @@ MonoBehaviour:
       type: 2}
     animators:
     - raceName: ToonFemale
-      animatorControllerName: IdleTest-w-head
-      animatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
-        type: 2}
-    - raceName: ToonMale
       animatorControllerName: IdleTest-w-head
       animatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
         type: 2}
@@ -11690,18 +11642,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c03cf28ed277e7246a4dfc2e6b550cc1, type: 2}
   - {fileID: 11400000, guid: 0ec96409ed505ea41a08ee9f877fb5cc, type: 2}
   - {fileID: 11400000, guid: 1c93c34e5ba9413419409dce673c4656, type: 2}
-  - {fileID: 11400000, guid: 5796a4e4acdd63d46880579a45e10eb9, type: 2}
-  - {fileID: 11400000, guid: fb5e508539b15bb49be02fbdb3a0272a, type: 2}
-  - {fileID: 11400000, guid: 0349dc358f24856488d8568522a842cc, type: 2}
-  - {fileID: 11400000, guid: ca3035e322676cd4f97367b3f6a8f0bf, type: 2}
-  - {fileID: 11400000, guid: 56a94cae7b0476c42a78366f63a7ff61, type: 2}
-  - {fileID: 11400000, guid: 6554d0bf30c848f49ac74be0cf02d02d, type: 2}
-  - {fileID: 11400000, guid: 4a9e9a1cdb629df47883eb525108780b, type: 2}
-  - {fileID: 11400000, guid: 6c603b733441d554c8944c4b8bc0c525, type: 2}
-  - {fileID: 11400000, guid: 8e9fad72eaa553a42bd7e41f4506bd56, type: 2}
-  - {fileID: 11400000, guid: 99cf4735659c3ad409ccbaba83f6d734, type: 2}
-  - {fileID: 11400000, guid: 7ae2ad46fc8723a449c0fcb591875320, type: 2}
-  - {fileID: 11400000, guid: 4f174b4f153b7904e83ea487fc40a843, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 11400000, guid: 0dfbf95a2c3548040a6cc23330e64d76, type: 2}
   - {fileID: 11400000, guid: ce2cca2d60a3a964e96c77683b6263db, type: 2}
   - {fileID: 11400000, guid: 1e7ddc02cd51b41488288a4982ca4274, type: 2}
@@ -12522,15 +12474,15 @@ MonoBehaviour:
       _compatibleRaces:
       - ToonFemale
     - _recipeName: StarcasterMale
-      _recipe: {fileID: 11400000, guid: 2f3ea69d4dca02f46a03cbd281a87204, type: 2}
+      _recipe: {fileID: 0}
       _compatibleRaces:
       - ToonMale
     - _recipeName: ToonHair2
-      _recipe: {fileID: 11400000, guid: 7f3c22be42c5ef14b82ac5b36109f044, type: 2}
+      _recipe: {fileID: 0}
       _compatibleRaces:
       - ToonMale
     - _recipeName: ToonMaleUnderwear1
-      _recipe: {fileID: 11400000, guid: 6a45190d2a9563d4bb0b6f713b1641ec, type: 2}
+      _recipe: {fileID: 0}
       _compatibleRaces:
       - ToonMale
     - _recipeName: FemaleHair1-Res
