@@ -486,15 +486,18 @@ namespace UMA
             //overall modifiers
             if (overallScaleFound && lowerBackScaleFound && overallModifiersEnabled)
             {
-                umaData.characterHeight = overallScaleCalc * (heightModifiers.x + heightModifiers.y * lowerBackScale);
-                umaData.characterRadius = radiusModifier * overallScaleCalc;
+                
                 if(umaDna == null)
                 {
+                    umaData.characterHeight = overallScaleCalc * (heightModifiers.x + heightModifiers.y * lowerBackScale);
                     umaData.characterMass = massModifiers.x * overallScaleCalc + massModifiers.y + massModifiers.z;
+                    umaData.characterRadius = radiusModifier * overallScaleCalc;
                 }
                 else
                 {
+                    umaData.characterHeight = overallScaleCalc * (heightModifiers.x + heightModifiers.y * lowerBackScale) + ((((DynamicUMADnaBase)umaDna).GetValue("feetSize") - 0.5f) * 0.20f);
                     umaData.characterMass = massModifiers.x * overallScaleCalc + massModifiers.y * ((DynamicUMADnaBase)umaDna).GetValue("upperWeight") + massModifiers.z * ((DynamicUMADnaBase)umaDna).GetValue("lowerWeight");
+                    umaData.characterRadius = 0.24f + ((((DynamicUMADnaBase)umaDna).GetValue("height") - 0.5f) * 0.32f) + ((((DynamicUMADnaBase)umaDna).GetValue("upperMuscle") - 0.5f) * 0.01f);
                 }
             }
             if (startingPose != null && asReset == false)
