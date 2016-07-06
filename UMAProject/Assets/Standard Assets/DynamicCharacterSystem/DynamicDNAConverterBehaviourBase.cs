@@ -17,7 +17,6 @@ namespace UMA
             return base.GetDnaTypeHash();
         }
 
-        //This would have to be an abstract method I think...
         public static void FixUpUMADnaToDynamicUMADna(UMAData.UMARecipe _recipe)
         {
             Debug.Log("Converting UMADnaHumanoid/Tutorial to DynamicUMADna");
@@ -26,7 +25,6 @@ namespace UMA
             bool needsHumanoidDnaUpdate = false;
             bool needsTutorialDnaUpdate = false;
             var currentDNA = _recipe.GetAllDna();
-            //TODO this check should maybe also check for anything that inherits from UMADnaHumanoid/Tutorial?
             for (int i = 0; i < currentDNA.Length; i++)
             {
                 if (currentDNA[i].GetType().ToString() == "UMA.UMADnaHumanoid")
@@ -79,13 +77,6 @@ namespace UMA
                 if (dnaImported > 0)//we say greater than 0 because we want to get rid of Humanoid even if all the values did not cross over
                 {
                     Debug.Log("UMADnaHumanoid/Tutorial imported successfully");
-                    //remove the UMADnaHumanoid from current DNA
-                    /*for (int i = 0; i < currentDNA.Length; i++)
-                    {
-                        if (i != thisUMADnaHumanoid && i != thisUMADnaTutorial)
-                            newCurrentDna.Add(currentDNA[i]);
-                    }
-                    currentDNA = newCurrentDna.ToArray();*/
                     //remove the UMADnaHumanoid/Tutorial from the recipe
                     if (thisUMADnaHumanoid > -1)
                         _recipe.RemoveDna(UMAUtils.StringToHash("UMADnaHumanoid"));
