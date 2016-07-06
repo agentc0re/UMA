@@ -3683,13 +3683,13 @@ MonoBehaviour:
   heightModifiers: {x: 0.85, y: 1.2}
   radiusModifier: 0.26
   massModifiers: {x: 42, y: 28, z: 22}
-  startingPose: {fileID: 11400000, guid: 5ab2d970de3c3bf4d9062517fe98093e, type: 2}
+  startingPose: {fileID: 0}
   startingPoseWeight: 1
   lastKnownAssetPath: Assets/UMA/Extensions/DynamicCharacterSystem/Resources/HumanFemaleResourcesExample/RaceBase/DNA/HumanFemaleSerializedDNAConverterBehaviour
     1b.prefab
   lastKnownDuplicateAssetPath: Assets/UMA/Extensions/DynamicCharacterSystem/Resources/HumanFemaleResourcesExample/RaceBase/DNA/HumanFemaleSerializedDNAConverterBehaviour
     1b 1.prefab
-  lastKnownInstanceID: 13782
+  lastKnownInstanceID: 16686
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
