@@ -140,7 +140,7 @@ public class DynamicOverlayLibrary : OverlayLibrary
         {
             if (overlayName == "")
                 AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<OverlayDataAsset>(resourcesFolderPath, UMAUtils.StringToHash(overlayName), "", AddOverlayAssets);
+            found = DynamicAssetLoader.Instance.AddAssetsFromResources<OverlayDataAsset>(resourcesFolderPath, null, overlayName, AddOverlayAssets);
         }
         if (dynamicallyAddFromAssetBundles && (overlayName == "" || found == false))
         {

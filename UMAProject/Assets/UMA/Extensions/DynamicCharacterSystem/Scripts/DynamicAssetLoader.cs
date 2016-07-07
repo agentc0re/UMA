@@ -460,6 +460,12 @@ namespace UMA
                 if (inbundle.Length > 0)
                     skipDeepSearch = true;
             }
+            else if(found == false && AssetBundleManager.SimulateAssetBundleInEditor)
+            {
+                //we could actually run the assetbundle search here if we are in simulation mode since its miles quicker than the following resources search
+                var dummyAssetBundlesUsedDict = new Dictionary<string, List<string>>();
+                found = SimulateAddAssetsFromAssetBundles<T>(ref dummyAssetBundlesUsedDict, "", assetNameHash, assetName, callback);
+            }
             if (found == false && skipDeepSearch == false)
             {
                 foreach (string path in resourcesFolderPathArray)
@@ -800,8 +806,8 @@ namespace UMA
             var typeString = typeParameterType.FullName;
             if (assetNameHash != null)
             {
-                //actually this is not true. We could load all assets of type, iterate over them and get the hash and see if it matches...
-                Debug.Log("It is not currently possible to search for assets in assetbundles using the assetNameHash. " + typeString + " is trying to do this with assetNameHash " + assetNameHash);
+                //actually this is not true. We could load all assets of type, iterate over them and get the hash and see if it matches...But then that would be as slow as loading from resources was
+                Debug.Log("It is not currently possible to search for assetBundle assets in SimulationMode using the assetNameHash. " + typeString + " is trying to do this with assetNameHash " + assetNameHash);
             }
             string[] allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
             string[] assetBundleNamesArray;

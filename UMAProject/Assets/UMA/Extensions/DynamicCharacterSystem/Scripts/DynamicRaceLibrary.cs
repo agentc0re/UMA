@@ -30,8 +30,6 @@ public class DynamicRaceLibrary : RaceLibrary
 
     bool AllResourcesScanned = false;
 
-    Coroutine WaitForAssetBundleManagerCO = null;
-
     public void Start()
     {
         if (Application.isPlaying)

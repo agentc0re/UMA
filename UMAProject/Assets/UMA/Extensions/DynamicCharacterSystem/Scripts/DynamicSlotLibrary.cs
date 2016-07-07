@@ -138,7 +138,7 @@ public class DynamicSlotLibrary : SlotLibrary
         {
             if (slotName == "")
                 AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<SlotDataAsset>(resourcesFolderPath, UMAUtils.StringToHash(slotName), "", AddSlotAssets);
+            found = DynamicAssetLoader.Instance.AddAssetsFromResources<SlotDataAsset>(resourcesFolderPath, null, slotName, AddSlotAssets);
         }
         if (dynamicallyAddFromAssetBundles && (slotName == "" || found == false))
         {
