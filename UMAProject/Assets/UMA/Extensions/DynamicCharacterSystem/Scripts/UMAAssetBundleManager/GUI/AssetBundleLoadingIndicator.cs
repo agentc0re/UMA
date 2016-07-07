@@ -183,7 +183,7 @@ namespace UMAAssetBundleManager
             {
                 indicatorBar.value = 1f;
             }
-            yield return new WaitForSeconds(delayHideWhenDone);
+            //yield return new WaitForSeconds(delayHideWhenDone);
             ResetAndHide();
         }
 

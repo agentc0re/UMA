@@ -103,10 +103,20 @@ namespace UMA
         #endregion
         public TypeIndex[] data = new TypeIndex[0];
 
+        /// <summary>
+        /// Adds a path terporarily to the index. To add it permanently use UMAResourcesIndex.Instance.Add
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="objName"></param>
         public void AddPath(UnityEngine.Object obj, string objName)
         {
             AddPath(obj, UMAUtils.StringToHash(objName));
         }
+        /// <summary>
+        /// Adds a path terporarily to the index. To add it permanently use UMAResourcesIndex.Instance.Add
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="objNameHash"></param>
         public void AddPath(UnityEngine.Object obj, int objNameHash)
         {
             if (obj == null)
@@ -167,18 +177,45 @@ namespace UMA
                 }
             }
         }
-
-        public string GetPath<T>(string thisName) where T : UnityEngine.Object
+        /// <summary>
+        /// Get a path out of the index, optionally filtering result based on specified folders
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="thisName"></param>
+        /// <param name="foldersToSearch"></param>
+        /// <returns></returns>
+        public string GetPath<T>(string thisName, string[] foldersToSearch = null) where T : UnityEngine.Object
         {
-            return GetPath<T>(UMAUtils.StringToHash(thisName));
+            return GetPath<T>(UMAUtils.StringToHash(thisName), foldersToSearch);
         }
-        public string GetPath<T>(int nameHash) where T : UnityEngine.Object
+        /// <summary>
+        /// Get a path out of the index, optionally filtering result based on specified folders
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="nameHash"></param>
+        /// <param name="foldersToSearch"></param>
+        /// <returns></returns>
+        public string GetPath<T>(int nameHash, string[] foldersToSearch = null) where T : UnityEngine.Object
         {
             for (int i = 0; i < data.Length; i++)
             {
                 if (data[i].type == typeof(T).ToString())
                 {
-                    return data[i].Get(nameHash);
+                    var foundPath = data[i].Get(nameHash);
+                    if (foldersToSearch != null && foldersToSearch.Length > 0)
+                    {
+                        for(int ii = 0; ii < foldersToSearch.Length; ii++)
+                        {
+                            if(foundPath.IndexOf(foldersToSearch[ii]) > -1)
+                            {
+                                return foundPath;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return foundPath;
+                    }
                 }
             }
             return "";

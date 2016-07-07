@@ -633,7 +633,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 305676970}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3293,7 +3293,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
 --- !u!114 &363062549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3665,7 +3665,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
 --- !u!114 &385653674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6498,7 +6498,7 @@ Transform:
   - {fileID: 1289554245}
   - {fileID: 2079422107}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!1 &805294999
 GameObject:
   m_ObjectHideFlags: 0
@@ -6942,7 +6942,7 @@ Transform:
   - {fileID: 518079763}
   - {fileID: 2079936342}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
 --- !u!1 &893401640
 GameObject:
   m_ObjectHideFlags: 0
@@ -7153,7 +7153,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
 --- !u!114 &893401644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7263,7 +7263,7 @@ RectTransform:
   - {fileID: 564266366}
   - {fileID: 2111217992}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -9684,7 +9684,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
 --- !u!114 &1326423181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10230,7 +10230,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 1.74}
@@ -12043,15 +12043,316 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1613494037}
---- !u!1 &1656948702
+--- !u!1 &1658982380
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1656948704}
-  - 114: {fileID: 1656948703}
+  - 224: {fileID: 1658982381}
+  - 222: {fileID: 1658982384}
+  - 114: {fileID: 1658982383}
+  - 114: {fileID: 1658982382}
+  - 114: {fileID: 1658982385}
+  m_Layer: 5
+  m_Name: BtnWardrobe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1658982381
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1658982380}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1412197964}
+  m_Father: {fileID: 1566076950}
+  m_RootOrder: 1
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 261.1453, y: -25}
+  m_SizeDelta: {x: 180.29628, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1658982382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1658982380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1658982383}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1326423181}
+        m_MethodName: ShowHideWardrobeDropdowns
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &1658982383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1658982380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &1658982384
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1658982380}
+--- !u!114 &1658982385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1658982380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1679637790, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1.3
+  m_FlexibleHeight: -1
+--- !u!1 &1687655965
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1687655966}
+  - 222: {fileID: 1687655969}
+  - 114: {fileID: 1687655968}
+  - 114: {fileID: 1687655967}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1687655966
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1687655965}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 146165254}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1687655967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1687655965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1679637790, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 5
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+--- !u!114 &1687655968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1687655965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Get ToonFemale Wardrobe2 <i>(ToonFemale)</i>: $10000'
+--- !u!222 &1687655969
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1687655965}
+--- !u!1 &1693580477
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1693580478}
+  - 222: {fileID: 1693580481}
+  - 114: {fileID: 1693580480}
+  m_Layer: 5
+  m_Name: OverviewBut
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1693580478
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1693580477}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1526319211}
+  - {fileID: 1188966355}
+  m_Father: {fileID: 930765368}
+  m_RootOrder: 3
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 15}
+  m_SizeDelta: {x: 130, y: 50}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &1693580480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1693580477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &1693580481
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1693580477}
+--- !u!1 &1705365348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1705365350}
+  - 114: {fileID: 1705365349}
   m_Layer: 0
   m_Name: UMAResourcesIndex
   m_TagString: Untagged
@@ -12059,12 +12360,12 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1656948703
+--- !u!114 &1705365349
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1656948702}
+  m_GameObject: {fileID: 1705365348}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1204365021c0c848882e62d0caf1ce6, type: 3}
@@ -12072,168 +12373,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Index:
     data:
-    - type: UMA.DynamicUMADnaAsset
-      typeFiles:
-      - nameHash: 1659336102
-        path: HumanFemaleResourcesExample/RaceBase/DNA/HumanFemaleDNA 1
-      - nameHash: -1537030843
-        path: HumanFemaleResourcesExample/RaceBase/DNA/EyeSpacing
-      - nameHash: 749242782
-        path: HumanGirlResourcesExample/RaceBase/DNA/HumanGirlDNA
-      - nameHash: 1200865674
-        path: HumanMaleDna/HumanMaleDynamicDnaAsset
-    - type: UMA.SlotDataAsset
-      typeFiles:
-      - nameHash: 1359425300
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Feet_Slot
-          1
-      - nameHash: -816462944
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Hands_Slot
-          1
-      - nameHash: -1993551920
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Eyes_Slot
-          1
-      - nameHash: 140901836
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Torso_Slot
-          1
-      - nameHash: 308288387
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Legs_Slot
-          1
-      - nameHash: -1384929192
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Face_Slot
-          1
-      - nameHash: 949974205
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_InnerMouth_Slot
-          1
-      - nameHash: -921950741
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/FemaleEyelash
-          1
-      - nameHash: 407492320
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleLongHair01-Res
-      - nameHash: 1963768353
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleLongHair01_Module-Res
-      - nameHash: -1034322341
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleTshirt01-Res
-      - nameHash: 688492029
-        path: Slots/Toon/UMA_Toon_LASHES-Female_Guide
-      - nameHash: 677366509
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_ElvenEars_Slot
-          1
-      - nameHash: 861182728
-        path: Slots/Toon/UMA_Toon_FEET_Guide
-      - nameHash: 517722962
-        path: Slots/UMA_Human_Female_Eyes_SlotGuide
-      - nameHash: 602070288
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Head_Slot
-          1
-      - nameHash: 1929891632
-        path: Slots/Toon/StarCaster_Edge_Guide
-      - nameHash: -1427704956
-        path: Slots/PlaceholderTorso
-      - nameHash: 1063560695
-        path: Slots/Toon/UMA_Toon_INNERMOUTH_Guide
-      - nameHash: 455792501
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Ears_Slot
-          1
-      - nameHash: 491574392
-        path: Slots/PlaceholderSlot
-      - nameHash: 944939254
-        path: Slots/UMA_Human_Female_Hands_SlotGuide
-      - nameHash: -342393607
-        path: Slots/PlaceholderHands
-      - nameHash: 2137284791
-        path: Slots/Toon/StarCaster_Eye_R_Guide
-      - nameHash: 1372076031
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Eyes_Slot
-          1
-      - nameHash: 734928376
-        path: Slots/Toon/StarCaster_Face_1b_Guide
-      - nameHash: 250826820
-        path: Slots/UMA_Human_Female_Legs_SlotGuide
-      - nameHash: 813391558
-        path: Slots/UMA_Human_Female_Torso_SlotGuide
-      - nameHash: 1059034116
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleShortHair01-Res
-      - nameHash: 1216710436
-        path: Slots/Toon/StarCaster_Eye_L_Guide
-      - nameHash: 1656125228
-        path: Slots/FemaleEyelashGuide
-      - nameHash: 31267853
-        path: Slots/Toon/UMA_Toon_TORSO-Female_Guide
-      - nameHash: -1841619697
-        path: Slots/UMA_Human_Female_InnerMouth_SlotGuide
-      - nameHash: -414131903
-        path: Slots/Toon/UMA_Toon_FACE-Female_Guide
-      - nameHash: 1045893557
-        path: Slots/UMA_Human_Female_Face_SlotGuide
-      - nameHash: 1462808544
-        path: Slots/Toon/UMA_Toon_EYES_Guide
-      - nameHash: -1883922224
-        path: Slots/PlaceholderFeet
-      - nameHash: 847446521
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Nose_Slot
-          1
-      - nameHash: 356603942
-        path: Slots/Toon/UMA_Toon_LEGS-Female_Guide
-      - nameHash: 1458534598
-        path: Slots/Toon/StarCaster_Mouth_1b_Guide
-      - nameHash: 289930059
-        path: Slots/UMA_Human_Female_Feet_SlotGuide
-      - nameHash: -1131820760
-        path: Slots/Toon/UMA_Toon_HANDS_Guide
-      - nameHash: 1281013653
-        path: Slots/PlaceholderLegs
-      - nameHash: -746979518
-        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Mouth_Slot
-          1
-      - nameHash: -2020816312
-        path: Slots/Toon/UMA_Toon_FACE_STARCASTER-Female_Guide
-      - nameHash: -1269395592
-        path: Slots/PlaceholderFace
-    - type: UMA.OverlayDataAsset
-      typeFiles:
-      - nameHash: 1148047082
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleBody01-Res
-      - nameHash: -2004342825
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleHead01-Res
-      - nameHash: -381975059
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleLipstick01-Res
-      - nameHash: -1753872797
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleEyebrow01-Res
-      - nameHash: 587140822
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleEyelash-Res
-      - nameHash: 407492320
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleLongHair01-Res
-      - nameHash: 1963768353
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleLongHair01_Module-Res
-      - nameHash: -1031105777
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleUnderwear02-Res
-      - nameHash: -180241003
-        path: HumanGirlResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/GirlBody01
-      - nameHash: -1034322341
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleTshirt01-Res
-      - nameHash: -539847272
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleJeans01-Res
-      - nameHash: -1426301804
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleShirt01-Res
-      - nameHash: -312727996
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleShirt02-Res
-      - nameHash: -2047277941
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleTshirt02-Res
-      - nameHash: -1737298104
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleJeans02-Res
-      - nameHash: -2060785185
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleUnderwear01-Res
-      - nameHash: -393787725
-        path: HumanGirlResourcesExample/Wardrobe1/Overlays/GirlShirt01Color
-      - nameHash: 1573650394
-        path: Overlays/GuideMeshOverlayTrans
-      - nameHash: 1183308871
-        path: Overlays/PlaceholderOverlay
-      - nameHash: 1059034116
-        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleShortHair01-Res
-      - nameHash: 63812666
-        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleBody02-Res
     - type: UnityEngine.Texture2D
       typeFiles:
       - nameHash: -480429847
@@ -12640,6 +12779,114 @@ MonoBehaviour:
         path: HumanFemaleResourcesExample/RaceBase/Expressions/Female Resources Poses/MouthNarrow
       - nameHash: -1704752410
         path: HumanGirlResourcesExample/RaceBase/Expressions/Girl Poses/TongueOut_Partial
+    - type: UMA.SlotDataAsset
+      typeFiles:
+      - nameHash: 688492029
+        path: Slots/Toon/UMA_Toon_LASHES-Female_Guide
+      - nameHash: 677366509
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_ElvenEars_Slot
+          1
+      - nameHash: 1359425300
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Feet_Slot
+          1
+      - nameHash: 1963768353
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleLongHair01_Module-Res
+      - nameHash: 861182728
+        path: Slots/Toon/UMA_Toon_FEET_Guide
+      - nameHash: 517722962
+        path: Slots/UMA_Human_Female_Eyes_SlotGuide
+      - nameHash: 602070288
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Head_Slot
+          1
+      - nameHash: 407492320
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleLongHair01-Res
+      - nameHash: 949974205
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_InnerMouth_Slot
+          1
+      - nameHash: 1929891632
+        path: Slots/Toon/StarCaster_Edge_Guide
+      - nameHash: -1427704956
+        path: Slots/PlaceholderTorso
+      - nameHash: 1063560695
+        path: Slots/Toon/UMA_Toon_INNERMOUTH_Guide
+      - nameHash: 455792501
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Ears_Slot
+          1
+      - nameHash: 491574392
+        path: Slots/PlaceholderSlot
+      - nameHash: 944939254
+        path: Slots/UMA_Human_Female_Hands_SlotGuide
+      - nameHash: -1034322341
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleTshirt01-Res
+      - nameHash: -342393607
+        path: Slots/PlaceholderHands
+      - nameHash: -816462944
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Hands_Slot
+          1
+      - nameHash: 2137284791
+        path: Slots/Toon/StarCaster_Eye_R_Guide
+      - nameHash: 1372076031
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Eyes_Slot
+          1
+      - nameHash: -1993551920
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Eyes_Slot
+          1
+      - nameHash: 734928376
+        path: Slots/Toon/StarCaster_Face_1b_Guide
+      - nameHash: 250826820
+        path: Slots/UMA_Human_Female_Legs_SlotGuide
+      - nameHash: 813391558
+        path: Slots/UMA_Human_Female_Torso_SlotGuide
+      - nameHash: 1059034116
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleShortHair01-Res
+      - nameHash: 1216710436
+        path: Slots/Toon/StarCaster_Eye_L_Guide
+      - nameHash: 1656125228
+        path: Slots/FemaleEyelashGuide
+      - nameHash: 140901836
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Torso_Slot
+          1
+      - nameHash: 31267853
+        path: Slots/Toon/UMA_Toon_TORSO-Female_Guide
+      - nameHash: -1841619697
+        path: Slots/UMA_Human_Female_InnerMouth_SlotGuide
+      - nameHash: -414131903
+        path: Slots/Toon/UMA_Toon_FACE-Female_Guide
+      - nameHash: 1045893557
+        path: Slots/UMA_Human_Female_Face_SlotGuide
+      - nameHash: 1462808544
+        path: Slots/Toon/UMA_Toon_EYES_Guide
+      - nameHash: -1883922224
+        path: Slots/PlaceholderFeet
+      - nameHash: 308288387
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Legs_Slot
+          1
+      - nameHash: -1384929192
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/UMA_Human_Female_Face_Slot
+          1
+      - nameHash: 847446521
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Nose_Slot
+          1
+      - nameHash: 356603942
+        path: Slots/Toon/UMA_Toon_LEGS-Female_Guide
+      - nameHash: 1458534598
+        path: Slots/Toon/StarCaster_Mouth_1b_Guide
+      - nameHash: 289930059
+        path: Slots/UMA_Human_Female_Feet_SlotGuide
+      - nameHash: -921950741
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeSlots/FemaleEyelash
+          1
+      - nameHash: -1131820760
+        path: Slots/Toon/UMA_Toon_HANDS_Guide
+      - nameHash: 1281013653
+        path: Slots/PlaceholderLegs
+      - nameHash: -746979518
+        path: HumanFemaleResourcesExample/Wardrobe1/Slots/FemaleSwappedHead/UMA_Human_Female_Head_Mouth_Slot
+          1
+      - nameHash: -2020816312
+        path: Slots/Toon/UMA_Toon_FACE_STARCASTER-Female_Guide
+      - nameHash: -1269395592
+        path: Slots/PlaceholderFace
     - type: UnityEngine.TextAsset
       typeFiles:
       - nameHash: 529800099
@@ -12718,6 +12965,50 @@ MonoBehaviour:
         path: Recipes/MaleShirt1
       - nameHash: 1759565287
         path: HumanFemaleResourcesExample/Wardrobe1/Recipes/FemaleSwappedFace-Res
+    - type: UMA.OverlayDataAsset
+      typeFiles:
+      - nameHash: 407492320
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleLongHair01-Res
+      - nameHash: -2060785185
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleUnderwear01-Res
+      - nameHash: -2004342825
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleHead01-Res
+      - nameHash: 1148047082
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleBody01-Res
+      - nameHash: 1963768353
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleLongHair01_Module-Res
+      - nameHash: -1031105777
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleUnderwear02-Res
+      - nameHash: -180241003
+        path: HumanGirlResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/GirlBody01
+      - nameHash: -1753872797
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleEyebrow01-Res
+      - nameHash: -2047277941
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleTshirt02-Res
+      - nameHash: -312727996
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleShirt02-Res
+      - nameHash: 587140822
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleEyelash-Res
+      - nameHash: -393787725
+        path: HumanGirlResourcesExample/Wardrobe1/Overlays/GirlShirt01Color
+      - nameHash: -1426301804
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleShirt01-Res
+      - nameHash: -1737298104
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleJeans02-Res
+      - nameHash: -1034322341
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleTshirt01-Res
+      - nameHash: 1573650394
+        path: Overlays/GuideMeshOverlayTrans
+      - nameHash: 1183308871
+        path: Overlays/PlaceholderOverlay
+      - nameHash: -381975059
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleLipstick01-Res
+      - nameHash: 1059034116
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleShortHair01-Res
+      - nameHash: -539847272
+        path: HumanFemaleResourcesExample/Wardrobe1/Overlays/FemaleJeans01-Res
+      - nameHash: 63812666
+        path: HumanFemaleResourcesExample/RaceBase/BaseRecipe/BaseRecipeOverlays/FemaleBody02-Res
     - type: UMA.DNARangeAsset
       typeFiles:
       - nameHash: -262804101
@@ -12765,323 +13056,32 @@ MonoBehaviour:
         path: HumanGirlResourcesExample/RaceBase/TPose/Girl_Unified_TPose
       - nameHash: 618520238
         path: HumanFemaleResourcesExample/RaceBase/TPose/Female_Resources_Unified_TPose
+    - type: UMA.DynamicUMADnaAsset
+      typeFiles:
+      - nameHash: 749242782
+        path: HumanGirlResourcesExample/RaceBase/DNA/HumanGirlDNA
+      - nameHash: 1659336102
+        path: HumanFemaleResourcesExample/RaceBase/DNA/HumanFemaleDNA 1
+      - nameHash: -1537030843
+        path: HumanFemaleResourcesExample/RaceBase/DNA/EyeSpacing
+      - nameHash: 1200865674
+        path: HumanMaleDna/HumanMaleDynamicDnaAsset
     - type: UnityEngine.Material
       typeFiles:
       - nameHash: -2005329935
         path: Material/PlaceholderShader
---- !u!4 &1656948704
+--- !u!4 &1705365350
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1656948702}
+  m_GameObject: {fileID: 1705365348}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
---- !u!1 &1658982380
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 224: {fileID: 1658982381}
-  - 222: {fileID: 1658982384}
-  - 114: {fileID: 1658982383}
-  - 114: {fileID: 1658982382}
-  - 114: {fileID: 1658982385}
-  m_Layer: 5
-  m_Name: BtnWardrobe
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1658982381
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1658982380}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1412197964}
-  m_Father: {fileID: 1566076950}
-  m_RootOrder: 1
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 261.1453, y: -25}
-  m_SizeDelta: {x: 180.29628, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1658982382
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1658982380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1658982383}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1326423181}
-        m_MethodName: ShowHideWardrobeDropdowns
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
---- !u!114 &1658982383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1658982380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
---- !u!222 &1658982384
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1658982380}
---- !u!114 &1658982385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1658982380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1679637790, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: -1
-  m_PreferredHeight: -1
-  m_FlexibleWidth: 1.3
-  m_FlexibleHeight: -1
---- !u!1 &1687655965
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 224: {fileID: 1687655966}
-  - 222: {fileID: 1687655969}
-  - 114: {fileID: 1687655968}
-  - 114: {fileID: 1687655967}
-  m_Layer: 5
-  m_Name: Text
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1687655966
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1687655965}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 146165254}
-  m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1687655967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1687655965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1679637790, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 5
-  m_PreferredHeight: -1
-  m_FlexibleWidth: -1
-  m_FlexibleHeight: -1
---- !u!114 &1687655968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1687655965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 4
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: 'Get ToonFemale Wardrobe2 <i>(ToonFemale)</i>: $10000'
---- !u!222 &1687655969
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1687655965}
---- !u!1 &1693580477
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 224: {fileID: 1693580478}
-  - 222: {fileID: 1693580481}
-  - 114: {fileID: 1693580480}
-  m_Layer: 5
-  m_Name: OverviewBut
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1693580478
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1693580477}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1526319211}
-  - {fileID: 1188966355}
-  m_Father: {fileID: 930765368}
-  m_RootOrder: 3
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 15}
-  m_SizeDelta: {x: 130, y: 50}
-  m_Pivot: {x: 0.5, y: 0}
---- !u!114 &1693580480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1693580477}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 0
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
---- !u!222 &1693580481
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1693580477}
+  m_RootOrder: 12
 --- !u!1 &1732080089
 GameObject:
   m_ObjectHideFlags: 0
@@ -14098,7 +14098,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
 --- !u!1 &1830782567
 GameObject:
   m_ObjectHideFlags: 0
@@ -14610,7 +14610,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 102905476}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14786,7 +14786,7 @@ RectTransform:
   m_LocalScale: {x: 0.80476826, y: 0.80476826, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 1.18}

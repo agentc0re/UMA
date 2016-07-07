@@ -170,15 +170,15 @@ namespace UMAAssetBundleManager
         public string[] FindContainingAssetBundle(string assetNameOrFilename, string type = "")
         {
             List<string> assetFoundIn = new List<string>();
-            foreach (AssetBundleIndexList iAssetList in bundlesIndex)
+            for(int i = 0; i < bundlesIndex.Count; i++)
             {
-                foreach (AssetBundleIndexItem iAsset in iAssetList.assetBundleAssets)
+                for(int ii = 0; ii < bundlesIndex[i].assetBundleAssets.Count; ii++)
                 {
-                    if (assetNameOrFilename == iAsset.assetName)
+                    if (assetNameOrFilename == bundlesIndex[i].assetBundleAssets[ii].assetName)
                     {
-                        if (type == "" || (type != "" && (type == iAsset.assetType || type == GetTypeWithoutAssembly(iAsset.assetType))))
+                        if (type == "" || (type != "" && (type == bundlesIndex[i].assetBundleAssets[ii].assetType || type == GetTypeWithoutAssembly(bundlesIndex[i].assetBundleAssets[ii].assetType))))
                         {
-                            assetFoundIn.Add(iAssetList.assetBundleName);
+                            assetFoundIn.Add(bundlesIndex[i].assetBundleName);
                         }
 
                     }
@@ -187,15 +187,15 @@ namespace UMAAssetBundleManager
             //if we didn't find it check the filename?
             if(assetFoundIn.Count == 0)
             {
-                foreach (AssetBundleIndexList iAssetList in bundlesIndex)
+                for (int i = 0; i < bundlesIndex.Count; i++)
                 {
-                    foreach (AssetBundleIndexItem iAsset in iAssetList.assetBundleAssets)
+                    for (int ii = 0; ii < bundlesIndex[i].assetBundleAssets.Count; ii++)
                     {
-                        if (assetNameOrFilename == iAsset.filename)
+                        if (assetNameOrFilename == bundlesIndex[i].assetBundleAssets[ii].filename)
                         {
-                            if (type == "" || (type != "" && (type == iAsset.assetType || type == GetTypeWithoutAssembly(iAsset.assetType))))
+                            if (type == "" || (type != "" && (type == bundlesIndex[i].assetBundleAssets[ii].assetType || type == GetTypeWithoutAssembly(bundlesIndex[i].assetBundleAssets[ii].assetType))))
                             {
-                                assetFoundIn.Add(iAssetList.assetBundleName);
+                                assetFoundIn.Add(bundlesIndex[i].assetBundleName);
                             }
 
                         }
@@ -213,15 +213,15 @@ namespace UMAAssetBundleManager
         public string[] FindContainingAssetBundle(int? assetNameHash, string type = "")
         {
             List<string> assetFoundIn = new List<string>();
-            foreach (AssetBundleIndexList iAssetList in bundlesIndex)
+            for (int i = 0; i < bundlesIndex.Count; i++)
             {
-                foreach (AssetBundleIndexItem iAsset in iAssetList.assetBundleAssets)
+                for (int ii = 0; ii < bundlesIndex[i].assetBundleAssets.Count; ii++)
                 {
-                    if (assetNameHash == iAsset.assetHash)
+                    if (assetNameHash == bundlesIndex[i].assetBundleAssets[ii].assetHash)
                     {
-                        if (type == "" || (type != "" && (type == iAsset.assetType || type == GetTypeWithoutAssembly(iAsset.assetType))))
+                        if (type == "" || (type != "" && (type == bundlesIndex[i].assetBundleAssets[ii].assetType || type == GetTypeWithoutAssembly(bundlesIndex[i].assetBundleAssets[ii].assetType))))
                         {
-                            assetFoundIn.Add(iAssetList.assetBundleName);
+                            assetFoundIn.Add(bundlesIndex[i].assetBundleName);
                         }
 
                     }

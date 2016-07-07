@@ -107,7 +107,6 @@ namespace UMA
             if (assetBundlesToPreLoad.Count > 0)
             {
                 yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
-                //we may need to update the libraries after this...
             }
         }
 
@@ -405,10 +404,10 @@ namespace UMA
         }
 #pragma warning restore 0219
 
-#endregion
+        #endregion
 
-#region LOAD ASSETS METHODS
-
+        #region LOAD ASSETS METHODS
+        
         /// <summary>
         /// Generic Library function to search Resources for a type of asset, optionally filtered by folderpath and asset assetNameHash or assetName. 
         /// Optionally sends the found assets to the supplied callback for processing.
@@ -419,23 +418,22 @@ namespace UMA
         /// <param name="assetName"></param>
         /// <param name="callback"></param>
         /// <returns>Returns true if a assetNameHash or assetName were specified and an asset with that assetNameHash or assetName is found. Else returns false.</returns>
-        /// TODO: Loading from resources like this is REALLY slow, but because UMA races/slots/overalays can have names that differ from the asset name there is no quick way to find them without loading them
-        /// What we could do is create an UMAResourcesIndex that indexed assets in a way that you could get the asset name by asking for the slot/overlay/race name
         public bool AddAssetsFromResources<T>(string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
         {
             bool found = false;
             List<T> assetsToReturn = new List<T>();
+            string[] resourcesFolderPathArray = SearchStringToArray(resourcesFolderPath);
             //Using new static resources index if available
-            if(UMAResourcesIndex.Instance != null)
+            if (UMAResourcesIndex.Instance != null)
             {
                 string foundAssetPath = "";
                 if (assetNameHash != null)
                 {
-                    foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>((int)assetNameHash);
+                    foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>((int)assetNameHash, resourcesFolderPathArray);
                 }
                 else if (assetName != "")
                 {
-                    foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>(assetName);
+                    foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>(assetName, resourcesFolderPathArray);
                 }
                 if(foundAssetPath != "")
                 {
@@ -447,36 +445,23 @@ namespace UMA
                     }
                 }
             }
-            /*if (!UMAResourcesIndex.ContainsKey(typeof(T)) && ((typeof(T) == typeof(SlotDataAsset)) || (typeof(T) == typeof(OverlayDataAsset)) || (typeof(T) == typeof(RaceData))))
+            //if its not in the index and we have an assetBundleIndex check if its in there before we do the following deep search in Resources because that is really slow
+            //we have to do resources first because we dont want to have to wait for the index if we dont need too
+            bool skipDeepSearch = false;
+            if(found == false && AssetBundleManager.AssetBundleIndexObject != null)
             {
-                UMAResourcesIndex[typeof(T)] = new Dictionary<int, string>();
-            }*/
-            /*if (UMAResourcesIndex.ContainsKey(typeof(T))){
-                if (assetNameHash != null || assetName != "")
-                {
-                    string foundAssetName = "";
-                    if (assetNameHash != null)
-                    {
-                        UMAResourcesIndex[typeof(T)].TryGetValue((int)assetNameHash, out foundAssetName);
-                    }
-                    else if (assetName != "")
-                    {
-                        UMAResourcesIndex[typeof(T)].TryGetValue(UMAUtils.StringToHash(assetName), out foundAssetName);
-                    }
-                    if(foundAssetName != "")
-                    {
-                       T foundAsset =  Resources.Load<T>(foundAssetName);//Wont be correct if there was a path Also bloody Resources wont find anything in subfolders so this is pretty useless
-                        if(foundAsset != null)
-                        {
-                            assetsToReturn.Add(foundAsset);
-                            found = true;
-                        }
-                    }
+                var typeString = typeof(T).FullName;
+                string[] inbundle = new string[0];
+                if(assetName != "")
+                    inbundle = AssetBundleManager.AssetBundleIndexObject.FindContainingAssetBundle(assetName, typeString);
+                else if(assetNameHash != null){
+                    inbundle = AssetBundleManager.AssetBundleIndexObject.FindContainingAssetBundle(assetNameHash, typeString);
                 }
-            }*/
-            if (found == false)
+                if (inbundle.Length > 0)
+                    skipDeepSearch = true;
+            }
+            if (found == false && skipDeepSearch == false)
             {
-                string[] resourcesFolderPathArray = SearchStringToArray(resourcesFolderPath);
                 foreach (string path in resourcesFolderPathArray)
                 {
                     T[] foundAssets = new T[0];
@@ -646,25 +631,25 @@ namespace UMA
                 {
                     List<string> processedBundleNamesArray = new List<string>();
                     var bundlesToSearchArray = SearchStringToArray(bundlesToSearch);
-                    foreach (string bundleToSearch in bundlesToSearchArray)
+                    for(int i = 0; i < bundlesToSearchArray.Length; i++)
                     {
-                        foreach (string bundleName in allAssetBundleNames)
+                        for(int ii = 0; ii < allAssetBundleNames.Length; ii++)
                         {
-                            if (bundleName.IndexOf(bundleToSearch) > -1 && !processedBundleNamesArray.Contains(bundleName))
+                            if (allAssetBundleNames[ii].IndexOf(bundlesToSearchArray[i]) > -1 && !processedBundleNamesArray.Contains(allAssetBundleNames[ii]))
                             {
-                                processedBundleNamesArray.Add(bundleName);
+                                processedBundleNamesArray.Add(allAssetBundleNames[ii]);
                             }
                         }
                     }
                     assetBundleNamesArray = processedBundleNamesArray.ToArray();
                 }
                 bool assetFound = false;
-                foreach (string assetBundleName in assetBundleNamesArray)
+                for (int i = 0; i < assetBundleNamesArray.Length; i++)
                 {
                     string error = "";
                     if (assetNameHash != null && assetName == "")
                     {
-                        assetName = AssetBundleManager.AssetBundleIndexObject.GetAssetNameFromHash(assetBundleName, assetNameHash, typeString);
+                        assetName = AssetBundleManager.AssetBundleIndexObject.GetAssetNameFromHash(assetBundleNamesArray[i], assetNameHash, typeString);
                     }
                     if (assetName != "" || assetNameHash != null)
                     {
@@ -672,31 +657,31 @@ namespace UMA
                         {
                             continue;
                         }
-                        bool assetBundleContains = AssetBundleManager.AssetBundleIndexObject.AssetBundleContains(assetBundleName, assetName, typeString);
+                        bool assetBundleContains = AssetBundleManager.AssetBundleIndexObject.AssetBundleContains(assetBundleNamesArray[i], assetName, typeString);
                         if (!assetBundleContains && typeof(T) == typeof(SlotDataAsset))
                         {
                             //try the '_Slot' version
-                            assetBundleContains = AssetBundleManager.AssetBundleIndexObject.AssetBundleContains(assetBundleName, assetName + "_Slot", typeString);
+                            assetBundleContains = AssetBundleManager.AssetBundleIndexObject.AssetBundleContains(assetBundleNamesArray[i], assetName + "_Slot", typeString);
                         }
                         if (assetBundleContains)
                         {
-                            if (AssetBundleManager.IsAssetBundleDownloaded(assetBundleName))
+                            if (AssetBundleManager.IsAssetBundleDownloaded(assetBundleNamesArray[i]))
                             {
-                                T target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleName, out error).m_AssetBundle.LoadAsset<T>(assetName);
+                                T target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(assetName);
                                 if (target == null && typeof(T) == typeof(SlotDataAsset))
                                 {
-                                    target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleName, out error).m_AssetBundle.LoadAsset<T>(assetName + "_Slot");
+                                    target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(assetName + "_Slot");
                                 }
                                 if (target != null)
                                 {
                                     assetFound = true;
-                                    if (!assetBundlesUsedDict.ContainsKey(assetBundleName))
+                                    if (!assetBundlesUsedDict.ContainsKey(assetBundleNamesArray[i]))
                                     {
-                                        assetBundlesUsedDict[assetBundleName] = new List<string>();
+                                        assetBundlesUsedDict[assetBundleNamesArray[i]] = new List<string>();
                                     }
-                                    if (!assetBundlesUsedDict[assetBundleName].Contains(assetName))
+                                    if (!assetBundlesUsedDict[assetBundleNamesArray[i]].Contains(assetName))
                                     {
-                                        assetBundlesUsedDict[assetBundleName].Add(assetName);
+                                        assetBundlesUsedDict[assetBundleNamesArray[i]].Add(assetName);
                                     }
                                     assetsToReturn.Add(target);
                                     if (assetName != "")
@@ -714,9 +699,9 @@ namespace UMA
                             {
                                 //Here we return a temp asset and wait for the bundle to download
                                 //We dont want to create multiple downloads of the same bundle so check its not already downloading
-                                if (AssetBundleManager.AreBundlesDownloading(assetBundleName) == false)
+                                if (AssetBundleManager.AreBundlesDownloading(assetBundleNamesArray[i]) == false)
                                 {
-                                    LoadAssetBundle(assetBundleName);
+                                    LoadAssetBundle(assetBundleNamesArray[i]);
                                 }
                                 else
                                 {
@@ -724,19 +709,19 @@ namespace UMA
                                 }
                                 if (assetNameHash == null)
                                 {
-                                    assetNameHash = AssetBundleManager.AssetBundleIndexObject.GetAssetHashFromName(assetBundleName, assetName, typeString);
+                                    assetNameHash = AssetBundleManager.AssetBundleIndexObject.GetAssetHashFromName(assetBundleNamesArray[i], assetName, typeString);
                                 }
-                                T target = downloadingAssets.AddDownloadItem<T>(CurrentBatchID, assetName, assetNameHash, assetBundleName, requestingUMA);
+                                T target = downloadingAssets.AddDownloadItem<T>(CurrentBatchID, assetName, assetNameHash, assetBundleNamesArray[i], requestingUMA);
                                 if (target != null)
                                 {
                                     assetFound = true;
-                                    if (!assetBundlesUsedDict.ContainsKey(assetBundleName))
+                                    if (!assetBundlesUsedDict.ContainsKey(assetBundleNamesArray[i]))
                                     {
-                                        assetBundlesUsedDict[assetBundleName] = new List<string>();
+                                        assetBundlesUsedDict[assetBundleNamesArray[i]] = new List<string>();
                                     }
-                                    if (!assetBundlesUsedDict[assetBundleName].Contains(assetName))
+                                    if (!assetBundlesUsedDict[assetBundleNamesArray[i]].Contains(assetName))
                                     {
-                                        assetBundlesUsedDict[assetBundleName].Add(assetName);
+                                        assetBundlesUsedDict[assetBundleNamesArray[i]].Add(assetName);
                                     }
                                     assetsToReturn.Add(target);
                                     if (assetName != "")
@@ -747,28 +732,28 @@ namespace UMA
                     }
                     else //we are just loading in all assets of type from the downloaded bundles- only realistically possible when the bundles have been downloaded already because otherwise this would trigger the download of all possible assetbundles that contain anything of type T...
                     {
-                        if (AssetBundleManager.IsAssetBundleDownloaded(assetBundleName))
+                        if (AssetBundleManager.IsAssetBundleDownloaded(assetBundleNamesArray[i]))
                         {
-                            string[] assetsInBundle = AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(assetBundleName, typeString);
+                            string[] assetsInBundle = AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(assetBundleNamesArray[i], typeString);
                             if (assetsInBundle.Length > 0)
                             {
                                 foreach (string asset in assetsInBundle)
                                 {
-                                    T target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleName, out error).m_AssetBundle.LoadAsset<T>(asset);
+                                    T target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(asset);
                                     if (target == null && typeof(T) == typeof(SlotDataAsset))
                                     {
-                                        target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleName, out error).m_AssetBundle.LoadAsset<T>(asset + "_Slot");
+                                        target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(asset + "_Slot");
                                     }
                                     if (target != null)
                                     {
                                         assetFound = true;
-                                        if (!assetBundlesUsedDict.ContainsKey(assetBundleName))
+                                        if (!assetBundlesUsedDict.ContainsKey(assetBundleNamesArray[i]))
                                         {
-                                            assetBundlesUsedDict[assetBundleName] = new List<string>();
+                                            assetBundlesUsedDict[assetBundleNamesArray[i]] = new List<string>();
                                         }
-                                        if (!assetBundlesUsedDict[assetBundleName].Contains(asset))
+                                        if (!assetBundlesUsedDict[assetBundleNamesArray[i]].Contains(asset))
                                         {
-                                            assetBundlesUsedDict[assetBundleName].Add(asset);
+                                            assetBundlesUsedDict[assetBundleNamesArray[i]].Add(asset);
                                         }
                                         assetsToReturn.Add(target);
                                     }
@@ -809,8 +794,6 @@ namespace UMA
         /// <param name="assetNameHash"></param>
         /// <param name="assetName"></param>
         /// <param name="callback"></param>
-        //TODO: This really slows things down in the inspector when the game is playing, maybe it could be a coroutine?
-        //TODO2: If it really is going to be this slow consider showing the LoadingIndicator
         bool SimulateAddAssetsFromAssetBundles<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, string bundlesToSearch = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
         {
             Type typeParameterType = typeof(T);
@@ -827,13 +810,13 @@ namespace UMA
             {
                 List<string> processedBundleNamesArray = new List<string>();
                 var bundlesToSearchArray = SearchStringToArray(bundlesToSearch);
-                foreach (string bundleToSearch in bundlesToSearchArray)
+                for (int i = 0; i < bundlesToSearchArray.Length; i++)
                 {
-                    foreach (string bundleName in allAssetBundleNames)
+                    for (int ii = 0; ii < allAssetBundleNames.Length; ii++)
                     {
-                        if (bundleName.IndexOf(bundleToSearch) > -1 && !processedBundleNamesArray.Contains(bundleName))
+                        if (allAssetBundleNames[ii].IndexOf(bundlesToSearchArray[i]) > -1 && !processedBundleNamesArray.Contains(allAssetBundleNames[ii]))
                         {
-                            processedBundleNamesArray.Add(bundleName);
+                            processedBundleNamesArray.Add(allAssetBundleNames[ii]);
                         }
                     }
                 }
@@ -845,7 +828,7 @@ namespace UMA
             }
             bool assetFound = false;
             List<string> dependencies = new List<string>();
-            foreach (string assetBundleName in assetBundleNamesArray)
+            for (int i = 0; i < assetBundleNamesArray.Length; i++)
             {
                 if (assetFound && assetName != "")//Do we want to break actually? What if the user has named two overlays the same? Or would this not work anyway?
                     break;
@@ -855,8 +838,8 @@ namespace UMA
                     //if this is looking for SlotsDataAssets then the asset name has _Slot after it usually even if the slot name doesn't have that-but the user might have renamed it so cover both cases
                     if (typeof(T) == typeof(SlotDataAsset))
                     {
-                        string[] possiblePathsTemp = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleName, assetName);
-                        string[] possiblePaths_SlotTemp = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleName, assetName + "_Slot");
+                        string[] possiblePathsTemp = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleNamesArray[i], assetName);
+                        string[] possiblePaths_SlotTemp = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleNamesArray[i], assetName + "_Slot");
                         List<string> possiblePathsList = new List<string>(possiblePathsTemp);
                         foreach (string path in possiblePaths_SlotTemp)
                         {
@@ -869,7 +852,7 @@ namespace UMA
                     }
                     else
                     {
-                        possiblePaths = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleName, assetName);
+                        possiblePaths = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleNamesArray[i], assetName);
                     }
                 }
                 else
@@ -878,7 +861,7 @@ namespace UMA
                     //to this data because its in the manifest, which is not there, otherwise we would not be simulating in the first place
                     if (!Application.isPlaying)
                     {
-                        possiblePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
+                        possiblePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
                     }
                 }
                 foreach (string path in possiblePaths)
@@ -887,24 +870,24 @@ namespace UMA
                     if (target != null)
                     {
                         assetFound = true;
-                        if (!assetBundlesUsedDict.ContainsKey(assetBundleName))
+                        if (!assetBundlesUsedDict.ContainsKey(assetBundleNamesArray[i]))
                         {
-                            assetBundlesUsedDict[assetBundleName] = new List<string>();
+                            assetBundlesUsedDict[assetBundleNamesArray[i]] = new List<string>();
                         }
-                        if (!assetBundlesUsedDict[assetBundleName].Contains(assetName))
+                        if (!assetBundlesUsedDict[assetBundleNamesArray[i]].Contains(assetName))
                         {
-                            assetBundlesUsedDict[assetBundleName].Add(assetName);
+                            assetBundlesUsedDict[assetBundleNamesArray[i]].Add(assetName);
                         }
                         assetsToReturn.Add(target);
                         //if the application is not playing we want to load ALL the assets from the bundle this asset will be in
                         if (Application.isPlaying)
                         {
-                            var thisAssetBundlesAssets = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
-                            for (int i = 0; i < thisAssetBundlesAssets.Length; i++)
+                            var thisAssetBundlesAssets = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
+                            for (int ii = 0; ii < thisAssetBundlesAssets.Length; ii++)
                             {
-                                if (!dependencies.Contains(thisAssetBundlesAssets[i]) && thisAssetBundlesAssets[i] != path)
+                                if (!dependencies.Contains(thisAssetBundlesAssets[ii]) && thisAssetBundlesAssets[ii] != path)
                                 {
-                                    dependencies.Add(thisAssetBundlesAssets[i]);
+                                    dependencies.Add(thisAssetBundlesAssets[ii]);
                                 }
                             }
                         }
@@ -925,19 +908,19 @@ namespace UMA
             {
                 //we need to load ALL the assets from every Assetbundle that has a dependency in it.
                 List<string> AssetBundlesToFullyLoad = new List<string>();
-                foreach (string assetBundleName in assetBundleNamesArray)
+                for (int i = 0; i < assetBundleNamesArray.Length; i++)
                 {
-                    var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
+                    var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
                     bool processed = false;
-                    for(int i = 0; i < allAssetBundlePaths.Length; i++)
+                    for(int ii = 0; ii < allAssetBundlePaths.Length; ii++)
                     {
                         for (int di = 0; di < dependencies.Count; di++)
                         {
-                            if(allAssetBundlePaths[i] == dependencies[di])
+                            if(allAssetBundlePaths[ii] == dependencies[di])
                             {
-                                if (!AssetBundlesToFullyLoad.Contains(assetBundleName))
+                                if (!AssetBundlesToFullyLoad.Contains(assetBundleNamesArray[i]))
                                 {
-                                    AssetBundlesToFullyLoad.Add(assetBundleName);
+                                    AssetBundlesToFullyLoad.Add(assetBundleNamesArray[i]);
                                 }
                                 processed = true;
                                 break;
