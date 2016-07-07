@@ -49,8 +49,8 @@ namespace UMA
         public DownloadingAssetsList downloadingAssets = new DownloadingAssetsList();
 
         //Because searching Resources for UMA Assets is so slow we will cache the results as we get them
-        [System.NonSerialized]
-        public Dictionary<Type, Dictionary<int, string>> UMAResourcesIndex = new Dictionary<Type, Dictionary<int, string>>();
+        //[System.NonSerialized]
+        //public Dictionary<Type, Dictionary<int, string>> UMAResourcesIndex = new Dictionary<Type, Dictionary<int, string>>();
 
         int? _currentBatchID = null;
 
@@ -425,11 +425,33 @@ namespace UMA
         {
             bool found = false;
             List<T> assetsToReturn = new List<T>();
-            if (!UMAResourcesIndex.ContainsKey(typeof(T)) && ((typeof(T) == typeof(SlotDataAsset)) || (typeof(T) == typeof(OverlayDataAsset)) || (typeof(T) == typeof(RaceData))))
+            //Using new static resources index if available
+            if(UMAResourcesIndex.Instance != null)
+            {
+                string foundAssetPath = "";
+                if (assetNameHash != null)
+                {
+                    foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>((int)assetNameHash);
+                }
+                else if (assetName != "")
+                {
+                    foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>(assetName);
+                }
+                if(foundAssetPath != "")
+                {
+                    T foundAsset = Resources.Load<T>(foundAssetPath);
+                    if(foundAsset != null)
+                    {
+                        assetsToReturn.Add(foundAsset);
+                        found = true;
+                    }
+                }
+            }
+            /*if (!UMAResourcesIndex.ContainsKey(typeof(T)) && ((typeof(T) == typeof(SlotDataAsset)) || (typeof(T) == typeof(OverlayDataAsset)) || (typeof(T) == typeof(RaceData))))
             {
                 UMAResourcesIndex[typeof(T)] = new Dictionary<int, string>();
-            }
-            if (UMAResourcesIndex.ContainsKey(typeof(T))){
+            }*/
+            /*if (UMAResourcesIndex.ContainsKey(typeof(T))){
                 if (assetNameHash != null || assetName != "")
                 {
                     string foundAssetName = "";
@@ -451,7 +473,7 @@ namespace UMA
                         }
                     }
                 }
-            }
+            }*/
             if (found == false)
             {
                 string[] resourcesFolderPathArray = SearchStringToArray(resourcesFolderPath);
@@ -476,6 +498,8 @@ namespace UMA
                                 T foundAsset = Resources.Load<T>(pathPrefix + assetName);
                                 if (foundAsset != null)
                                 {
+                                    if (UMAResourcesIndex.Instance != null)
+                                        UMAResourcesIndex.Instance.Add(foundAsset);
                                     assetsToReturn.Add(foundAsset);
                                     found = true;
                                 }
@@ -499,21 +523,20 @@ namespace UMA
                                 int foundHash = UMAUtils.StringToHash(foundAssets[i].name);
                                 if (typeof(T) == typeof(SlotDataAsset))
                                 {
-                                    foundHash = (foundAssets[i] as SlotDataAsset).nameHash;
-                                    UMAResourcesIndex[typeof(T)][(foundAssets[i] as SlotDataAsset).nameHash] = pathPrefix + (foundAssets[i] as SlotDataAsset).name;
+                                    foundHash = (foundAssets[i] as SlotDataAsset).nameHash; 
                                 }
                                 if (typeof(T) == typeof(OverlayDataAsset))
                                 {
                                     foundHash = UMAUtils.StringToHash((foundAssets[i] as OverlayDataAsset).overlayName);
-                                    UMAResourcesIndex[typeof(T)][UMAUtils.StringToHash((foundAssets[i] as OverlayDataAsset).overlayName)] = pathPrefix + (foundAssets[i] as OverlayDataAsset).name;
                                 }
                                 if (typeof(T) == typeof(RaceData))
                                 {
                                     foundHash = UMAUtils.StringToHash((foundAssets[i] as RaceData).raceName);
-                                    UMAResourcesIndex[typeof(T)][UMAUtils.StringToHash((foundAssets[i] as RaceData).raceName)] = pathPrefix + (foundAssets[i] as RaceData).name;
                                 }
                                 if (foundHash == assetNameHash)
                                 {
+                                    if (UMAResourcesIndex.Instance != null)
+                                        UMAResourcesIndex.Instance.Add(foundAssets[i]);
                                     assetsToReturn.Add(foundAssets[i]);
                                     found = true;
                                 }
@@ -524,20 +547,19 @@ namespace UMA
                                 if (typeof(T) == typeof(OverlayDataAsset))
                                 {
                                     foundName = (foundAssets[i] as OverlayDataAsset).overlayName;
-                                    UMAResourcesIndex[typeof(T)][UMAUtils.StringToHash((foundAssets[i] as OverlayDataAsset).overlayName)] = pathPrefix + (foundAssets[i] as OverlayDataAsset).name;
                                 }
                                 if (typeof(T) == typeof(SlotDataAsset))
                                 {
                                     foundName = (foundAssets[i] as SlotDataAsset).slotName;
-                                    UMAResourcesIndex[typeof(T)][(foundAssets[i] as SlotDataAsset).nameHash] = pathPrefix + (foundAssets[i] as SlotDataAsset).name;
                                 }
                                 if (typeof(T) == typeof(RaceData))
                                 {
                                     foundName = (foundAssets[i] as RaceData).raceName;
-                                    UMAResourcesIndex[typeof(T)][UMAUtils.StringToHash((foundAssets[i] as RaceData).raceName)] = pathPrefix + (foundAssets[i] as RaceData).name;
                                 }
                                 if (foundName == assetName)
                                 {
+                                    if (UMAResourcesIndex.Instance != null)
+                                        UMAResourcesIndex.Instance.Add(foundAssets[i]);
                                     assetsToReturn.Add(foundAssets[i]);
                                     found = true;
                                 }
@@ -545,18 +567,8 @@ namespace UMA
                             }
                             else
                             {
-                                if (typeof(T) == typeof(RaceData))
-                                {
-                                    UMAResourcesIndex[typeof(T)][UMAUtils.StringToHash((foundAssets[i] as RaceData).raceName)] = pathPrefix + (foundAssets[i] as RaceData).name;
-                                }
-                                if (typeof(T) == typeof(SlotDataAsset))
-                                {
-                                    UMAResourcesIndex[typeof(T)][(foundAssets[i] as SlotDataAsset).nameHash] = pathPrefix + (foundAssets[i] as SlotDataAsset).name;
-                                }
-                                if (typeof(T) == typeof(OverlayDataAsset))
-                                {
-                                    UMAResourcesIndex[typeof(T)][UMAUtils.StringToHash((foundAssets[i] as OverlayDataAsset).overlayName)] = pathPrefix + (foundAssets[i] as OverlayDataAsset).name;
-                                }
+                                if (UMAResourcesIndex.Instance != null)
+                                    UMAResourcesIndex.Instance.Add(foundAssets[i]);
                                 assetsToReturn.Add(foundAssets[i]);
                             }
                         }
