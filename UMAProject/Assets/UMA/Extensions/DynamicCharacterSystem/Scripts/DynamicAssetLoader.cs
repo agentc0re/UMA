@@ -462,9 +462,12 @@ namespace UMA
             }
             else if(found == false && AssetBundleManager.SimulateAssetBundleInEditor)
             {
-                //we could actually run the assetbundle search here if we are in simulation mode since its miles quicker than the following resources search
-                var dummyAssetBundlesUsedDict = new Dictionary<string, List<string>>();
-                found = SimulateAddAssetsFromAssetBundles<T>(ref dummyAssetBundlesUsedDict, "", assetNameHash, assetName, callback);
+                if (Application.isPlaying)
+                {
+                    //we could actually run the assetbundle search here if we are in simulation mode since its miles quicker than the following resources search
+                    var dummyAssetBundlesUsedDict = new Dictionary<string, List<string>>();
+                    found = SimulateAddAssetsFromAssetBundles<T>(ref dummyAssetBundlesUsedDict, "", assetNameHash, assetName, callback);
+                }
             }
             if (found == false && skipDeepSearch == false)
             {
