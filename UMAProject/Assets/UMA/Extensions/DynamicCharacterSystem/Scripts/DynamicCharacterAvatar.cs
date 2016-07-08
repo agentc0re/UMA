@@ -28,8 +28,6 @@ namespace UMACharacterSystem
         bool flagForRebuild = false;
         bool flagForReload = false;
 
-        //TO DO can we get rid of WardrobeRecipes now and just use WardrobeRecipes2?
-        public Dictionary<WardrobeSlot, UMATextRecipe> WardrobeRecipes = new Dictionary<WardrobeSlot, UMATextRecipe>();
         public Dictionary<string, UMATextRecipe> WardrobeRecipes2 = new Dictionary<string, UMATextRecipe>();
 
         [Tooltip("You can add wardrobe recipes for many races in here and only the ones that apply to the active race will be applied to the Avatar")]
@@ -668,7 +666,6 @@ namespace UMACharacterSystem
         /// </summary>
         public void ClearSlots()
         {
-            WardrobeRecipes.Clear();
             WardrobeRecipes2.Clear();
         }
         /// <summary>
@@ -680,17 +677,6 @@ namespace UMACharacterSystem
             if (WardrobeRecipes2.ContainsKey(ws))
             {
                 WardrobeRecipes2.Remove(ws);
-            }
-        }
-        /// <summary>
-        /// Clears the given wardrobe slot of any recipes that have been set on the Avatar
-        /// </summary>
-        /// <param name="ws"></param>
-        public void ClearSlot(WardrobeSlot ws)
-        {
-            if (WardrobeRecipes.ContainsKey(ws))
-            {
-                WardrobeRecipes.Remove(ws);
             }
         }
         /// <summary>
