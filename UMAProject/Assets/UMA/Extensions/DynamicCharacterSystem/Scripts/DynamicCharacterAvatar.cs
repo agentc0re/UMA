@@ -138,11 +138,9 @@ namespace UMACharacterSystem
 
         IEnumerator StartStartCoroutine()
         {
-            //TODO Need this here?
-            DynamicAssetLoader.Instance.requestingUMA = this;
-            //
             bool mayRequireDownloads = false;
-            if(activeRace.data == null)//This MUST validate otherwise the desired race will not download
+            //calling activeRace.data checks the actual RaceLibrary to see if the raceData is in there since in the editor the asset may still be there even if it shouldn't be (i.e. is in an asset bundle)
+            if(activeRace.data == null)
             {
                 mayRequireDownloads = true;
             }
@@ -155,6 +153,8 @@ namespace UMACharacterSystem
                 //if the AssetBundleManifest download request fails in the editor AssetBundleManager.SimulateOverride becomes true and thus we are in simulation mode so we can just carry on.
                 if (AssetBundleManager.SimulateOverride == true)
                 {
+                    //SimulateOverride still needs the requestingUMA
+                    DynamicAssetLoader.Instance.requestingUMA = this;
                     mayRequireDownloads = false;
                 }
                 else
@@ -198,7 +198,7 @@ namespace UMACharacterSystem
             }
             else
             {
-                if (mayRequireDownloads)//TODO this should be Definitive- is it?
+                if (mayRequireDownloads)
                 {
                     DynamicAssetLoader.Instance.requestingUMA = null;
                     dynamicCharacterSystem.Refresh();
@@ -1504,7 +1504,7 @@ namespace UMACharacterSystem
             }
             public void FindAnimatorByName(string animatorName)
             {
-                bool found = false;
+                /*bool found = false;
                 if (dynamicallyAddFromResources)
                 {
                     found = DynamicAssetLoader.Instance.AddAssetsFromResources<RuntimeAnimatorController>("", null, animatorName, SetFoundAnimators);
@@ -1512,7 +1512,9 @@ namespace UMACharacterSystem
                 if(found == false && dynamicallyAddFromAssetBundles)
                 {
                     DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<RuntimeAnimatorController>(ref assetBundlesUsedDict, false, "", null, animatorName, SetFoundAnimators);
-                }
+                }*/
+                DynamicAssetLoader.Instance.AddAssets<RuntimeAnimatorController>(ref assetBundlesUsedDict, true, true, false, "", "", null, animatorName, SetFoundAnimators);
+
             }
             //This function is probablt redundant since animators from this class should never cause assetbundles to download
             //and therefore there should never be any 'temp' assets that need to be replaced

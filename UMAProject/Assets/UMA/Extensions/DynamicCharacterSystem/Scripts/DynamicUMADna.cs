@@ -215,14 +215,7 @@ namespace UMA
         public override void FindMissingDnaAsset(string _dnaAssetName, bool dynamicallyAddFromResources = true, bool dynamicallyAddFromAssetBundles = false)
         {
             didDnaAssetUpdate = false;
-            if (dynamicallyAddFromResources)
-            {
-                didDnaAssetUpdate = DynamicAssetLoader.Instance.AddAssetsFromResources<UMA.DynamicUMADnaAsset>("", null, _dnaAssetName, SetMissingDnaAsset);
-            }
-            if (didDnaAssetUpdate == false && dynamicallyAddFromAssetBundles)
-            {
-                didDnaAssetUpdate = DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<UMA.DynamicUMADnaAsset>(true, "", null, _dnaAssetName, SetMissingDnaAsset);
-            }
+            didDnaAssetUpdate = DynamicAssetLoader.Instance.AddAssets <UMA.DynamicUMADnaAsset > (true, true, true, "", "", null, _dnaAssetName, SetMissingDnaAsset);
             if (didDnaAssetUpdate == false)
             {
                 Debug.LogWarning("DynamicUMADna could not find DNAAsset " + _dnaAssetName + "!");

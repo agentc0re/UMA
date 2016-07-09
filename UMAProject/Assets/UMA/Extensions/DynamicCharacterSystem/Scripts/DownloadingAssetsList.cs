@@ -112,8 +112,7 @@ namespace UMA
         /// <param name="assetName"></param>
         public IEnumerator RemoveDownload(List<DownloadingAssetItem> itemsToRemove, string onlyUpdateType = "")
         {
-            List<UMAAvatarBase> updatedUMAs = new List<UMAAvatarBase>();
-            Dictionary<UMAAvatarBase, List<string>> updatedUMAs2 = new Dictionary<UMAAvatarBase, List<string>>();
+            Dictionary<UMAAvatarBase, List<string>> updatedUMAs = new Dictionary<UMAAvatarBase, List<string>>();
             foreach (DownloadingAssetItem item in itemsToRemove)
             {
                 item.isBeingRemoved = true;
@@ -159,17 +158,13 @@ namespace UMA
                         UMAContext.Instance.raceLibrary.UpdateDictionary();
                         if (item.requestingUma != null)
                         {
-                            if (!updatedUMAs.Contains(item.requestingUma))
+                            if (!updatedUMAs.ContainsKey(item.requestingUma))
                             {
-                                updatedUMAs.Add(item.requestingUma);
+                                updatedUMAs.Add(item.requestingUma, new List<string>());
                             }
-                            if (!updatedUMAs2.ContainsKey(item.requestingUma))
+                            if (!updatedUMAs[item.requestingUma].Contains("race"))
                             {
-                                updatedUMAs2.Add(item.requestingUma, new List<string>());
-                            }
-                            if (!updatedUMAs2[item.requestingUma].Contains("race"))
-                            {
-                                updatedUMAs2[item.requestingUma].Add("race");
+                                updatedUMAs[item.requestingUma].Add("race");
                             }
                             //We have to do this explicitly or downloaded slots just get added into the placeholderBaseRecipe
                             item.requestingUma.umaRecipe = actualRace.baseRaceRecipe;
@@ -192,17 +187,13 @@ namespace UMA
                             UMAContext.Instance.slotLibrary.AddSlotAsset(thisSlot);
                             if (item.requestingUma != null)
                             {
-                                if (!updatedUMAs.Contains(item.requestingUma))
+                                if (!updatedUMAs.ContainsKey(item.requestingUma))
                                 {
-                                    updatedUMAs.Add(item.requestingUma);
+                                    updatedUMAs.Add(item.requestingUma, new List<string>());
                                 }
-                                if (!updatedUMAs2.ContainsKey(item.requestingUma))
+                                if (!updatedUMAs[item.requestingUma].Contains("slots"))
                                 {
-                                    updatedUMAs2.Add(item.requestingUma, new List<string>());
-                                }
-                                if (!updatedUMAs2[item.requestingUma].Contains("slots"))
-                                {
-                                    updatedUMAs2[item.requestingUma].Add("slots");
+                                    updatedUMAs[item.requestingUma].Add("slots");
                                 }
                             }
                         }
@@ -220,17 +211,13 @@ namespace UMA
                             UMAContext.Instance.overlayLibrary.AddOverlayAsset(thisOverlay);
                             if (item.requestingUma != null)
                             {
-                                if (!updatedUMAs.Contains(item.requestingUma))
+                                if (!updatedUMAs.ContainsKey(item.requestingUma))
                                 {
-                                    updatedUMAs.Add(item.requestingUma);
+                                    updatedUMAs.Add(item.requestingUma, new List<string>());
                                 }
-                                if (!updatedUMAs2.ContainsKey(item.requestingUma))
+                                if (!updatedUMAs[item.requestingUma].Contains("overlays"))
                                 {
-                                    updatedUMAs2.Add(item.requestingUma, new List<string>());
-                                }
-                                if (!updatedUMAs2[item.requestingUma].Contains("overlays"))
-                                {
-                                    updatedUMAs2[item.requestingUma].Add("overlays");
+                                    updatedUMAs[item.requestingUma].Add("overlays");
                                 }
                             }
                         }
@@ -246,17 +233,13 @@ namespace UMA
                         {
                             UMATextRecipe downloadedRecipe = loadedBundleAB.LoadAsset<UMATextRecipe>(item.requiredAssetName);
                             (item.requestingUma as UMACharacterSystem.DynamicCharacterAvatar).dynamicCharacterSystem.AddRecipe(downloadedRecipe);
-                            if (!updatedUMAs.Contains(item.requestingUma))
+                            if (!updatedUMAs.ContainsKey(item.requestingUma))
                             {
-                                updatedUMAs.Add(item.requestingUma);
+                                updatedUMAs.Add(item.requestingUma, new List<string>());
                             }
-                            if (!updatedUMAs2.ContainsKey(item.requestingUma))
+                            if (!updatedUMAs[item.requestingUma].Contains("recipes"))
                             {
-                                updatedUMAs2.Add(item.requestingUma, new List<string>());
-                            }
-                            if (!updatedUMAs2[item.requestingUma].Contains("recipes"))
-                            {
-                                updatedUMAs2[item.requestingUma].Add("recipes");
+                                updatedUMAs[item.requestingUma].Add("recipes");
                             }
                         }
                     }
@@ -273,36 +256,45 @@ namespace UMA
                 var batchId = item.batchID;
                 downloadingItems.Remove(item);
                 downloadingItemsDict[batchId].Remove(item);
-                if (downloadingItemsDict[batchId].Count == 0)
-                {
-                    downloadingItemsDict.Remove(batchId);
-                }
             }
-            if (updatedUMAs.Count > 0 && downloadingItems.Count == 0)//TODO this is not right. It should really be whether the batch that this UMA is in is finished because itdoesn't need to wait for any other batches...
+            List<int> dlDictsToRemove = new List<int>();
+            foreach(KeyValuePair<int,List<DownloadingAssetItem>> dlDictKp in downloadingItemsDict)
             {
-                foreach (KeyValuePair<UMAAvatarBase, List<string>> kp in updatedUMAs2)
+                if (dlDictKp.Value.Count == 0)
                 {
-                    if (kp.Key as UMACharacterSystem.DynamicCharacterAvatar)// TODO check how this works with derived classes
+                    if (updatedUMAs.Count > 0)
                     {
-                        //Refresh CharacterSystems libraries of the available items...
-                        (kp.Key as UMACharacterSystem.DynamicCharacterAvatar).dynamicCharacterSystem.Refresh();
-                        //the download of a wardroberecipe on its own could occur when a character is loaded from an UMAText string that uses a wardrobe item that has not been downloaded yet
-                        if (kp.Value.Contains("recipes"))
+                        foreach (KeyValuePair<UMAAvatarBase, List<string>> kp in updatedUMAs)
                         {
-                            //Force the WardrobeSlots used by a DynamicCharacterAvatar to update the recipes they refer to to the actual downloaded ones
-                            (kp.Key as UMACharacterSystem.DynamicCharacterAvatar).UpdateSetSlots();
+                            if (kp.Key as UMACharacterSystem.DynamicCharacterAvatar)// TODO check how this works with derived classes
+                            {
+                                //Refresh CharacterSystems libraries of the available items...
+                                (kp.Key as UMACharacterSystem.DynamicCharacterAvatar).dynamicCharacterSystem.Refresh();
+                                //the download of a wardroberecipe on its own could occur when a character is loaded from an UMAText string that uses a wardrobe item that has not been downloaded yet
+                                if (kp.Value.Contains("recipes"))
+                                {
+                                    //Force the WardrobeSlots used by a DynamicCharacterAvatar to update the recipes they refer to to the actual downloaded ones
+                                    (kp.Key as UMACharacterSystem.DynamicCharacterAvatar).UpdateSetSlots();
+                                }
+                                //Finally rebuild the character!
+                                (kp.Key as UMACharacterSystem.DynamicCharacterAvatar).BuildCharacter(false);
+                            }
+                            else
+                            {
+                                kp.Key.umaData.Dirty(true, true, true);
+                            }
                         }
-                        //Finally rebuild the character!
-                        (kp.Key as UMACharacterSystem.DynamicCharacterAvatar).BuildCharacter(false);
                     }
-                    else
-                    {
-                        kp.Key.umaData.Dirty(true, true, true);
-                    }
+                    dlDictsToRemove.Add(dlDictKp.Key);
                 }
-                areDownloadedItemsReady = true;
             }
-            yield break;
+            for(int dlri = 0; dlri < dlDictsToRemove.Count; dlri++)
+            {
+                downloadingItemsDict.Remove(dlDictsToRemove[dlri]);
+            }
+            if (downloadingItems.Count == 0)
+                areDownloadedItemsReady = true;
+            //yield break;
         }
 
         /// <summary>

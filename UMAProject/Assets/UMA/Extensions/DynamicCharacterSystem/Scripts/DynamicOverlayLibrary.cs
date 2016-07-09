@@ -114,44 +114,12 @@ public class DynamicOverlayLibrary : OverlayLibrary
 
     public void UpdateDynamicOverlayLibrary(int? nameHash = null)
     {
-        bool found = false;
-        if (dynamicallyAddFromResources && AllResourcesScanned == false)
-        {
-            if (nameHash == null)
-                AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<OverlayDataAsset>(resourcesFolderPath, nameHash, "", AddOverlayAssets);
-        }
-        if (dynamicallyAddFromAssetBundles && (name == "" || found == false))
-        {
-            if (((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-            {
-                StopCoroutine(WaitForAssetBundleManager(nameHash));
-                StartCoroutine(WaitForAssetBundleManager(nameHash));
-                return;
-            }
-            DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<OverlayDataAsset>(ref assetBundlesUsedDict, downloadAssetsEnabled, assetBundleNamesToSearch, nameHash, "", AddOverlayAssets);
-        }
+        DynamicAssetLoader.Instance.AddAssets<OverlayDataAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleNamesToSearch, resourcesFolderPath, nameHash, "", AddOverlayAssets);
     }
 
     public void UpdateDynamicOverlayLibrary(string overlayName)
     {
-        bool found = false;
-        if (dynamicallyAddFromResources && AllResourcesScanned == false)
-        {
-            if (overlayName == "")
-                AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<OverlayDataAsset>(resourcesFolderPath, null, overlayName, AddOverlayAssets);
-        }
-        if (dynamicallyAddFromAssetBundles && (overlayName == "" || found == false))
-        {
-            if (((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-            {
-                StopCoroutine(WaitForAssetBundleManager(overlayName));
-                StartCoroutine(WaitForAssetBundleManager(overlayName));
-                return;
-            }
-            DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<OverlayDataAsset>(ref assetBundlesUsedDict, downloadAssetsEnabled, assetBundleNamesToSearch, null, overlayName, AddOverlayAssets);
-        }
+        DynamicAssetLoader.Instance.AddAssets<OverlayDataAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleNamesToSearch, resourcesFolderPath, null, overlayName, AddOverlayAssets);
     }
 
     private void AddOverlayAssets(OverlayDataAsset[] overlays)

@@ -185,23 +185,7 @@ namespace UMACharacterSystem
 
         private void GatherXMLFiles(string filename = "")
         {
-            bool found = false;
-            if (dynamicallyAddFromResources && AllResourcesScannedXML == false)
-            {
-                if (filename == "")
-                    AllResourcesScannedXML = true;
-                found = DynamicAssetLoader.Instance.AddAssetsFromResources<TextAsset>(resourcesCharactersFolder, null, filename, AddXMLFiles);
-            }
-            if (dynamicallyAddFromAssetBundles && (filename == "" || found == false))
-            {
-                if (((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-                {
-                    StopCoroutine(XMLWaitForAssetBundleManager(filename));
-                    StartCoroutine(XMLWaitForAssetBundleManager(filename));
-                    return;
-                }
-                DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<TextAsset>(ref assetBundlesUsedDict, downloadAssetsEnabled, assetBundlesForCharactersToSearch, null, filename, AddXMLFiles);
-            }
+            DynamicAssetLoader.Instance.AddAssets<TextAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundlesForCharactersToSearch, resourcesCharactersFolder, null, filename, AddXMLFiles);
         }
 
         private void AddXMLFiles(TextAsset[] xmlFiles)
@@ -225,23 +209,7 @@ namespace UMACharacterSystem
 
         private void GatherRecipeFiles(string filename = "")
         {
-            bool found = false;
-            if (dynamicallyAddFromResources && AllResourcesScannedRecipes == false)
-            {
-                if (filename == "")
-                    AllResourcesScannedRecipes = true;
-                found = DynamicAssetLoader.Instance.AddAssetsFromResources<UMATextRecipe>(resourcesRecipesFolder, null, filename, AddRecipesFromAB);
-            }
-            if (dynamicallyAddFromAssetBundles && (filename == "" || found == false))
-            {
-                if (((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-                {
-                    StopCoroutine(RecipesWaitForAssetBundleManager(filename));
-                    StartCoroutine(RecipesWaitForAssetBundleManager(filename));
-                    return;
-                }
-                DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<UMATextRecipe>(ref assetBundlesUsedDict, downloadAssetsEnabled, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
-            }
+            DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundlesForRecipesToSearch, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
         }
 
         IEnumerator CleanFilesFromResourcesAndBundles()

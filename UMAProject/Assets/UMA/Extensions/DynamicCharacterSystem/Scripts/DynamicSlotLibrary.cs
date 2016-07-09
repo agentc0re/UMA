@@ -112,44 +112,12 @@ public class DynamicSlotLibrary : SlotLibrary
 
     public void UpdateDynamicSlotLibrary(int? nameHash = null)
     {
-        bool found = false;
-        if (dynamicallyAddFromResources && AllResourcesScanned == false)
-        {
-            if (nameHash == null)
-                AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<SlotDataAsset>(resourcesFolderPath, nameHash, "", AddSlotAssets);
-        }
-        if (dynamicallyAddFromAssetBundles && (nameHash == null || found == false))
-        {
-            if (((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-            {
-                StopCoroutine(WaitForAssetBundleManager(nameHash));
-                StartCoroutine(WaitForAssetBundleManager(nameHash));
-                return;
-            }
-            DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<SlotDataAsset>(ref assetBundlesUsedDict, downloadAssetsEnabled, assetBundleNamesToSearch, null, name, AddSlotAssets);
-        }
+        DynamicAssetLoader.Instance.AddAssets<SlotDataAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleNamesToSearch, resourcesFolderPath, nameHash, "", AddSlotAssets);
     }
 
     public void UpdateDynamicSlotLibrary(string slotName)
     {
-        bool found = false;
-        if (dynamicallyAddFromResources && AllResourcesScanned == false)
-        {
-            if (slotName == "")
-                AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<SlotDataAsset>(resourcesFolderPath, null, slotName, AddSlotAssets);
-        }
-        if (dynamicallyAddFromAssetBundles && (slotName == "" || found == false))
-        {
-            if ((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false)
-            {
-                StopCoroutine(WaitForAssetBundleManager(slotName));
-                StartCoroutine(WaitForAssetBundleManager(slotName));
-                return;
-            }
-            DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<SlotDataAsset>(ref assetBundlesUsedDict, downloadAssetsEnabled, assetBundleNamesToSearch, null, slotName, AddSlotAssets);
-        }
+        DynamicAssetLoader.Instance.AddAssets<SlotDataAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleNamesToSearch, resourcesFolderPath, null, slotName, AddSlotAssets);
     }
 
     private void AddSlotAssets(SlotDataAsset[] slots)

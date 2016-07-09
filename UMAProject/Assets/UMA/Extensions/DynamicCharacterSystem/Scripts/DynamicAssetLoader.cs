@@ -407,24 +407,66 @@ namespace UMA
         #endregion
 
         #region LOAD ASSETS METHODS
-        
-        /// <summary>
-        /// Generic Library function to search Resources for a type of asset, optionally filtered by folderpath and asset assetNameHash or assetName. 
-        /// Optionally sends the found assets to the supplied callback for processing.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="resourcesFolderPath"></param>
-        /// <param name="assetNameHash"></param>
-        /// <param name="assetName"></param>
-        /// <param name="callback"></param>
-        /// <returns>Returns true if a assetNameHash or assetName were specified and an asset with that assetNameHash or assetName is found. Else returns false.</returns>
-        public bool AddAssetsFromResources<T>(string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+        List<Type> deepResourcesScanned = new List<Type>();
+        //we do really need a unified AddAssets method really because now its not a simple two stage process 
+        //i.e. we check the resources index then asset bundles then deep scan resources (slow)
+        //but we still want people to be able to turn resources/assetbundles scanning on and off
+        //its gonna be a monster to call...
+        public bool AddAssets<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, bool searchResources, bool searchBundles, bool downloadAssetsEnabled, string bundlesToSearch = "", string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
         {
             bool found = false;
             List<T> assetsToReturn = new List<T>();
             string[] resourcesFolderPathArray = SearchStringToArray(resourcesFolderPath);
-            //Using new static resources index if available
-            if (UMAResourcesIndex.Instance != null)
+            string[] bundlesToSearchArray = SearchStringToArray(bundlesToSearch);
+            bool doDeepSearch = (assetName == "" && assetNameHash == null && deepResourcesScanned.Contains(typeof(T)) == false);
+            //first do the quick resourcesIndex search if searchResources and we have either a name or a hash
+            if (searchResources)
+            {
+                if (UMAResourcesIndex.Instance != null)
+                {
+                    doDeepSearch = doDeepSearch == true ? UMAResourcesIndex.Instance.enableDynamicIndexing : doDeepSearch;
+                    found = AddAssetsFromResourcesIndex<T>(ref assetsToReturn, resourcesFolderPathArray, assetNameHash, assetName);
+                    if ((assetName != "" || assetNameHash != null) && found)
+                        doDeepSearch = false;
+                }
+            }
+            //if we can and want to search asset bundles
+            if ((AssetBundleManager.AssetBundleIndexObject != null || AssetBundleManager.SimulateAssetBundleInEditor == true) || Application.isPlaying == false)
+                if (searchBundles && (found == false || (assetName == "" && assetNameHash == null)))
+                {
+                    bool foundHere = AddAssetsFromAssetBundles<T>(ref assetBundlesUsedDict, ref assetsToReturn, downloadAssetsEnabled, bundlesToSearchArray, assetNameHash, assetName);
+                    found = foundHere == true ? true : found;
+                    if ((assetName != "" || assetNameHash != null) && found)
+                        doDeepSearch = false;
+                }
+            //if enabled and we have not found anything yet or we are getting all items of a type do a deep resources search (slow)
+            if (searchResources && (found == false || doDeepSearch))
+            {
+                Debug.Log("DID DEEP SEARCH");
+                bool foundHere = AddAssetsFromResources<T>(ref assetsToReturn, resourcesFolderPathArray, assetNameHash, assetName);
+                found = foundHere == true ? true : found;
+                if (assetName == "" && assetNameHash == null && deepResourcesScanned.Contains(typeof(T)) == false)
+                    deepResourcesScanned.Add(typeof(T));
+            }
+            if (callback != null)
+            {
+                callback(assetsToReturn.ToArray());
+            }
+            return found;
+        }
+
+        public bool AddAssets<T>(bool searchResources, bool searchBundles, bool downloadAssetsEnabled, string bundlesToSearch = "", string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+        {
+            var dummyDict = new Dictionary<string, List<string>>();
+            return AddAssets<T>(ref dummyDict, searchResources, searchBundles, downloadAssetsEnabled, bundlesToSearch, resourcesFolderPath, assetNameHash, assetName, callback);
+        }
+
+        public bool AddAssetsFromResourcesIndex<T>(ref List<T> assetsToReturn, string[] resourcesFolderPathArray, int? assetNameHash = null, string assetName = "") where T : UnityEngine.Object
+        {
+            bool found = false;
+            if (UMAResourcesIndex.Instance == null)
+                return found;
+            if (assetNameHash != null || assetName != "")
             {
                 string foundAssetPath = "";
                 if (assetNameHash != null)
@@ -435,160 +477,147 @@ namespace UMA
                 {
                     foundAssetPath = UMAResourcesIndex.Instance.Index.GetPath<T>(assetName, resourcesFolderPathArray);
                 }
-                if(foundAssetPath != "")
+                if (foundAssetPath != "")
                 {
                     T foundAsset = Resources.Load<T>(foundAssetPath);
-                    if(foundAsset != null)
+                    if (foundAsset != null)
                     {
                         assetsToReturn.Add(foundAsset);
                         found = true;
                     }
                 }
             }
-            //if its not in the index and we have an assetBundleIndex check if its in there before we do the following deep search in Resources because that is really slow
-            //we have to do resources first because we dont want to have to wait for the index if we dont need too
-            bool skipDeepSearch = false;
-            if(found == false && AssetBundleManager.AssetBundleIndexObject != null)
+            else if (assetNameHash == null && assetName == "")
             {
-                var typeString = typeof(T).FullName;
-                string[] inbundle = new string[0];
-                if(assetName != "")
-                    inbundle = AssetBundleManager.AssetBundleIndexObject.FindContainingAssetBundle(assetName, typeString);
-                else if(assetNameHash != null){
-                    inbundle = AssetBundleManager.AssetBundleIndexObject.FindContainingAssetBundle(assetNameHash, typeString);
-                }
-                if (inbundle.Length > 0)
-                    skipDeepSearch = true;
-            }
-            else if(found == false && AssetBundleManager.SimulateAssetBundleInEditor)
-            {
-                if (Application.isPlaying)
+                foreach (string path in UMAResourcesIndex.Instance.Index.GetPaths<T>())
                 {
-                    //we could actually run the assetbundle search here if we are in simulation mode since its miles quicker than the following resources search
-                    var dummyAssetBundlesUsedDict = new Dictionary<string, List<string>>();
-                    found = SimulateAddAssetsFromAssetBundles<T>(ref dummyAssetBundlesUsedDict, "", assetNameHash, assetName, callback);
-                }
-            }
-            if (found == false && skipDeepSearch == false)
-            {
-                foreach (string path in resourcesFolderPathArray)
-                {
-                    T[] foundAssets = new T[0];
-                    var pathPrefix = path == "" ? "" : path + "/";
-                    if ((typeof(T) == typeof(SlotDataAsset)) || (typeof(T) == typeof(OverlayDataAsset)) || (typeof(T) == typeof(RaceData)))
+                    T foundAsset = Resources.Load<T>(path);
+                    if (foundAsset != null)
                     {
-                        //This is hugely expensive but we have to do this as we dont know the asset name, only the race/slot/overlayName which may not be the same. 
-                        //This will only happen once now that I added the UMAResourcesDictionary
-                        foundAssets = Resources.LoadAll<T>(path);
+                        assetsToReturn.Add(foundAsset);
+                        found = true;
                     }
+                }
+            }
+            return found;
+        }
+
+        /// <summary>
+        /// Generic Library function to search Resources for a type of asset, optionally filtered by folderpath and asset assetNameHash or assetName. 
+        /// Optionally sends the found assets to the supplied callback for processing.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="resourcesFolderPath"></param>
+        /// <param name="assetNameHash"></param>
+        /// <param name="assetName"></param>
+        /// <param name="callback"></param>
+        /// <returns>Returns true if a assetNameHash or assetName were specified and an asset with that assetNameHash or assetName is found. Else returns false.</returns>
+        public bool AddAssetsFromResources<T>(ref List<T> assetsToReturn, string[] resourcesFolderPathArray, int? assetNameHash = null, string assetName = "") where T : UnityEngine.Object
+        {
+            bool found = false;
+            //If resources had an index like the one we made we could skip this (it does but because nobody understands the need to access it you cant)
+            foreach (string path in resourcesFolderPathArray)
+            {
+                T[] foundAssets = new T[0];
+                var pathPrefix = path == "" ? "" : path + "/";
+                if ((typeof(T) == typeof(SlotDataAsset)) || (typeof(T) == typeof(OverlayDataAsset)) || (typeof(T) == typeof(RaceData)))
+                {
+                    //This is hugely expensive but we have to do this as we dont know the asset name, only the race/slot/overlayName which may not be the same. 
+                    //This will only happen once now that I added the UMAResourcesDictionary
+                    foundAssets = Resources.LoadAll<T>(path);
+                }
+                else
+                {
+                    if (assetName == "")
+                        foundAssets = Resources.LoadAll<T>(path);
                     else
                     {
-                        if (assetName == "")
-                            foundAssets = Resources.LoadAll<T>(path);
-                        else
+                        if (pathPrefix != "")
                         {
-                            if(pathPrefix != "")
+                            T foundAsset = Resources.Load<T>(pathPrefix + assetName);
+                            if (foundAsset != null)
                             {
-                                T foundAsset = Resources.Load<T>(pathPrefix + assetName);
-                                if (foundAsset != null)
-                                {
-                                    if (UMAResourcesIndex.Instance != null)
-                                        UMAResourcesIndex.Instance.Add(foundAsset);
-                                    assetsToReturn.Add(foundAsset);
-                                    found = true;
-                                }
-                                else
-                                {
-                                    foundAssets = Resources.LoadAll<T>(path);
-                                }
+                                if (UMAResourcesIndex.Instance != null)
+                                    UMAResourcesIndex.Instance.Add(foundAsset);
+                                assetsToReturn.Add(foundAsset);
+                                found = true;
                             }
                             else
                             {
                                 foundAssets = Resources.LoadAll<T>(path);
                             }
                         }
-                    }
-                    if (found == false)
-                    {
-                        for (int i = 0; i < foundAssets.Length; i++)
+                        else
                         {
-                            if (assetNameHash != null)
+                            foundAssets = Resources.LoadAll<T>(path);
+                        }
+                    }
+                }
+                if (found == false)
+                {
+                    for (int i = 0; i < foundAssets.Length; i++)
+                    {
+                        if (assetNameHash != null)
+                        {
+                            int foundHash = UMAUtils.StringToHash(foundAssets[i].name);
+                            if (typeof(T) == typeof(SlotDataAsset))
                             {
-                                int foundHash = UMAUtils.StringToHash(foundAssets[i].name);
-                                if (typeof(T) == typeof(SlotDataAsset))
-                                {
-                                    foundHash = (foundAssets[i] as SlotDataAsset).nameHash; 
-                                }
-                                if (typeof(T) == typeof(OverlayDataAsset))
-                                {
-                                    foundHash = UMAUtils.StringToHash((foundAssets[i] as OverlayDataAsset).overlayName);
-                                }
-                                if (typeof(T) == typeof(RaceData))
-                                {
-                                    foundHash = UMAUtils.StringToHash((foundAssets[i] as RaceData).raceName);
-                                }
-                                if (foundHash == assetNameHash)
-                                {
-                                    if (UMAResourcesIndex.Instance != null)
-                                        UMAResourcesIndex.Instance.Add(foundAssets[i]);
-                                    assetsToReturn.Add(foundAssets[i]);
-                                    found = true;
-                                }
+                                foundHash = (foundAssets[i] as SlotDataAsset).nameHash;
                             }
-                            else if (assetName != "")
+                            if (typeof(T) == typeof(OverlayDataAsset))
                             {
-                                string foundName = foundAssets[i].name;
-                                if (typeof(T) == typeof(OverlayDataAsset))
-                                {
-                                    foundName = (foundAssets[i] as OverlayDataAsset).overlayName;
-                                }
-                                if (typeof(T) == typeof(SlotDataAsset))
-                                {
-                                    foundName = (foundAssets[i] as SlotDataAsset).slotName;
-                                }
-                                if (typeof(T) == typeof(RaceData))
-                                {
-                                    foundName = (foundAssets[i] as RaceData).raceName;
-                                }
-                                if (foundName == assetName)
-                                {
-                                    if (UMAResourcesIndex.Instance != null)
-                                        UMAResourcesIndex.Instance.Add(foundAssets[i]);
-                                    assetsToReturn.Add(foundAssets[i]);
-                                    found = true;
-                                }
-
+                                //foundHash = UMAUtils.StringToHash((foundAssets[i] as OverlayDataAsset).nameHash);
+                                foundHash = (foundAssets[i] as OverlayDataAsset).nameHash;
                             }
-                            else
+                            if (typeof(T) == typeof(RaceData))
+                            {
+                                foundHash = UMAUtils.StringToHash((foundAssets[i] as RaceData).raceName);
+                            }
+                            if (foundHash == assetNameHash)
                             {
                                 if (UMAResourcesIndex.Instance != null)
-                                    UMAResourcesIndex.Instance.Add(foundAssets[i]);
+                                    UMAResourcesIndex.Instance.Add(foundAssets[i], foundHash);
                                 assetsToReturn.Add(foundAssets[i]);
+                                found = true;
                             }
+                        }
+                        else if (assetName != "")
+                        {
+                            string foundName = foundAssets[i].name;
+                            if (typeof(T) == typeof(OverlayDataAsset))
+                            {
+                                foundName = (foundAssets[i] as OverlayDataAsset).overlayName;
+                            }
+                            if (typeof(T) == typeof(SlotDataAsset))
+                            {
+                                foundName = (foundAssets[i] as SlotDataAsset).slotName;
+                            }
+                            if (typeof(T) == typeof(RaceData))
+                            {
+                                foundName = (foundAssets[i] as RaceData).raceName;
+                            }
+                            if (foundName == assetName)
+                            {
+                                if (UMAResourcesIndex.Instance != null)
+                                    UMAResourcesIndex.Instance.Add(foundAssets[i], foundName);
+                                assetsToReturn.Add(foundAssets[i]);
+                                found = true;
+                            }
+
+                        }
+                        else
+                        {
+                            if (UMAResourcesIndex.Instance != null)
+                                UMAResourcesIndex.Instance.Add(foundAssets[i]);
+                            assetsToReturn.Add(foundAssets[i]);
+                            found = true;
                         }
                     }
                 }
             }
-            if (callback != null)
-            {
-                callback(assetsToReturn.ToArray());
-            }
             return found;
         }
-        /// <summary>
-        /// Override for AddAssetsFromAssetBundles that does not require a dictionary
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="downloadAssetsEnabled"></param>
-        /// <param name="bundlesToSearch"></param>
-        /// <param name="assetNameHash"></param>
-        /// <param name="assetName"></param>
-        /// <param name="callback"></param>
-        public bool AddAssetsFromAssetBundles<T>(bool downloadAssetsEnabled, string bundlesToSearch = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
-        {
-            var dummyAssetBundlesUsedDict = new Dictionary<string, List<string>>();
-            return AddAssetsFromAssetBundles<T>(ref dummyAssetBundlesUsedDict, downloadAssetsEnabled, bundlesToSearch, assetNameHash, assetName, callback);
-        }
+
         /// <summary>
         /// Generic Library function to search AssetBundles for a type of asset, optionally filtered by bundle name, and asset assetNameHash or assetName. 
         /// Optionally sends the found assets to the supplied callback for processing.
@@ -599,12 +628,12 @@ namespace UMA
         /// <param name="assetNameHash"></param>
         /// <param name="assetName"></param>
         /// <param name="callback"></param>
-        public bool AddAssetsFromAssetBundles<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, bool downloadAssetsEnabled, string bundlesToSearch = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+        public bool AddAssetsFromAssetBundles<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, ref List<T> assetsToReturn, bool downloadAssetsEnabled, string[] bundlesToSearchArray, int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
         {
 #if UNITY_EDITOR
             if (AssetBundleManager.SimulateAssetBundleInEditor)
             {
-                return SimulateAddAssetsFromAssetBundles<T>(ref assetBundlesUsedDict, bundlesToSearch, assetNameHash, assetName, callback);
+                return SimulateAddAssetsFromAssetBundlesNew<T>(ref assetBundlesUsedDict, ref assetsToReturn, bundlesToSearchArray, assetNameHash, assetName, callback);
             }
             else
             {
@@ -614,7 +643,7 @@ namespace UMA
 #if UNITY_EDITOR
                     Debug.LogWarning("[DynamicAssetLoader] No AssetBundleManager.AssetBundleManifestObject found. Do you need to rebuild your AssetBundles and/or upload the platform manifest bundle?");
                     AssetBundleManager.SimulateOverride = true;
-                    return SimulateAddAssetsFromAssetBundles<T>(ref assetBundlesUsedDict, bundlesToSearch, assetNameHash, assetName, callback);
+                    return SimulateAddAssetsFromAssetBundlesNew<T>(ref assetBundlesUsedDict, ref assetsToReturn, bundlesToSearchArray, assetNameHash, assetName, callback);
 #else
 					Debug.LogError("[DynamicAssetLoader] No AssetBundleManager.AssetBundleManifestObject found. Do you need to rebuild your AssetBundles and/or upload the platform manifest bundle?");
                     return false;
@@ -625,7 +654,7 @@ namespace UMA
 #if UNITY_EDITOR
                     Debug.LogWarning("[DynamicAssetLoader] No AssetBundleManager.AssetBundleIndexObject found. Do you need to rebuild your AssetBundles and/or upload the platform index bundle?");
                     AssetBundleManager.SimulateOverride = true;
-                    return SimulateAddAssetsFromAssetBundles<T>(ref assetBundlesUsedDict, bundlesToSearch, assetNameHash, assetName, callback);
+                    return SimulateAddAssetsFromAssetBundlesNew<T>(ref assetBundlesUsedDict, ref assetsToReturn, bundlesToSearchArray, assetNameHash, assetName, callback);
 #else
 					Debug.LogError("[DynamicAssetLoader] No AssetBundleManager.AssetBundleIndexObject found. Do you need to rebuild your AssetBundles and/or upload the platform index bundle?");
                     return false;
@@ -633,16 +662,14 @@ namespace UMA
                 }
                 string[] allAssetBundleNames = AssetBundleManager.AssetBundleIndexObject.GetAllAssetBundleNames();
                 string[] assetBundleNamesArray = allAssetBundleNames;
-                List<T> assetsToReturn = new List<T>();
                 Type typeParameterType = typeof(T);
                 var typeString = typeParameterType.FullName;
-                if (bundlesToSearch != "")
+                if (bundlesToSearchArray.Length > 0 && bundlesToSearchArray[0] != "")
                 {
                     List<string> processedBundleNamesArray = new List<string>();
-                    var bundlesToSearchArray = SearchStringToArray(bundlesToSearch);
-                    for(int i = 0; i < bundlesToSearchArray.Length; i++)
+                    for (int i = 0; i < bundlesToSearchArray.Length; i++)
                     {
-                        for(int ii = 0; ii < allAssetBundleNames.Length; ii++)
+                        for (int ii = 0; ii < allAssetBundleNames.Length; ii++)
                         {
                             if (allAssetBundleNames[ii].IndexOf(bundlesToSearchArray[i]) > -1 && !processedBundleNamesArray.Contains(allAssetBundleNames[ii]))
                             {
@@ -781,7 +808,7 @@ namespace UMA
                 if (!assetFound && assetName != "")
                 {
                     string[] assetIsInArray = AssetBundleManager.AssetBundleIndexObject.FindContainingAssetBundle(assetName, typeString);
-                    string assetIsIn = assetIsInArray.Length > 0 ? " but it was in "+assetIsInArray[0] : ". Do you need to reupload you platform manifest and index?";
+                    string assetIsIn = assetIsInArray.Length > 0 ? " but it was in " + assetIsInArray[0] : ". Do you need to reupload you platform manifest and index?";
                     Debug.LogWarning("Dynamic" + typeof(T).Name + "Library (" + typeString + ") could not load " + assetName + " from any of the AssetBundles searched" + assetIsIn);
                 }
                 if (assetsToReturn.Count > 0 && callback != null)
@@ -794,6 +821,7 @@ namespace UMA
             }
 #endif
         }
+
 #if UNITY_EDITOR
         /// <summary>
         /// Simulates the loading of assets when AssetBundleManager is set to 'SimulationMode'
@@ -803,7 +831,7 @@ namespace UMA
         /// <param name="assetNameHash"></param>
         /// <param name="assetName"></param>
         /// <param name="callback"></param>
-        bool SimulateAddAssetsFromAssetBundles<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, string bundlesToSearch = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+        bool SimulateAddAssetsFromAssetBundlesNew<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, ref List<T> assetsToReturn, string[] bundlesToSearchArray, int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
         {
             Type typeParameterType = typeof(T);
             var typeString = typeParameterType.FullName;
@@ -814,11 +842,9 @@ namespace UMA
             }
             string[] allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
             string[] assetBundleNamesArray;
-            List<T> assetsToReturn = new List<T>();
-            if (bundlesToSearch != "")
+            if (bundlesToSearchArray.Length > 0 && bundlesToSearchArray[0] != "")
             {
                 List<string> processedBundleNamesArray = new List<string>();
-                var bundlesToSearchArray = SearchStringToArray(bundlesToSearch);
                 for (int i = 0; i < bundlesToSearchArray.Length; i++)
                 {
                     for (int ii = 0; ii < allAssetBundleNames.Length; ii++)
@@ -921,11 +947,11 @@ namespace UMA
                 {
                     var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
                     bool processed = false;
-                    for(int ii = 0; ii < allAssetBundlePaths.Length; ii++)
+                    for (int ii = 0; ii < allAssetBundlePaths.Length; ii++)
                     {
                         for (int di = 0; di < dependencies.Count; di++)
                         {
-                            if(allAssetBundlePaths[ii] == dependencies[di])
+                            if (allAssetBundlePaths[ii] == dependencies[di])
                             {
                                 if (!AssetBundlesToFullyLoad.Contains(assetBundleNamesArray[i]))
                                 {
@@ -936,7 +962,7 @@ namespace UMA
                             }
                         }
                         if (processed) break;
-                    }              
+                    }
                 }
                 foreach (string assetBundleName in AssetBundlesToFullyLoad)
                 {
@@ -961,7 +987,9 @@ namespace UMA
             }
             return assetFound;
         }
-
+#endif
+        
+#if UNITY_EDITOR
         public void SimulateLoadAssetBundle(string assetBundleToLoad)
         {
             var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleToLoad);

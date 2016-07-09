@@ -114,44 +114,12 @@ public class DynamicRaceLibrary : RaceLibrary
 
     public void UpdateDynamicRaceLibrary(bool downloadAssets, int? raceHash = null)
     {
-        bool found = false;
-        if (dynamicallyAddFromResources && AllResourcesScanned == false)
-        {
-            if (raceHash == null)
-                AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<RaceData>(resourcesFolderPath, raceHash, "", AddRaces);
-        }
-        if (dynamicallyAddFromAssetBundles &&  found == false)
-        {
-            if(((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-            {
-                StopCoroutine(WaitForAssetBundleManager(downloadAssets, raceHash));
-                StartCoroutine(WaitForAssetBundleManager(downloadAssets, raceHash));
-                return;
-            }
-            DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<RaceData>(ref assetBundlesUsedDict, downloadAssets, assetBundleNamesToSearch, raceHash, "", AddRaces);
-        }
+       DynamicAssetLoader.Instance.AddAssets<RaceData>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssets, assetBundleNamesToSearch, resourcesFolderPath, raceHash, "", AddRaces);
     }
 
     public void UpdateDynamicRaceLibrary(string raceName)
     {
-        bool found = false;
-        if (dynamicallyAddFromResources && AllResourcesScanned == false)
-        {
-            if (raceName == "")
-                AllResourcesScanned = true;
-            found = DynamicAssetLoader.Instance.AddAssetsFromResources<RaceData>(resourcesFolderPath, null, raceName, AddRaces);
-        }
-        if (dynamicallyAddFromAssetBundles && found == false)
-        {
-            if (((AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null) && AssetBundleManager.SimulateAssetBundleInEditor == false) && Application.isPlaying == true)
-            {
-                StopCoroutine(WaitForAssetBundleManager(raceName));
-                StartCoroutine(WaitForAssetBundleManager(raceName));
-                return;
-            }
-            DynamicAssetLoader.Instance.AddAssetsFromAssetBundles<RaceData>(ref assetBundlesUsedDict, downloadAssetsEnabled, assetBundleNamesToSearch, null, raceName, AddRaces);
-        }
+       DynamicAssetLoader.Instance.AddAssets<RaceData>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleNamesToSearch, resourcesFolderPath, null, raceName, AddRaces);
     }
 
     private void AddRaces(RaceData[] races)

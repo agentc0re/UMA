@@ -10,22 +10,26 @@ using System.IO;
 namespace UMA
 {
     [System.Serializable]
-    public class UMAResourcesIndex : MonoBehaviour
+    public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
     {
         public static UMAResourcesIndex Instance;
         public UMAResourcesIndexData Index;
+        public bool enableDynamicIndexing = false;
 
         public UMAResourcesIndex()
         {
 
         }
 
+
+
         void Reset()
         {
+            Debug.Log("UMARESCOURCESINDEX RESET HAPPENNED");
             LoadOrCreateData();
         }
 
-        void OnEnable()
+        /*void OnEnable()
         {
             if (Instance == null)
             {
@@ -37,7 +41,7 @@ namespace UMA
                 Destroy(gameObject);
             }
             LoadOrCreateData();
-        }
+        }*/
 
         void Awake()
         {
@@ -48,6 +52,7 @@ namespace UMA
             }
             else if(Instance != this)
             {
+                //Instance.enableDynamicIndexing = this.enableDynamicIndexing;
                 Destroy(gameObject);
             }
             LoadOrCreateData();
@@ -56,6 +61,19 @@ namespace UMA
         void OnApplicationQuit()
         {
             Save();
+        }
+
+        public void OnBeforeSerialize()
+        {
+
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if(Instance == null)//make an Instance in the editor too
+            {
+                Instance = this;
+            }
         }
 
         public void Add(UnityEngine.Object obj)
@@ -85,6 +103,13 @@ namespace UMA
             Index.AddPath(obj, objName);
             Save();
         }
+        public void Add(UnityEngine.Object obj, int objNameHash)
+        {
+            if (obj == null)
+                return;
+            Index.AddPath(obj, objNameHash);
+            Save();
+        }
         /// <summary>
         /// Loads saved Index data from a file or creates new data object;
         /// </summary>
@@ -112,6 +137,7 @@ namespace UMA
         }
 
 #if UNITY_EDITOR
+
         /// <summary>
         /// Clears the Index of all data.
         /// </summary>
@@ -123,6 +149,7 @@ namespace UMA
         /// <summary>
         /// Method to generate a full index of every file in Resources
         /// </summary>
+        // slight issue here is that UMABonePose assets dont have a hash and expressions are called the same thing for every race (so we only end up with one set indexed). But since they are refrerenced in an expressionset this seems to work ok anyway.
         public void IndexAllResources()
         {
             if (Application.isPlaying)
@@ -149,25 +176,29 @@ namespace UMA
                     {
                         pathsAdded++;
                         string thisName = Path.GetFileNameWithoutExtension(paths[i]);
+                        int thisHash = UMAUtils.StringToHash(thisName);
                         if (tempObj.GetType() == typeof(SlotDataAsset))
                         {
                             thisName = ((SlotDataAsset)tempObj).slotName;
+                            thisHash = ((SlotDataAsset)tempObj).nameHash;
                         }
                         if (tempObj.GetType() == typeof(OverlayDataAsset))
                         {
                             thisName = ((OverlayDataAsset)tempObj).overlayName;
+                            thisHash = ((OverlayDataAsset)tempObj).nameHash;
                         }
                         if (tempObj.GetType() == typeof(RaceData))
                         {
                             thisName = ((RaceData)tempObj).raceName;
+                            thisHash = UMAUtils.StringToHash(thisName);
                         }
-                        Index.AddPath(tempObj, thisName);
+                        Index.AddPath(tempObj, thisHash);
                         if(tempObj.GetType() != typeof(UnityEngine.GameObject))
                             Resources.UnloadAsset(tempObj);//TODO check if this is safe to do...
                     }
                 }
             }
-            Debug.Log("[UMAResourcesIndex] Added or updated " + pathsAdded + " to the Index");
+            Debug.Log("[UMAResourcesIndex] Added/Updated " + Index.Count() + " assets in the Index");
             Save();
         }
 #endif

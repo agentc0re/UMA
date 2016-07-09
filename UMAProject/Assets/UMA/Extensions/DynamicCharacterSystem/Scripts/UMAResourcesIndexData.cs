@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -102,6 +103,16 @@ namespace UMA
         }
         #endregion
         public TypeIndex[] data = new TypeIndex[0];
+
+        public int Count()
+        {
+            int totalCount = 0;
+            for(int i = 0; i < data.Length; i++)
+            {
+                totalCount += data[i].Count();
+            }
+            return totalCount;
+        }
 
         /// <summary>
         /// Adds a path terporarily to the index. To add it permanently use UMAResourcesIndex.Instance.Add
@@ -215,10 +226,39 @@ namespace UMA
                     else
                     {
                         return foundPath;
-                    }
+                   }
                 }
             }
             return "";
+        }
+        public string[] GetPaths<T>(string[] foldersToSearch = null) where T : UnityEngine.Object
+        {
+            List<string> foundPaths = new List<string>();
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i].type == typeof(T).ToString())
+                {
+                    for(int ii = 0; ii < data[i].typeFiles.Length; ii++)
+                    {
+                        if (foldersToSearch != null && foldersToSearch.Length > 0)
+                        {
+                            for (int iii = 0; iii < foldersToSearch.Length; iii++)
+                            {
+                                if (data[i].typeFiles[ii].path.IndexOf(foldersToSearch[iii]) > -1)
+                                {
+                                    foundPaths.Add(data[i].typeFiles[ii].path);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foundPaths.Add(data[i].typeFiles[ii].path);
+                        }
+                    }
+                }
+            }
+            return foundPaths.ToArray();
         }
     }
 }
