@@ -489,7 +489,7 @@ namespace UMA
             }
             else if (assetNameHash == null && assetName == "")
             {
-                foreach (string path in UMAResourcesIndex.Instance.Index.GetPaths<T>())
+                foreach (string path in UMAResourcesIndex.Instance.Index.GetPaths<T>(resourcesFolderPathArray))
                 {
                     T foundAsset = Resources.Load<T>(path);
                     if (foundAsset != null)
