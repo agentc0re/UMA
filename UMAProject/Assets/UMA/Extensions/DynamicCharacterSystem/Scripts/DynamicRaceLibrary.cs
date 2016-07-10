@@ -12,9 +12,11 @@ public class DynamicRaceLibrary : RaceLibrary
 
     //extra fields for Dynamic Version
     public bool dynamicallyAddFromResources;
+	[Tooltip("Limit the Resources search to the following folders (no starting slash and seperate multiple entries with a comma)")]
     public string resourcesFolderPath = "";
     public bool dynamicallyAddFromAssetBundles;
-    public string assetBundleNamesToSearch = "";
+	[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
+	public string assetBundleNamesToSearch = "";
     //This is a ditionary of asset bundles that were loaded into the library at runtime. 
     //CharacterAvatar can query this this to find out what asset bundles were required to create itself 
     //or other scripts can use it to find out which asset bundles are being used by the Libraries at any given point.
@@ -93,24 +95,6 @@ public class DynamicRaceLibrary : RaceLibrary
         return foundRaceData;
     }
 #endif
-
-    IEnumerator WaitForAssetBundleManager(bool downloadAssets, int? raceHash = null)
-    {
-        while (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
-        {
-            yield return null;
-        }
-        UpdateDynamicRaceLibrary(downloadAssets, raceHash);
-    }
-
-    IEnumerator WaitForAssetBundleManager(string raceName)
-    {
-        while (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
-        {
-            yield return null;
-        }
-        UpdateDynamicRaceLibrary(raceName);
-    }
 
     public void UpdateDynamicRaceLibrary(bool downloadAssets, int? raceHash = null)
     {

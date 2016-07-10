@@ -12,9 +12,11 @@ public class DynamicOverlayLibrary : OverlayLibrary
 
     //extra fields for Dynamic Version
     public bool dynamicallyAddFromResources;
-    public string resourcesFolderPath = "";
+	[Tooltip("Limit the Resources search to the following folders (no starting slash and seperate multiple entries with a comma)")]
+	public string resourcesFolderPath = "";
     public bool dynamicallyAddFromAssetBundles;
-    public string assetBundleNamesToSearch = "";
+	[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
+	public string assetBundleNamesToSearch = "";
     //This is a ditionary of asset bundles that were loaded into the library at runtime. 
     //CharacterAvatar can query this this to find out what asset bundles were required to create itself 
     //or other scripts can use it to find out which asset bundles are being used by the Libraries at any given point.
@@ -93,24 +95,6 @@ public class DynamicOverlayLibrary : OverlayLibrary
         return foundOverlay;
     }
 #endif
-
-    IEnumerator WaitForAssetBundleManager(int? nameHash = null)
-    {
-        while (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
-        {
-            yield return null;
-        }
-        UpdateDynamicOverlayLibrary(nameHash);
-    }
-
-    IEnumerator WaitForAssetBundleManager(string name)
-    {
-        while (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
-        {
-            yield return null;
-        }
-        UpdateDynamicOverlayLibrary(name);
-    }
 
     public void UpdateDynamicOverlayLibrary(int? nameHash = null)
     {

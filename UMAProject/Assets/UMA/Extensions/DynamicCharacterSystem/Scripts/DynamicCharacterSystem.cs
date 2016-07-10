@@ -31,11 +31,15 @@ namespace UMACharacterSystem
         //extra fields for Dynamic Version
         //TODO Definately make it possible to gather json recipes from PersistentAssets
         public bool dynamicallyAddFromResources;
-        public string resourcesCharactersFolder = "CharacterRecipes";
-        public string resourcesRecipesFolder = "Recipes";
+		[Tooltip("Limit the Resources search to the following folders (no starting slash and seperate multiple entries with a comma)")]
+		public string resourcesCharactersFolder = "CharacterRecipes";
+		[Tooltip("Limit the Resources search to the following folders (no starting slash and seperate multiple entries with a comma)")]
+		public string resourcesRecipesFolder = "Recipes";
         public bool dynamicallyAddFromAssetBundles;
-        public string assetBundlesForCharactersToSearch;
-        public string assetBundlesForRecipesToSearch;
+		[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
+		public string assetBundlesForCharactersToSearch;
+		[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
+		public string assetBundlesForRecipesToSearch;
         [NonSerialized]
         public Dictionary<string, Dictionary<string, List<UMATextRecipe>>> Recipes2 = new Dictionary<string, Dictionary<string, List<UMATextRecipe>>>();
         bool refresh = false;
@@ -173,16 +177,6 @@ namespace UMACharacterSystem
             GatherRecipeFiles();
         }
 
-
-        IEnumerator XMLWaitForAssetBundleManager(string filename)
-        {
-            while (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
-            {
-                yield return null;
-            }
-            GatherXMLFiles(filename);
-        }
-
         private void GatherXMLFiles(string filename = "")
         {
             DynamicAssetLoader.Instance.AddAssets<TextAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundlesForCharactersToSearch, resourcesCharactersFolder, null, filename, AddXMLFiles);
@@ -196,15 +190,6 @@ namespace UMACharacterSystem
                     XMLFiles.Add(xmlFile.name, xmlFile.text);
             }
             StartCoroutine(CleanFilesFromResourcesAndBundles());
-        }
-
-        IEnumerator RecipesWaitForAssetBundleManager(string filename)
-        {
-            while (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
-            {
-                yield return null;
-            }
-            GatherRecipeFiles(filename);
         }
 
         private void GatherRecipeFiles(string filename = "")
