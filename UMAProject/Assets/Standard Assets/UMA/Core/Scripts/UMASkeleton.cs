@@ -27,6 +27,9 @@ namespace UMA
 			public int accessedFrame;
 		}
 
+		[NonSerialized]
+		public UmaTPose TPose;
+
 		public IEnumerable<int> BoneHashes { get { return GetBoneHashes(); } }
 
         //DynamicUMADna:: DynamicUMADnaConverterCustomizer Editor interface needs to have an array of bone names
@@ -82,6 +85,25 @@ namespace UMA
 		{ 
 		}
 
+		/// <summary>
+		/// Initialize a custom TPose for this skeleton.
+		/// </summary>
+		public virtual void SetTPose(UmaTPose pose)
+		{
+			TPose = new UmaTPose();
+
+			// Deserialize and then clone the pose
+			pose.DeSerialize();
+			TPose.boneInfo = (SkeletonBone[]) pose.boneInfo.Clone();
+			TPose.humanInfo = (HumanBone[]) pose.humanInfo.Clone();
+			TPose.armStretch = pose.armStretch;
+			TPose.feetSpacing = pose.feetSpacing;
+			TPose.legStretch = pose.legStretch;
+			TPose.lowerArmTwist = pose.lowerArmTwist;
+			TPose.lowerLegTwist = pose.lowerLegTwist;
+			TPose.upperArmTwist = pose.upperArmTwist;
+			TPose.upperLegTwist = pose.upperLegTwist;
+		}
 
 		/// <summary>
 		/// Marks the skeleton as being updated.

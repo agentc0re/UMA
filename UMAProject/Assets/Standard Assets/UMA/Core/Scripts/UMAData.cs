@@ -1209,13 +1209,16 @@ namespace UMA
 		}
 
 		/// <summary>
-		/// Align skeleton to the race data TPose.
+		/// Align skeleton to the TPose.
 		/// </summary>
 		public void GotoTPose()
 		{
 			if ((umaRecipe.raceData != null) && (umaRecipe.raceData.TPose != null))
 			{
-				var tpose = umaRecipe.raceData.TPose;
+				var tpose = skeleton.TPose;
+				if (tpose == null) {
+					tpose = umaRecipe.raceData.TPose;
+				}
 				tpose.DeSerialize();
 				for (int i = 0; i < tpose.boneInfo.Length; i++)
 				{
