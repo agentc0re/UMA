@@ -152,10 +152,7 @@ namespace UMA
 		/// <param name="animator>Animator.</param>
 		public static void SetAvatar(UMAData umaData, Animator animator)
 		{
-			var umaTPose = umaData.skeleton.TPose;
-			if (umaTPose == null) {
-				umaTPose = umaData.umaRecipe.raceData.TPose;
-			}
+			var umaTPose = umaData.umaRecipe.raceData.TPose;
 
 			switch (umaData.umaRecipe.raceData.umaTarget)
 			{
@@ -290,7 +287,8 @@ namespace UMA
 				{
 					skeletonbone.position = boneGO.transform.localPosition;
 					skeletonbone.scale = boneGO.transform.localScale;
-					skeletonbone.rotation = umaData.skeleton.GetTPoseCorrectedRotation(boneHash, skeletonbone.rotation);
+//					skeletonbone.rotation = umaData.skeleton.GetTPoseCorrectedRotation(boneHash, skeletonbone.rotation);
+					skeletonbone.rotation = boneGO.transform.localRotation;
 					newBones.Add(skeletonbone);
 				}
 			}

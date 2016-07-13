@@ -510,6 +510,7 @@ namespace UMA
                     weightedScale.y = (weightedScale.y * startingPoseWeight) + (1 * (1 - startingPoseWeight));
                     weightedScale.z = (weightedScale.z * startingPoseWeight) + (1 * (1 - startingPoseWeight));
                     skeleton.SetScaleRelative(startingPose.poses[i].hash, weightedScale);
+                    skeleton.SetRotationRelative(startingPose.poses[i].hash, startingPose.poses[i].rotation, startingPoseWeight);
                 }
             }
         }
@@ -524,10 +525,11 @@ namespace UMA
         {
             if (startingPose == null)
                 return false;
-            for (int i = 0; i < startingPose.poses.Length; i++)
-            {
-                umaData.skeleton.SetRotationRelative(startingPose.poses[i].hash, startingPose.poses[i].rotation, startingPoseWeight/*, hasAnimator*/);
-            }
+			
+//            for (int i = 0; i < startingPose.poses.Length; i++)
+//            {
+//                umaData.skeleton.SetRotationRelative(startingPose.poses[i].hash, startingPose.poses[i].rotation, startingPoseWeight/*, hasAnimator*/);
+//            }
             return true;
         }
 
