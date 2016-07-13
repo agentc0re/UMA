@@ -46,7 +46,7 @@ MonoBehaviour:
   raceName: Werewolf
   dnaConverterList:
   - {fileID: 11465070, guid: cc9494659977a4a4ca7fc872a190aaae, type: 2}
-  TPose: {fileID: 11400000, guid: c23b309c7b833504190dd4daa7f21591, type: 2}
+  TPose: {fileID: 11400000, guid: 6c2e4c0ffb1de864d929a7009446ae32, type: 2}
   umaTarget: 0
   genericRootMotionTransformName: 
   expressionSet: {fileID: 11400000, guid: 867d92cfde017aa40b39941918dac9bc, type: 2}
