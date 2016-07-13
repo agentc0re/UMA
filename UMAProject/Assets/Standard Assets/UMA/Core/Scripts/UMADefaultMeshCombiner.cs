@@ -62,7 +62,6 @@ namespace UMA
             BuildCombineInstances();
 
 			EnsureUMADataSetup(umaData);
-			umaData.skeleton.SetTPose(umaData.umaRecipe.raceData.TPose);
 			umaData.skeleton.BeginSkeletonUpdate();
 
 			UMAMeshData umaMesh = new UMAMeshData();

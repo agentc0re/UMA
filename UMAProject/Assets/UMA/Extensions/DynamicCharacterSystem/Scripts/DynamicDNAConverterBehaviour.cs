@@ -516,24 +516,6 @@ namespace UMA
         }
 
         /// <summary>
-        /// @ECURTZ Hopefully we wont need this if the rotations that are set here can be applied to the TPose earlier on using your magic method!
-        /// There is also a skeleton.Restore that needs to happen at the end of the frame for this to work which also wouldn't be needed...
-        /// </summary>
-        /// <param name="umaData"></param>
-        /// <param name="forceUpdateFrame"></param>
-        public bool LateUpdateSkeleton(UMAData umaData, bool forceUpdateFrame = false)
-        {
-            if (startingPose == null)
-                return false;
-			
-//            for (int i = 0; i < startingPose.poses.Length; i++)
-//            {
-//                umaData.skeleton.SetRotationRelative(startingPose.poses[i].hash, startingPose.poses[i].rotation, startingPoseWeight/*, hasAnimator*/);
-//            }
-            return true;
-        }
-
-        /// <summary>
         /// Method to temporarily remove any dna from a Skeleton. Useful for getting bone values for pre and post dna (since the skeletons own unmodified values often dont *quite* match for some reason- I think because a recipes 0.5 values end up as 0.5019608 when they come out of binary)
         /// Or it could be that I need to change the way this outputs values maybe?
         /// </summary>

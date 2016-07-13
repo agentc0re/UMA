@@ -1215,10 +1215,7 @@ namespace UMA
 		{
 			if ((umaRecipe.raceData != null) && (umaRecipe.raceData.TPose != null))
 			{
-				var tpose = skeleton.TPose;
-				if (tpose == null) {
-					tpose = umaRecipe.raceData.TPose;
-				}
+				var tpose = umaRecipe.raceData.TPose;
 				tpose.DeSerialize();
 				for (int i = 0; i < tpose.boneInfo.Length; i++)
 				{

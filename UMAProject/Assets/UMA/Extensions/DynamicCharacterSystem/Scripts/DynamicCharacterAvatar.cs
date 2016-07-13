@@ -102,40 +102,6 @@ namespace UMACharacterSystem
 
         }
 
-        //@ECURTZ right now each converters LateUpdateSkeleton method has to be called by something else since the converters prefab itself is in active and so cant do LateUpdate or do a StartCoRoutine for the end of frame reset (which we also hopefully wont need)
-        void LateUpdate()
-        {
-            bool needsOnPostRender = false;
-            if (activeRace.racedata != null && umaData != null && umaData.skeleton != null)
-            {
-                if (activeRace.racedata.dnaConverterList.Length > 0)
-                {
-                    foreach (DnaConverterBehaviour converter in activeRace.racedata.dnaConverterList)
-                    {
-                        if(converter.GetType() == typeof(DynamicDNAConverterBehaviour))
-                        if (((DynamicDNAConverterBehaviour)converter).LateUpdateSkeleton(umaData))
-                        {
-                            needsOnPostRender = true;
-                        }
-                    }
-                }
-            }
-            if (needsOnPostRender) {
-                StopCoroutine(OnPostRender());
-                StartCoroutine(OnPostRender());
-            }
-        }
-
-        IEnumerator OnPostRender()
-        {
-            yield return new WaitForEndOfFrame();
-
-            if (activeRace.racedata != null && umaData != null)
-            {
-                umaData.skeleton.RestoreAll();
-            }
-        }
-
         IEnumerator StartStartCoroutine()
         {
             bool mayRequireDownloads = false;
