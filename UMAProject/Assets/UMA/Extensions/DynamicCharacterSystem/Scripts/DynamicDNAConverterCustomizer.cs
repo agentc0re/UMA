@@ -38,19 +38,34 @@ namespace UMA
         Dictionary<string, DynamicDNAConverterBehaviour> converterBackups = new Dictionary<string, DynamicDNAConverterBehaviour>();
         Dictionary<string, string[]> dnaAssetNamesBackups = new Dictionary<string, string[]>();
         Dictionary<string, UMABonePose.PoseBone[]> poseBonesBackups = new Dictionary<string, UMABonePose.PoseBone[]>();
-       
-        // Use this for initialization
-        void Start()
+
+		//UndoRedoDelegate
+		void OnUndo()
+		{
+			UpdateUMA();
+		}
+
+		public void StartListeningForUndo()
+		{
+			Undo.undoRedoPerformed += OnUndo;
+		}
+		public void StopListeningForUndo()
+		{
+			Undo.undoRedoPerformed -= OnUndo;
+		}
+
+		// Use this for initialization
+		void Start()
         {
-            //TODO make the guide/target semi transparent
-            /*targetAlphaTex = new Texture2D(2,2);
+			//TODO make the guide/target semi transparent
+			/*targetAlphaTex = new Texture2D(2,2);
             guideAlphaTex = new Texture2D(2,2);
             var AlphaColor = new Color(guideAlpha, guideAlpha, guideAlpha, 1f);
             guideAlphaTex.SetPixel(0, 0, AlphaColor);
             guideAlphaTex.SetPixel(0, 1, AlphaColor);
             guideAlphaTex.SetPixel(1, 0, AlphaColor);
             guideAlphaTex.SetPixel(1, 1, AlphaColor);*/
-            if (targetUMA != null)
+			if (targetUMA != null)
             {
                 activeUMA = targetUMA;
                 activeUMA.CharacterUpdated.AddListener(SetAvailableConverters);
@@ -108,33 +123,6 @@ namespace UMA
                 }
             }
         }
-
-        /* //MOVED THE FOLLOWING TWO INTO DYNAMICCHARACTERAVATAR FOR THE TIME BEING
-        //@ECURTZ right now each converters LateUpdateSkeleton method has to be called by something else since the converters prefab itself is in active and so cant do LateUpdate or do a StartCoRoutine for the end of frame reset (which we also hopefully wont need)
-        void LateUpdate()
-        {
-            if(activeUMA != null)
-            {
-                if(availableConverters.Count > 0)
-                {
-                    foreach(DynamicDNAConverterBehaviour converter in availableConverters)
-                    {
-                        converter.LateUpdateSkeleton(activeUMA.umaData);
-                    }
-                }
-            }
-            StartCoroutine(OnPostRender());
-        }
-
-        IEnumerator OnPostRender()
-        {
-            yield return new WaitForEndOfFrame();
-
-            if (activeUMA != null)
-            {
-                activeUMA.umaData.skeleton.RestoreAll();               
-            }
-        }*/
 
         void OnApplicationQuit()
         {
@@ -317,7 +305,6 @@ namespace UMA
                     converter.ApplyDynamicDnaAction(activeUMA.umaData, activeUMA.umaData.skeleton);
                 }
             }
-            //activeUMA.umaData.GotoTPose();//Nothing happens if we do this.Its just the TPose with no dna...
             var skeleton = activeUMA.umaData.skeleton;
             var index = 0;
             foreach (int boneHash in skeleton.BoneHashes)

@@ -188,9 +188,24 @@ namespace UMA.PoseTools
                     position.vector3Value = newPosX100 / 100;
                 }
             }
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("rotation"), true);
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("scale"));
-            EditorGUI.indentLevel = startingIndent;
+			//these maybe easier to use if they were euler
+			SerializedProperty rotation = property.FindPropertyRelative("rotation");
+			Vector3 currentRotationEuler = ((Quaternion)rotation.quaternionValue).eulerAngles;
+			Vector3 newRotationEuler = currentRotationEuler;
+			EditorGUI.BeginChangeCheck();
+			newRotationEuler = EditorGUILayout.Vector3Field("Rotation", newRotationEuler);
+			if (EditorGUI.EndChangeCheck())
+			{
+				if(newRotationEuler != currentRotationEuler)
+				{
+					rotation.quaternionValue = Quaternion.Euler(newRotationEuler);
+				}
+
+			}
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("scale"));
+			//but sometimes rotation doesn't do what you would expect in euler so maybe still have quaternion anyway
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("rotation"),new GUIContent("qRotation"), true);
+			EditorGUI.indentLevel = startingIndent;
         }
     }
 }

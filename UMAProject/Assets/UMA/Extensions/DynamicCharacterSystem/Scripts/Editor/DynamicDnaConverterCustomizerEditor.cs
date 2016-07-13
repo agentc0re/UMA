@@ -101,6 +101,7 @@ namespace UMAEditor
             }
             if (serializedObject.FindProperty("selectedConverter").objectReferenceValue != null)
             {
+				thisDDCC.StartListeningForUndo();
                 GUIHelper.BeginVerticalPadded(10, new Color(0.75f, 0.875f, 1f));
                 EditorGUILayout.LabelField("Import Settings from another Converter", EditorStyles.boldLabel);
                 var ImportFromConverterR = EditorGUILayout.GetControlRect(false);
@@ -171,8 +172,11 @@ namespace UMAEditor
                     thisDDCC.SaveChangesAsNew();
                 }
                 GUIHelper.EndVerticalPadded(10);
-            }
-            serializedObject.ApplyModifiedProperties();
+			}else
+			{
+				thisDDCC.StopListeningForUndo();
+			}
+			serializedObject.ApplyModifiedProperties();
         }
    }
 
