@@ -72,6 +72,7 @@ public class DynamicDNAConverterBehaviourEditor : Editor
             hashes.Add(hashList.GetArrayElementAtIndex(i).FindPropertyRelative("hash").intValue);
         }
         UpdateDnaNames();
+		initialized = true;
     }
 
     void UpdateHashNames()
