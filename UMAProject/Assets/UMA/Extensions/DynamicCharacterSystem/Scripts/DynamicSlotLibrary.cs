@@ -28,14 +28,11 @@ public class DynamicSlotLibrary : SlotLibrary
     [HideInInspector]
     public bool downloadAssetsEnabled = true;
 
-    bool AllResourcesScanned = false;
-
     public void Start()
     {
         if (Application.isPlaying)
         {
             assetBundlesUsedDict.Clear();
-            AllResourcesScanned = false;
         }
 #if UNITY_EDITOR
         if (Application.isPlaying)
@@ -62,7 +59,6 @@ public class DynamicSlotLibrary : SlotLibrary
         if (editorAddedAssets.Count > 0)
         {
             editorAddedAssets.Clear();
-            AllResourcesScanned = false;
         }
 #endif
     }

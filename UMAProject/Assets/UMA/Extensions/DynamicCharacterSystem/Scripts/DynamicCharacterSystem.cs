@@ -55,9 +55,6 @@ namespace UMACharacterSystem
         [HideInInspector]
         public bool downloadAssetsEnabled = true;
 
-        bool AllResourcesScannedXML = false;
-        bool AllResourcesScannedRecipes = false;
-
 
         public virtual void Awake()
         {
@@ -106,8 +103,6 @@ namespace UMACharacterSystem
         // Use this for initialization
         public virtual void Start()
         {
-            AllResourcesScannedXML = false;
-            AllResourcesScannedRecipes = false;
             if (!initialized)
             {
                 Init();

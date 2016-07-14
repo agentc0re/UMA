@@ -30,13 +30,10 @@ public class DynamicRaceLibrary : RaceLibrary
     [HideInInspector]
     public bool downloadAssetsEnabled = true;
 
-    bool AllResourcesScanned = false;
-
     public void Start()
     {
         if (Application.isPlaying)
         {
-            AllResourcesScanned = false;
             assetBundlesUsedDict.Clear();
         }
 #if UNITY_EDITOR
@@ -63,7 +60,6 @@ public class DynamicRaceLibrary : RaceLibrary
         if(editorAddedAssets.Count > 0)
         {
             editorAddedAssets.Clear();
-            AllResourcesScanned = false;
         }
 #endif
     }
