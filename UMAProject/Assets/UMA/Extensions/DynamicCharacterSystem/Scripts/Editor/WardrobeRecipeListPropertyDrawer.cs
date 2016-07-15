@@ -60,6 +60,7 @@ public class WardrobeRecipeListPropertyDrawer : PropertyDrawer {
                                     thisRecipesProp.GetArrayElementAtIndex(newArrayElIndex).FindPropertyRelative("_compatibleRaces").GetArrayElementAtIndex(cr).stringValue = tempRecipeAsset.compatibleRaces[cr];
                                 }
                                 thisRecipesProp.serializedObject.ApplyModifiedProperties();
+								GUI.changed = true;
 							}
 							continue;
 						}

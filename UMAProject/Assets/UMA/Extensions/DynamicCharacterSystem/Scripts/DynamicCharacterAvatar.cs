@@ -589,7 +589,7 @@ namespace UMACharacterSystem
         /// <summary>
         /// Applies these colors to the loaded Avatar and adds any colors the loaded Avatar has which are missing from this list, to this list
         /// </summary>
-        void UpdateColors()
+        public void UpdateColors(bool triggerDirty = false)
         {
             foreach (UMA.OverlayColorData ucd in umaData.umaRecipe.sharedColors)
             {
@@ -608,6 +608,10 @@ namespace UMACharacterSystem
                     }
                 }
             }
+			if (triggerDirty)
+			{
+				ForceUpdate(false, true, false);
+			}
         }
 
         protected void UpdateUMA()

@@ -32,14 +32,42 @@ public partial class DynamicCharacterAvatarEditor : Editor
         serializedObject.ApplyModifiedProperties();
         SerializedProperty thisRaceSetter = serializedObject.FindProperty("activeRace");
         Rect currentRect = EditorGUILayout.GetControlRect(false, _racePropDrawer.GetPropertyHeight(thisRaceSetter, GUIContent.none));
-        EditorGUI.BeginChangeCheck();
-        _racePropDrawer.OnGUI(currentRect, thisRaceSetter, new GUIContent(thisRaceSetter.displayName));
-        //Other DCA propertyDrawers
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("preloadWardrobeRecipes"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("raceAnimationControllers"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("characterColors"),true);
-        //Load save fields
-        SerializedProperty loadPathType = serializedObject.FindProperty("loadPathType");
+		_racePropDrawer.OnGUI(currentRect, thisRaceSetter, new GUIContent(thisRaceSetter.displayName));
+		//Other DCA propertyDrawers
+		EditorGUI.BeginChangeCheck();
+		EditorGUILayout.PropertyField(serializedObject.FindProperty("preloadWardrobeRecipes"));
+		if (EditorGUI.EndChangeCheck())
+		{
+			serializedObject.ApplyModifiedProperties();
+			if (Application.isPlaying)
+			{
+				thisDCA.ClearSlots();
+				thisDCA.LoadDefaultWardrobe();
+				thisDCA.BuildCharacter();
+			}
+		}
+		EditorGUI.BeginChangeCheck();
+		EditorGUILayout.PropertyField(serializedObject.FindProperty("raceAnimationControllers"));
+		if (EditorGUI.EndChangeCheck())
+		{
+			serializedObject.ApplyModifiedProperties();
+			if (Application.isPlaying)
+			{
+				thisDCA.SetExpressionSet();//this triggers any expressions to reset.
+				thisDCA.SetAnimatorController();
+			}
+		}
+		EditorGUI.BeginChangeCheck();
+		EditorGUILayout.PropertyField(serializedObject.FindProperty("characterColors"),true);
+		if (EditorGUI.EndChangeCheck())
+		{
+			serializedObject.ApplyModifiedProperties();
+			if (Application.isPlaying)
+				thisDCA.UpdateColors(true);
+		}
+		//Load save fields
+		EditorGUI.BeginChangeCheck();
+		SerializedProperty loadPathType = serializedObject.FindProperty("loadPathType");
         loadPathType.isExpanded = EditorGUILayout.Foldout(loadPathType.isExpanded, "Load/Save Options");
         if (loadPathType.isExpanded)
         {
