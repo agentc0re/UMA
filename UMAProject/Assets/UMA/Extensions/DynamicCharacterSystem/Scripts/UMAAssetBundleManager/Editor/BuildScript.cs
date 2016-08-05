@@ -49,11 +49,11 @@ namespace UMAAssetBundleManager
 #endif
             }
             
-            //here we build a PlatformName.index file that contains an index of all the assets in each bundle...
+            //Build a [PlatformName]index asset that contains an index of all the assets in each bundle and the data that is genereted in the AssetBundleManifest when we build...
             //You can add to the AssetBundleIndex partial class to customize what data is saved for what assets.
             AssetBundleIndex thisIndex = ScriptableObject.CreateInstance<AssetBundleIndex>();
             string[] assetBundleNamesArray = AssetDatabase.GetAllAssetBundleNames();
-            //DOS NOTES: To do encrypted asset bundles I think we will need to create our own buildmap so after the bundles have been 
+            //DOS NOTES: To do encrypted asset bundles we will need to create our own buildmap so after the bundles have been 
             //created we can find them in the file system and encrypt them
             AssetBundleBuild[] buildMap = new AssetBundleBuild[assetBundleNamesArray.Length + 1];//+1 for the index bundle
             for (int i = 0; i < assetBundleNamesArray.Length; i++)
@@ -69,7 +69,6 @@ namespace UMAAssetBundleManager
                 else
                 {
                     buildMap[i].assetBundleName = bundleName;
-                    //buildMap[i].assetBundleVariant = "";
                 }
  
                 string[] assetBundleAssetsArray = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName);
@@ -91,18 +90,37 @@ namespace UMAAssetBundleManager
             buildMap[assetBundleNamesArray.Length].assetBundleName = Utility.GetPlatformName() + "Index";
             buildMap[assetBundleNamesArray.Length].assetNames = new string[1] { "Assets/" + Utility.GetPlatformName() + "Index.asset" };
 
-            //Save a json version of the data- just for reference, this does not need to be uploaded.
-            var relativeAssetBundlesOutputPathForPlatform = Path.Combine(Utility.AssetBundlesOutputPath, Utility.GetPlatformName());
-            string thisIndexJson = JsonUtility.ToJson(thisIndex);
-            var thisIndexJsonPath =  Path.Combine(relativeAssetBundlesOutputPathForPlatform, Utility.GetPlatformName().ToLower()) + "index.json";
-            File.WriteAllText(thisIndexJsonPath, thisIndexJson);
+            //@TODO: Maybe we should use append hash?
+			//Build the current state so we can get the AssetBundleManifest object and add its values to the index
+            var assetBundleManifest = BuildPipeline.BuildAssetBundles(outputPath, buildMap, options, EditorUserBuildSettings.activeBuildTarget);
+			//now we can add the manifest data to the AssetBundleIndex
+			//Get any bundles with variants
+			thisIndex = AssetDatabase.LoadAssetAtPath<AssetBundleIndex>("Assets/" + Utility.GetPlatformName() + "Index.asset");
+			string[] bundlesWithVariant = assetBundleManifest.GetAllAssetBundlesWithVariant();
+			thisIndex.bundlesWithVariant = bundlesWithVariant;
+			//then loop over each bundle in the bundle names and get the bundle specific data
+			for (int i = 0; i < assetBundleNamesArray.Length; i++)
+			{
+				string assetBundleHash = assetBundleManifest.GetAssetBundleHash(assetBundleNamesArray[i]).ToString();
+				string[] allDependencies = assetBundleManifest.GetAllDependencies(assetBundleNamesArray[i]);
+				string[] directDependencies = assetBundleManifest.GetDirectDependencies(assetBundleNamesArray[i]);
+				thisIndex.bundlesIndex[i].assetBundleHash = assetBundleHash;
+				thisIndex.bundlesIndex[i].allDependencies = allDependencies;
+                thisIndex.bundlesIndex[i].directDependencies = directDependencies;
+			}
+			//Update and Save the index asset and build again. This will store the updated asset in the windowsindex asset bundle
+			EditorUtility.SetDirty(thisIndex);
+			AssetDatabase.SaveAssets();
+			BuildPipeline.BuildAssetBundles(outputPath, buildMap, options, EditorUserBuildSettings.activeBuildTarget);
+			//Save a json version of the data- this can be used for uploading to a server to update a database or something
+			var relativeAssetBundlesOutputPathForPlatform = Path.Combine(Utility.AssetBundlesOutputPath, Utility.GetPlatformName());
+			string thisIndexJson = JsonUtility.ToJson(thisIndex);
+			var thisIndexJsonPath = Path.Combine(relativeAssetBundlesOutputPathForPlatform, Utility.GetPlatformName().ToLower()) + "index.json";
+			File.WriteAllText(thisIndexJsonPath, thisIndexJson);
 
-            //@TODO: use append hash... (Make sure pipeline works correctly with it.)
-            //BuildPipeline.BuildAssetBundles(outputPath, options, EditorUserBuildSettings.activeBuildTarget);
-            //So now we have our buildMap we should get exactly the same results if we use it?
-            BuildPipeline.BuildAssetBundles(outputPath, buildMap, options, EditorUserBuildSettings.activeBuildTarget);
-            //And we should be able to encrypt them all now...
-            for(int bmi = 0; bmi < buildMap.Length; bmi++)
+			//Theoretically we could encrypt the bundles here, but there will also need to be decryption methods in AssetBundleManager/AssetBundleLoadOperation
+			//Its really important that caching functionality is preserverd somehow.
+			for (int bmi = 0; bmi < buildMap.Length; bmi++)
             {
                 //string thisABPath = Path.Combine(relativeAssetBundlesOutputPathForPlatform, buildMap[bmi].assetBundleName);
                 //byte[] thisABBytes = File.ReadAllBytes(thisABPath);

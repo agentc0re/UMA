@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -89,6 +89,9 @@ namespace UMAAssetBundleManager
         {
             public string assetBundleName;
             public List<AssetBundleIndexItem> assetBundleAssets = new List<AssetBundleIndexItem>();
+			public string[] allDependencies;
+			public string[] directDependencies;
+			public string assetBundleHash;
 
             public AssetBundleIndexList(string _assetBundleName)
             {
@@ -106,20 +109,78 @@ namespace UMAAssetBundleManager
                 assetBundleAssets.Add(thisItem);
             }
         }
-
-        [SerializeField]
+		[SerializeField]
+		public string ownBundleHash;
+		[SerializeField]
         public List<AssetBundleIndexList> bundlesIndex = new List<AssetBundleIndexList>();
+		[SerializeField]
+		public string[] bundlesWithVariant;
 
         public AssetBundleIndex()
         {
 
         }
 
-        /// <summary>
-        /// Replicates AssetDatabase.GetAllAssetBundleNames() method. Gets the names of all available asset bundles.
-        /// </summary>
-        /// <returns>String array of all available bundles.</returns>
-        public string[] GetAllAssetBundleNames()
+		#region AssetBundleManifest clone methods
+
+		//These methods are replicas of the AssetBundleManifest methods so that we can just use this Index in place of the manifest
+
+		public string[] GetAllAssetBundles()
+		{
+			return GetAllAssetBundleNames();
+		}
+
+		public Hash128 GetAssetBundleHash(string assetBundleName)
+		{
+			Hash128 hash = new Hash128();
+			for(int i = 0; i < bundlesIndex.Count; i++)
+			{
+				if(bundlesIndex[i].assetBundleName == assetBundleName)
+				{
+					hash = Hash128.Parse(bundlesIndex[i].assetBundleHash);
+				}
+			}
+			return hash;
+		}
+		//TODO work out what this actually is and how its made so we can recreate it server side
+		public string[] GetAllAssetBundlesWithVariant()
+		{
+			return bundlesWithVariant;
+		}
+
+		public string[] GetAllDependencies(string assetBundleName)
+		{
+			string[] deps = new string[0];
+			for (int i = 0; i < bundlesIndex.Count; i++)
+			{
+				if (bundlesIndex[i].assetBundleName == assetBundleName)
+				{
+					deps = bundlesIndex[i].allDependencies;
+				}
+			}
+			return deps;
+		}
+
+		public string[] GetDirectDependencies(string assetBundleName)
+		{
+			string[] deps = new string[0];
+			for (int i = 0; i < bundlesIndex.Count; i++)
+			{
+				if (bundlesIndex[i].assetBundleName == assetBundleName)
+				{
+					deps = bundlesIndex[i].directDependencies;
+				}
+			}
+			return deps;
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Replicates AssetDatabase.GetAllAssetBundleNames() method. Gets the names of all available asset bundles.
+		/// </summary>
+		/// <returns>String array of all available bundles.</returns>
+		public string[] GetAllAssetBundleNames()
         {
             List<string> assetBundleNames = new List<string>();
             foreach (AssetBundleIndexList iAssetList in bundlesIndex)

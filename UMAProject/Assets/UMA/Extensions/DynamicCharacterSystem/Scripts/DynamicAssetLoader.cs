@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,7 +16,11 @@ namespace UMA
 
         [Tooltip("Set the server URL that assetbundles can be loaded from. Used in a live build and when the LocalAssetServer is turned off.")]
         public string remoteServerURL = "";
-        [Tooltip("A list of assetbundles to preload when the game starts. After these have completed loading any GameObject in the gameObjectsToActivate field will be activated.")]
+		[Tooltip("Use the JSON version of the assetBundleIndex rather than the assetBundleVersion.")]
+		public bool useJsonIndex = false;
+		[Tooltip("Set the server URL for the AssetBundleIndex json data. You can use this to make a server request that could generate an index on the fly for example. Used in a live build and when the LocalAssetServer is turned off. TIP use [PLATFORM] to use the current platform name in the URL")]
+		public string remoteServerIndexURL = "";
+		[Tooltip("A list of assetbundles to preload when the game starts. After these have completed loading any GameObject in the gameObjectsToActivate field will be activated.")]
         public List<string> assetBundlesToPreLoad = new List<string>();
         [Tooltip("GameObjects that will be activated after the list of assetBundlesToPreLoad has finished downloading.")]
         public List<GameObject> gameObjectsToActivate = new List<GameObject>();
@@ -235,7 +239,7 @@ namespace UMA
                     yield break;
                 }
 #endif
-                var request = AssetBundleManager.Initialize();
+                var request = AssetBundleManager.Initialize(useJsonIndex, remoteServerIndexURL);
                 if (request != null)
                 {
                     while (AssetBundleManager.IsOperationInProgress(request))
@@ -243,7 +247,7 @@ namespace UMA
                         yield return null;
                     }
                     isInitializing = false;
-                    if (AssetBundleManager.AssetBundleManifestObject != null && AssetBundleManager.AssetBundleIndexObject != null)
+                    if (/*AssetBundleManager.AssetBundleManifestObject != null && */AssetBundleManager.AssetBundleIndexObject != null)
                     {
                         isInitialized = true;
                     }
@@ -252,7 +256,7 @@ namespace UMA
                         //if we are in the editor this can only have happenned because the asset bundles were not built and by this point
                         //an error will have already been shown about that and AssetBundleManager.SimulationOverride will be true so we can just continue.
 #if UNITY_EDITOR
-                        if (AssetBundleManager.AssetBundleManifestObject == null || AssetBundleManager.AssetBundleIndexObject == null)
+                        if (/*AssetBundleManager.AssetBundleManifestObject == null ||*/ AssetBundleManager.AssetBundleIndexObject == null)
                         {
                             isInitialized = true;
                             yield break;
@@ -360,7 +364,7 @@ namespace UMA
                     }
                 }
             }
-            string[] bundlesInManifest = AssetBundleManager.AssetBundleManifestObject.GetAllAssetBundles();
+            string[] bundlesInManifest = AssetBundleManager.AssetBundleIndexObject.GetAllAssetBundles();
             foreach (string assetBundleName in assetBundlesToLoad)
             {
                 foreach (string bundle in bundlesInManifest)
@@ -638,7 +642,7 @@ namespace UMA
             else
             {
 #endif
-                if (AssetBundleManager.AssetBundleManifestObject == null)
+                if (AssetBundleManager.AssetBundleIndexObject == null)
                 {
 #if UNITY_EDITOR
                     Debug.LogWarning("[DynamicAssetLoader] No AssetBundleManager.AssetBundleManifestObject found. Do you need to rebuild your AssetBundles and/or upload the platform manifest bundle?");

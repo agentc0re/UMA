@@ -10,7 +10,7 @@ using System.Collections.Generic;
     The AssetBundle Manager will take care of loading AssetBundles and their associated 
     Asset Dependencies.
         Initialize()
-            Initializes the AssetBundle manifest object.
+            Initializes the AssetBundle index object. This contains the standard Unity AssetBundleIndex data as well as an index of what assets are in what asset bundles
         LoadAssetAsync()
             Loads a given asset from a given AssetBundle and handles all the dependencies.
         LoadLevelAsync()
@@ -38,6 +38,8 @@ namespace UMAAssetBundleManager
     {
         public AssetBundle m_AssetBundle;
         public int m_ReferencedCount;
+		//to enable a json index we need to have a string/data field here
+		public string m_data;
 
         internal event Action unload;
 
@@ -53,7 +55,13 @@ namespace UMAAssetBundleManager
             m_AssetBundle = assetBundle;
             m_ReferencedCount = 1;
         }
-    }
+		public LoadedAssetBundle(string data)
+		{
+			m_AssetBundle = null;
+			m_data = data;
+			m_ReferencedCount = 1;
+		}
+	}
 
     /// <summary>
     /// Class takes care of loading assetBundle and its dependencies automatically, loading variants automatically.
@@ -66,7 +74,6 @@ namespace UMAAssetBundleManager
         static LogMode m_LogMode = LogMode.All;
         static string m_BaseDownloadingURL = "";
         static string[] m_ActiveVariants = { };
-        static AssetBundleManifest m_AssetBundleManifest = null;
         static AssetBundleIndex m_AssetBundleIndex = null;
 #if UNITY_EDITOR
         static int m_SimulateAssetBundleInEditor = -1;
@@ -107,15 +114,6 @@ namespace UMAAssetBundleManager
             get { return m_ActiveVariants; }
             set { m_ActiveVariants = value; }
         }
-
-        // AssetBundleManifest object which can be used to load the dependecies 
-        // and check suitable assetBundle variants.
-        public static AssetBundleManifest AssetBundleManifestObject
-        {
-            get { return m_AssetBundleManifest; }
-            set { m_AssetBundleManifest = value; }
-        }
-
         // AssetBundleIndex object which can be used to check the contents of any asset bundle without having to download it first. 
         public static AssetBundleIndex AssetBundleIndexObject
         {
@@ -213,7 +211,7 @@ namespace UMAAssetBundleManager
                 {
                     m_DownloadingErrors[assetBundleName] = "-" + error;
 #if UNITY_EDITOR
-                    if(assetBundleName == Utility.GetPlatformName())
+                    if(assetBundleName == Utility.GetPlatformName().ToLower() + "index")
                     {
                         if(EditorPrefs.GetBool("LocalAssetBundleServerEnabled") == false || SimpleWebServer.serverStarted == false)//when the user restarts Unity this might be true even if the server has not actually been started
                         {
@@ -223,8 +221,8 @@ namespace UMAAssetBundleManager
                             }
                             else
                             {
-                                Debug.LogWarning("AssetBundleManager could not download the AssetBundleManifest from the Remote Server URL you have set in DynamicAssetLoader. Have you set the URL correctly and uploaded your AssetBundles?");
-                                error = "AssetBundleManager could not download the AssetBundleManifest from the Remote Server URL you have set in DynamicAssetLoader. Have you set the URL correctly and uploaded your AssetBundles?";
+                                Debug.LogWarning("AssetBundleManager could not download the AssetBundleIndex from the Remote Server URL you have set in DynamicAssetLoader. Have you set the URL correctly and uploaded your AssetBundles?");
+                                error = "AssetBundleManager could not download the AssetBundleIndex from the Remote Server URL you have set in DynamicAssetLoader. Have you set the URL correctly and uploaded your AssetBundles?";
                             }
                         }
                         else
@@ -406,21 +404,30 @@ namespace UMAAssetBundleManager
         }
 
         /// <summary>
-        /// Initializes asset bundle namager and starts download of manifest asset bundle. When this completes the assetBundleIndex is downloaded or loaded from cache.
+        /// Initializes asset bundle namager and starts download of index asset bundle
         /// </summary>
-        /// <returns>Returns the manifest asset bundle download operation object.</returns>
-        // TODO I think that both the Manifest AND the index should be available if the device is offline. 
-        // Right now I think ABM always tries to download the manifest and the game will break if it cant.
-        // What I think should happen is that if the game is offline it should still be able to get a cached manifest, 
-        // index and any cached bundles- though if they have been previously cached the manifest may not be necessary if we have an index...
-        static public AssetBundleLoadManifestOperation Initialize()
+        /// <returns>Returns the index asset bundle download operation object.</returns>
+        // TODO I think that the index should be available if the device is offline. 
+        // Right now I think ABM always tries to download the index and the game will break if it cant.
+        // What I think should happen is that if the game is offline it should still be able to get a cached index
+        static public AssetBundleLoadIndexOperation Initialize()
         {
-            return Initialize(Utility.GetPlatformName());
+            return Initialize(Utility.GetPlatformName(), false, "");
         }
 
-        static public AssetBundleLoadManifestOperation Initialize(string manifestAssetBundleName)
+		static public AssetBundleLoadIndexOperation Initialize(bool useJsonIndex)
+		{
+			return Initialize(Utility.GetPlatformName(), useJsonIndex, "");
+		}
+
+		static public AssetBundleLoadIndexOperation Initialize(bool useJsonIndex, string jsonIndexUrl)
+		{
+			return Initialize(Utility.GetPlatformName(), useJsonIndex, jsonIndexUrl);
+		}
+
+		static public AssetBundleLoadIndexOperation Initialize(string indexAssetBundleName, bool useJsonIndex, string jsonIndexUrl)
         {
-            AssetBundleLoadingIndicator.Instance.Show(manifestAssetBundleName,"Initializing...", "", "Initialized");
+            AssetBundleLoadingIndicator.Instance.Show(indexAssetBundleName.ToLower() + "index", "Initializing...", "", "Initialized");
 #if UNITY_EDITOR
             Log(LogType.Info, "Simulation Mode: " + (SimulateAssetBundleInEditor ? "Enabled" : "Disabled"));
 #endif
@@ -429,73 +436,47 @@ namespace UMAAssetBundleManager
             DontDestroyOnLoad(go);
 
 #if UNITY_EDITOR
-            // If we're in Editor simulation mode, we don't need the manifest assetBundle.
+            // If we're in Editor simulation mode, we don't need the index assetBundle.
             if (SimulateAssetBundleInEditor)
                 return null;
 #endif
-            LoadAssetBundle(manifestAssetBundleName, true);//will add the  AssetBundleDownloadFromWebOperation
-            var operation = new AssetBundleLoadManifestOperation(manifestAssetBundleName, "AssetBundleManifest", typeof(AssetBundleManifest));
-            m_InProgressOperations.Add(operation);
+			//as of 05/08/2016 we dont use Unitys AssetBundleManifest at all we just use our AssetBundleIndex
+			LoadAssetBundle(indexAssetBundleName.ToLower() + "index", true, useJsonIndex, jsonIndexUrl);
+			var operation = new AssetBundleLoadIndexOperation(indexAssetBundleName.ToLower() + "index", indexAssetBundleName + "Index", typeof(AssetBundleIndex),useJsonIndex);
+			m_InProgressOperations.Add(operation);
             return operation;
-        }
-
-
-        /// <summary>
-        /// initializes the download or cache loadd of the AssetBundleIndex. This is automatically triggered when the AssetBundleManifest has completed downloading.
-        /// </summary>
-        /// <param name="manifestAssetBundleName"></param>
-        /// <returns></returns>
-        static public AssetBundleLoadIndexOperation InitializeIndex(string manifestAssetBundleName)
-        {
-            AssetBundleLoadingIndicator.Instance.Show(manifestAssetBundleName.ToLower() + "index", "Initializing Index...", "", "Index Initialized");
-#if UNITY_EDITOR
-            // If we're in Editor simulation mode, we don't need the index assetBundle either.
-            if (SimulateAssetBundleInEditor)
-                return null;
-#endif
-            LoadAssetBundle(manifestAssetBundleName.ToLower() + "index", false, true);
-            var operation = new AssetBundleLoadIndexOperation(manifestAssetBundleName.ToLower() + "index", manifestAssetBundleName + "Index", typeof(AssetBundleIndex));
-            m_InProgressOperations.Add(operation);
-            return operation;
-        }
-
-        // Temporarily work around a il2cpp bug
-        static protected void LoadAssetBundle(string assetBundleName)
-        {
-            LoadAssetBundle(assetBundleName, false);
         }
 
         /// <summary>
         /// Starts the download of the asset bundle identified by the given name. Also downloads any asset bundles the given asset bundle is dependent on.
         /// </summary>
         /// <param name="assetBundleName"></param>
-        /// <param name="isLoadingAssetBundleManifest"></param>
         /// <param name="isLoadingAssetBundleIndex"></param>
-        public static void LoadAssetBundle(string assetBundleName, bool isLoadingAssetBundleManifest, bool isLoadingAssetBundleIndex = false)
+        public static void LoadAssetBundle(string assetBundleName, bool isLoadingAssetBundleIndex = false, bool useJsonIndex = false, string jsonIndexUrl = "")
         {
 #if UNITY_EDITOR
             string fromLocalServer = (EditorPrefs.GetBool("LocalAssetBundleServerEnabled") && SimpleWebServer.serverStarted) ? "from LocalServer " : "";
-            Log(LogType.Info, "Loading Asset Bundle " + fromLocalServer + (isLoadingAssetBundleManifest ? "Manifest: " : ": ") + assetBundleName);
+            Log(LogType.Info, "Loading Asset Bundle " + fromLocalServer + (isLoadingAssetBundleIndex ? "Index: " : ": ") + assetBundleName);
 
             // If we're in Editor simulation mode, we don't have to really load the assetBundle and its dependencies.
             if (SimulateAssetBundleInEditor)
                 return;
 #endif
 
-            if (!isLoadingAssetBundleManifest)
-            {
-                if (m_AssetBundleManifest == null)
-                {
-                    Debug.LogError("Please initialize AssetBundleManifest by calling AssetBundleManager.Initialize()");
-                    return;
-                }
-            }
+			if (!isLoadingAssetBundleIndex)
+			{
+				if (m_AssetBundleIndex == null)
+				{
+					Debug.LogError("Please initialize AssetBundleIndex by calling AssetBundleManager.Initialize()");
+					return;
+				}
+			}
 
-            // Check if the assetBundle has already been processed.
-            bool isAlreadyProcessed = LoadAssetBundleInternal(assetBundleName, isLoadingAssetBundleManifest, isLoadingAssetBundleIndex);
+			// Check if the assetBundle has already been processed.
+			bool isAlreadyProcessed = LoadAssetBundleInternal(assetBundleName, isLoadingAssetBundleIndex, useJsonIndex, jsonIndexUrl);
 
             // Load dependencies.
-            if (!isAlreadyProcessed && !isLoadingAssetBundleManifest && !isLoadingAssetBundleIndex)
+            if (!isAlreadyProcessed && !isLoadingAssetBundleIndex)
                 LoadDependencies(assetBundleName);
         }
 
@@ -548,7 +529,7 @@ namespace UMAAssetBundleManager
         /// <returns></returns>
         static protected string RemapVariantName(string assetBundleName)
         {
-            string[] bundlesWithVariant = m_AssetBundleManifest.GetAllAssetBundlesWithVariant();
+            string[] bundlesWithVariant = m_AssetBundleIndex.GetAllAssetBundlesWithVariant();
 
             // Get base bundle name
             string baseName = assetBundleName.Split('.')[0];
@@ -600,10 +581,9 @@ namespace UMAAssetBundleManager
         /// Sets up download operation for the given asset bundle if it's not downloaded already.
         /// </summary>
         /// <param name="assetBundleName"></param>
-        /// <param name="isLoadingAssetBundleManifest"></param>
         /// <param name="isLoadingAssetBundleIndex"></param>
         /// <returns></returns>
-        static protected bool LoadAssetBundleInternal(string assetBundleName, bool isLoadingAssetBundleManifest, bool isLoadingAssetBundleIndex = false)
+        static protected bool LoadAssetBundleInternal(string assetBundleName, bool isLoadingAssetBundleIndex = false, bool useJsonIndex = false, string jsonIndexUrl = "")
         {
             // Already loaded.
             LoadedAssetBundle bundle = null;
@@ -644,25 +624,32 @@ namespace UMAAssetBundleManager
             {
                 WWW download = null;
                 string url = bundleBaseDownloadingURL + assetBundleName;
-                // For manifest assetbundle, always download it as we don't have hash for it.
+                // For index assetbundle, always download it as we don't have hash for it.
                 //TODO make something to test if there is and internet connection and if not try to get a cached version of this so we can still access the stuff that has been previously cached
-                //TODO2 Make the manifest cache somewhere when it is downloaded.
-                if (isLoadingAssetBundleManifest)
+                //TODO2 Make the index cache somewhere when it is downloaded.
+                if (isLoadingAssetBundleIndex)
                 {
+					if (useJsonIndex && jsonIndexUrl != "")
+					{
+						url = jsonIndexUrl.Replace("[PLATFORM]", Utility.GetPlatformName());
+					}else if (useJsonIndex)
+					{
+						url = url + ".json";
+					}
                     download = new WWW(url);
                     if(download.error != null || download == null)
                     {
                         if (download.error != null)
                             Debug.LogWarning("[AssetBundleManager] "+download.error);
                         else
-                            Debug.LogWarning("[AssetBundleManager] manifest new WWW(url) was NULL");
+                            Debug.LogWarning("[AssetBundleManager] index new WWW(url) was NULL");
                     }
                 }
                 else
                 {
-                    download = WWW.LoadFromCacheOrDownload(url, m_AssetBundleManifest.GetAssetBundleHash(assetBundleName), 0);
+                    download = WWW.LoadFromCacheOrDownload(url, m_AssetBundleIndex.GetAssetBundleHash(assetBundleName), 0);
                 }
-                m_InProgressOperations.Add(new AssetBundleDownloadFromWebOperation(assetBundleName, download));
+                m_InProgressOperations.Add(new AssetBundleDownloadFromWebOperation(assetBundleName, download, useJsonIndex));
             }
             m_DownloadingBundles.Add(assetBundleName);
 
@@ -670,19 +657,19 @@ namespace UMAAssetBundleManager
         }
 
         /// <summary>
-        /// Where we get all the dependencies from the manifest for the given asset bundle and load them all.
+        /// Where we get all the dependencies from the index for the given asset bundle and load them all.
         /// </summary>
         /// <param name="assetBundleName"></param>
         static protected void LoadDependencies(string assetBundleName)
         {
-            if (m_AssetBundleManifest == null)
+            if (m_AssetBundleIndex == null)
             {
-                Debug.LogError("Please initialize AssetBundleManifest by calling AssetBundleManager.Initialize()");
+                Debug.LogError("Please initialize AssetBundleIndex by calling AssetBundleManager.Initialize()");
                 return;
             }
 
-            // Get dependecies from the AssetBundleManifest object..
-            string[] dependencies = m_AssetBundleManifest.GetAllDependencies(assetBundleName);
+            // Get dependecies from the AssetBundleIndex object..
+            string[] dependencies = m_AssetBundleIndex.GetAllDependencies(assetBundleName);
             if (dependencies.Length == 0)
                 return;
 
@@ -702,7 +689,7 @@ namespace UMAAssetBundleManager
         static public void UnloadAssetBundle(string assetBundleName)
         {
 #if UNITY_EDITOR
-            // If we're in Editor simulation mode, we don't have to load the manifest assetBundle.
+            // If we're in Editor simulation mode, we don't have to load the index assetBundle.
             if (SimulateAssetBundleInEditor)
                 return;
 #endif

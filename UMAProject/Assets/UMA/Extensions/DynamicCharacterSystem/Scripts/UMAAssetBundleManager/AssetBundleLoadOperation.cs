@@ -151,12 +151,14 @@ namespace UMAAssetBundleManager
 		WWW m_WWW;
 		string m_Url;
         int zeroDownload = 0;
-		public AssetBundleDownloadFromWebOperation(string assetBundleName, WWW www)
+		bool m_isJsonIndex = false;
+		public AssetBundleDownloadFromWebOperation(string assetBundleName, WWW www, bool isJsonIndex = false)
 			: base(assetBundleName)
 		{
             if (www == null)
                 throw new System.ArgumentNullException("www");
 			m_Url = www.url;
+			m_isJsonIndex = isJsonIndex;
 			this.m_WWW = www;
 		}
 
@@ -241,17 +243,31 @@ namespace UMAAssetBundleManager
                 return;
             }
 
-			AssetBundle bundle = m_WWW.assetBundle;
-			if (bundle == null)
-            {
-                error = string.Format("{0} is not a valid asset bundle.", assetBundleName);
-                Debug.LogWarning(error);
-            }
-            else
-            {
-                assetBundle = new LoadedAssetBundle(m_WWW.assetBundle);
-            }
-
+			if (!m_isJsonIndex)
+			{
+				AssetBundle bundle = m_WWW.assetBundle;
+				if (bundle == null)
+				{
+					error = string.Format("{0} is not a valid asset bundle.", assetBundleName);
+					Debug.LogWarning(error);
+				}
+				else
+				{
+					assetBundle = new LoadedAssetBundle(m_WWW.assetBundle);
+				}
+			}
+			else
+			{
+				string indexData = m_WWW.text;
+				if (indexData == "")
+				{
+					Debug.LogWarning("The JSON AssetBundleIndex was empty");
+				}
+				else
+				{
+					assetBundle = new LoadedAssetBundle(m_WWW.text);
+				}
+			}
 			m_WWW.Dispose();
 			m_WWW = null;
 		}
@@ -434,74 +450,16 @@ namespace UMAAssetBundleManager
 		}
 	}
 
-	public class AssetBundleLoadManifestOperation : AssetBundleLoadAssetOperationFull
-	{
-        protected AssetBundleLoadIndexOperation m_LoadIndexOperation = null;
-
-        public AssetBundleLoadManifestOperation(string bundleName, string assetName, System.Type type)
-			: base(bundleName, assetName, type)
-		{
-		}
-        // Returns true if more Update calls are required.
-        public override bool Update()
-		{
-            //if(m_LoadIndexOperation == null)
-            //base.Update();
-            if (m_Request == null)
-            {
-                LoadedAssetBundle bundle = AssetBundleManager.GetLoadedAssetBundle(m_AssetBundleName, out m_DownloadingError);
-                if (bundle != null && string.IsNullOrEmpty(m_DownloadingError))
-                {
-                    m_Request = bundle.m_AssetBundle.LoadAssetAsync(m_AssetName, m_Type);
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(m_DownloadingError))
-                    {
-                        //This will happen when the file is not found because the asset bundles were not built
-                        //In this case AssetBundleManager will have switched to Simulation Mode so stop updating this download
-                        //probably dont need to log this- just left here in case there are other scenarios when its helpful
-                        //Debug.Log("[AssetBundleLoadOperation.AssetBundleLoadManifestOperation] ERROR: " + m_DownloadingError);
-                        return false;
-                    }
-                }
-            }
-            if (m_Request != null && m_Request.isDone && m_LoadIndexOperation == null)
-			{
-                AssetBundleManager.AssetBundleManifestObject = GetAsset<AssetBundleManifest>();
-                //Chain in the AssetBundleLoadIndexOperation here...
-                m_LoadIndexOperation = AssetBundleManager.InitializeIndex(m_AssetBundleName);
-                if (m_LoadIndexOperation != null)
-                {
-                    return true;
-                }
-                else
-                {
-                    Debug.LogWarning("[AssetBundleLoadOperation.AssetBundleLoadManifestOperation] m_LoadIndexOperation was NULL");
-                    return false;
-                }
-			}
-            else if(m_LoadIndexOperation != null)
-            {
-                bool opInProg = AssetBundleManager.IsOperationInProgress(m_LoadIndexOperation);
-                return opInProg;
-            }
-            else
-            {
-                return true;
-            }
-		}
-	}
-
-    //DOS MODIFIED 
     /// <summary>
     /// Operation for loading the AssetBundleIndex
     /// </summary>
     public class AssetBundleLoadIndexOperation : AssetBundleLoadAssetOperationFull
     {
-        public AssetBundleLoadIndexOperation(string bundleName, string assetName, System.Type type)
+		bool _isJsonIndex;
+        public AssetBundleLoadIndexOperation(string bundleName, string assetName, System.Type type, bool isJsonIndex = false)
             : base(bundleName, assetName, type)
         {
+			_isJsonIndex = isJsonIndex;
         }
         // Returns true if more Update calls are required.
         public override bool Update()
@@ -510,19 +468,34 @@ namespace UMAAssetBundleManager
             if (m_Request == null)
             {
                 LoadedAssetBundle bundle = AssetBundleManager.GetLoadedAssetBundle(m_AssetBundleName, out m_DownloadingError);
-                if (bundle != null)
+				if (bundle != null)
                 {
-                    m_Request = bundle.m_AssetBundle.LoadAssetAsync(m_AssetName, m_Type);
+					//TODO Ideally we want to use the following async request but it doesn't work... see here (http://forum.unity3d.com/threads/assetbundles-do-you-have-to-use-the-assetbundlemanifest-with-assetbundlerequest.423197/)
+					//m_Request = bundle.m_AssetBundle.LoadAssetAsync<AssetBundleIndex>(m_AssetName);
+					//so instead
+					if (_isJsonIndex)
+					{
+						AssetBundleManager.AssetBundleIndexObject = ScriptableObject.CreateInstance<AssetBundleIndex>();
+                        JsonUtility.FromJsonOverwrite(bundle.m_data, AssetBundleManager.AssetBundleIndexObject);
+					}
+					else
+					{
+						AssetBundleManager.AssetBundleIndexObject = bundle.m_AssetBundle.LoadAsset<AssetBundleIndex>(m_AssetName);
+					}
                 }
             }
-
-            if (m_Request != null && m_Request.isDone)
+			//TODO ideally we want to use the async request but it doesn't work so we cant until I sus out why
+			/*if (m_Request != null && m_Request.isDone)
             {
                 AssetBundleManager.AssetBundleIndexObject = GetAsset<AssetBundleIndex>();
                 return false;
-            }
-            else
-                return true;
+            }*/
+			if (AssetBundleManager.AssetBundleIndexObject != null)
+			{
+				return false;
+			}
+			else
+				return true;
         }
     }
 }
