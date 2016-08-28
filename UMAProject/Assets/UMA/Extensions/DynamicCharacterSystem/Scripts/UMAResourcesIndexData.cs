@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -114,12 +114,13 @@ namespace UMA
             return totalCount;
         }
 
-        /// <summary>
-        /// Adds a path terporarily to the index. To add it permanently use UMAResourcesIndex.Instance.Add
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="objName"></param>
-        public void AddPath(UnityEngine.Object obj, string objName)
+#if UNITY_EDITOR
+		/// <summary>
+		/// Adds a path terporarily to the index. To add it permanently use UMAResourcesIndex.Instance.Add
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <param name="objName"></param>
+		public void AddPath(UnityEngine.Object obj, string objName)
         {
             AddPath(obj, UMAUtils.StringToHash(objName));
         }
@@ -157,8 +158,8 @@ namespace UMA
                 data = list;
             }
         }
-
-        public void Remove(System.Type type)
+#endif
+		public void Remove(System.Type type)
         {
             var list = new TypeIndex[data.Length - 1];
             int listi = 0;

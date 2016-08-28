@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +14,8 @@ namespace UMA
     {
         public static UMAResourcesIndex Instance;
         public UMAResourcesIndexData Index;
-        public bool enableDynamicIndexing = false;
+		public UnityEngine.Object indexAsset;
+		public bool enableDynamicIndexing = false;
 
         public UMAResourcesIndex()
         {
@@ -76,72 +77,94 @@ namespace UMA
             }
         }
 
-        public void Add(UnityEngine.Object obj)
-        {
-            if (obj == null)
-                return;
-            string thisName = obj.name;
-            if (obj.GetType() == typeof(SlotDataAsset))
-            {
-                thisName = ((SlotDataAsset)obj).slotName;
-            }
-            if (obj.GetType() == typeof(OverlayDataAsset))
-            {
-                thisName = ((OverlayDataAsset)obj).overlayName;
-            }
-            if (obj.GetType() == typeof(RaceData))
-            {
-                thisName = ((RaceData)obj).raceName;
-            }
-            Index.AddPath(obj, thisName);
-            Save();
-        }
-        public void Add(UnityEngine.Object obj, string objName)
-        {
-            if (obj == null || objName == "")
-                return;
-            Index.AddPath(obj, objName);
-            Save();
-        }
-        public void Add(UnityEngine.Object obj, int objNameHash)
-        {
-            if (obj == null)
-                return;
-            Index.AddPath(obj, objNameHash);
-            Save();
-        }
-        /// <summary>
-        /// Loads saved Index data from a file or creates new data object;
-        /// </summary>
-        /// <returns></returns>
-        public void LoadOrCreateData()
-        {
-            var data = new UMAResourcesIndexData();
-            var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.dat");
-            if (File.Exists(dataAssetPath))
-            {
-                var rawData = FileUtils.ReadAllText(dataAssetPath);
-                data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
-            }
-            Index = data;
-        }
+		public void Add(UnityEngine.Object obj)
+		{
+#if UNITY_EDITOR
+			if (obj == null)
+				return;
+			string thisName = obj.name;
+			if (obj.GetType() == typeof(SlotDataAsset))
+			{
+				thisName = ((SlotDataAsset)obj).slotName;
+			}
+			if (obj.GetType() == typeof(OverlayDataAsset))
+			{
+				thisName = ((OverlayDataAsset)obj).overlayName;
+			}
+			if (obj.GetType() == typeof(RaceData))
+			{
+				thisName = ((RaceData)obj).raceName;
+			}
+			Index.AddPath(obj, thisName);
+			Save();
+#endif
+		}
 
-        /// <summary>
-        /// Saves any updates to the index to the data file
-        /// </summary>
-        public void Save()
-        {
-            var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.dat");
-            var jsonData = JsonUtility.ToJson(Index);
-            FileUtils.WriteAllText(dataAssetPath, jsonData);
-        }
+		public void Add(UnityEngine.Object obj, string objName)
+		{
+#if UNITY_EDITOR
+			if (obj == null || objName == "")
+				return;
+			Index.AddPath(obj, objName);
+			Save();
+#endif
+		}
+		public void Add(UnityEngine.Object obj, int objNameHash)
+		{
+#if UNITY_EDITOR
+			if (obj == null)
+				return;
+			Index.AddPath(obj, objNameHash);
+			Save();
+#endif
+		}
+		/// <summary>
+		/// Loads saved Index data from a file or creates new data object;
+		/// </summary>
+		/// <returns></returns>
+		public void LoadOrCreateData()
+		{
+			var data = new UMAResourcesIndexData();
+			if (indexAsset != null)
+			{
+				var rawData = ((TextAsset)indexAsset).text;
+				data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
+			}
+#if UNITY_EDITOR
+			else
+			{
+				var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
+				if (File.Exists(dataAssetPath))
+				{
+					var rawData = FileUtils.ReadAllText(dataAssetPath);
+					data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
+				}
+			}
+#endif
+			Index = data;
+		}
+
+		/// <summary>
+		/// Saves any updates to the index to the data file
+		/// </summary>
+		public void Save()
+		{
+			//Currently Editor Only. But then since you cant add any assets to Resources in a build you should not be adding anything to the index either.
+#if UNITY_EDITOR
+			var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
+			var jsonData = JsonUtility.ToJson(Index);
+			FileUtils.WriteAllText(dataAssetPath, jsonData);
+			//need to refresh the actual data?
+			LoadOrCreateData();
+#endif
+		}
 
 #if UNITY_EDITOR
 
-        /// <summary>
-        /// Clears the Index of all data.
-        /// </summary>
-        public void ClearIndex()
+		/// <summary>
+		/// Clears the Index of all data.
+		/// </summary>
+		public void ClearIndex()
         {
             Index = new UMAResourcesIndexData();
             Save();
