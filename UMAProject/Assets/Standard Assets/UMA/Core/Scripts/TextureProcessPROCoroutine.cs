@@ -62,6 +62,7 @@ namespace UMA
 					switch(slotData.asset.material.channels[textureType].channelType )
 					{
 						case UMAMaterial.ChannelType.Texture:
+						case UMAMaterial.ChannelType.DiffuseTexture:
 						case UMAMaterial.ChannelType.NormalMap:
 						{
 							textureMerge.Reset();
@@ -172,11 +173,11 @@ namespace UMA
 							{
 								var fragment = atlas.materialFragments[i];
 								if (fragment.isRectShared) continue;
-								for (int j = 0; j < fragment.baseTexture.Length; j++)
+								for (int j = 0; j < fragment.baseOverlay.textureList.Length; j++)
 								{
-									if (fragment.baseTexture[j] != null)
+									if (fragment.baseOverlay.textureList[j] != null)
 									{
-										atlas.material.SetTexture(slotData.asset.material.channels[j].materialPropertyName, fragment.baseTexture[j]);
+										atlas.material.SetTexture(slotData.asset.material.channels[j].materialPropertyName, fragment.baseOverlay.textureList[j]);
 										if (j == 0)
 										{
 											atlas.material.color = fragment.baseColor;
