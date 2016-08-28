@@ -395,20 +395,20 @@ namespace UMA
 				umaDna.Clear();
 				dnaValues.Clear();
 			}
-            /// <summary>
-            /// DynamicUMADna:: a version of RemoveDna that uses the dnaTypeNameHash
-            /// </summary>
-            /// <param name="dnaTypeNameHash"></param>
-            public void RemoveDna(int dnaTypeNameHash)
-            {
-                dnaValues.Remove(umaDna[dnaTypeNameHash]);
-                umaDna.Remove(dnaTypeNameHash);
-            }
-            /// <summary>
-            /// Removes the specified DNA.
-            /// </summary>
-            /// <param name="type">Type.</param>
-            public void RemoveDna(Type type)
+			/// <summary>
+			/// DynamicUMADna:: a version of RemoveDna that uses the dnaTypeNameHash
+			/// </summary>
+			/// <param name="dnaTypeNameHash"></param>
+			public void RemoveDna(int dnaTypeNameHash)
+			{
+				dnaValues.Remove(umaDna[dnaTypeNameHash]);
+				umaDna.Remove(dnaTypeNameHash);
+			}
+			/// <summary>
+			/// Removes the specified DNA.
+			/// </summary>
+			/// <param name="type">Type.</param>
+			public void RemoveDna(Type type)
 			{
 				int dnaTypeNameHash = UMAUtils.StringToHash(type.Name);
 				dnaValues.Remove(umaDna[dnaTypeNameHash]);
@@ -429,12 +429,12 @@ namespace UMA
 				}
 				return null;
 			}
-            /// <summary>
-            /// Get DNA of specified type.
-            /// </summary>
-            /// <returns>The DNA (or null if not found).</returns>
-            /// <param name="dnaTypeNameHash">Type.</param>
-            public UMADnaBase GetDna(int dnaTypeNameHash)
+			/// <summary>
+			/// Get DNA of specified type.
+			/// </summary>
+			/// <returns>The DNA (or null if not found).</returns>
+			/// <param name="dnaTypeNameHash">Type.</param>
+			public UMADnaBase GetDna(int dnaTypeNameHash)
 			{
 				UMADnaBase dna;
 				if (umaDna.TryGetValue(dnaTypeNameHash, out dna))
@@ -565,20 +565,20 @@ namespace UMA
 						for (int j = 0; j < overlayCount; j++)
 						{
 							OverlayData overlay = slot.GetOverlay(j);
-                            //DynamicCharacterSystem:: Needs to use alternative methods that find equivalent overlays since they may not be Equal if they were in an assetBundle
-                            OverlayData originalOverlay = originalSlot.GetEquivalentUsedOverlay(overlay);
-                            if (originalOverlay != null)
+							//DynamicCharacterSystem:: Needs to use alternative methods that find equivalent overlays since they may not be Equal if they were in an assetBundle
+							OverlayData originalOverlay = originalSlot.GetEquivalentUsedOverlay(overlay);
+							if (originalOverlay != null)
 							{
-                                originalOverlay.CopyColors(overlay);//also copies textures
-                                if (overlay.colorData.HasName())
-                                {
-                                    int sharedIndex;
-                                    if (mergedSharedColors.TryGetValue(overlay.colorData.name, out sharedIndex))
-                                    {
-                                        originalOverlay.colorData = sharedColors[sharedIndex];
-                                    }
-                                }
-                            }
+								originalOverlay.CopyColors(overlay);//also copies textures
+								if (overlay.colorData.HasName())
+								{
+									int sharedIndex;
+									if (mergedSharedColors.TryGetValue(overlay.colorData.name, out sharedIndex))
+									{
+										originalOverlay.colorData = sharedColors[sharedIndex];
+									}
+								}
+							}
 							else
 							{
 								OverlayData overlayCopy = overlay.Duplicate();
@@ -719,11 +719,11 @@ namespace UMA
 			public void ApplyDNA(UMAData umaData, bool fixUpUMADnaToDynamicUMADna = false)
 			{
 				EnsureAllDNAPresent();
-                //DynamicUMADna:: when loading an older recipe that has UMADnaHumanoid/Tutorial into a race that now uses DynamicUmaDna the following wont work
-                //so check that and fix it if it happens
-                if (fixUpUMADnaToDynamicUMADna)
-                    DynamicDNAConverterBehaviourBase.FixUpUMADnaToDynamicUMADna(this);
-                foreach (var dnaEntry in umaDna)
+				//DynamicUMADna:: when loading an older recipe that has UMADnaHumanoid/Tutorial into a race that now uses DynamicUmaDna the following wont work
+				//so check that and fix it if it happens
+				if (fixUpUMADnaToDynamicUMADna)
+					DynamicDNAConverterBehaviourBase.FixUpUMADnaToDynamicUMADna(this);
+				foreach (var dnaEntry in umaDna)
 				{
 					DnaConverterBehaviour.DNAConvertDelegate dnaConverter;
 					if (umaDnaConverter.TryGetValue(dnaEntry.Key, out dnaConverter))
@@ -732,17 +732,17 @@ namespace UMA
 					}
 					else
 					{
-                        //DynamicUMADna:: try again this time calling FixUpUMADnaToDynamicUMADna first
-                        if (fixUpUMADnaToDynamicUMADna == false)
-                        {
-                            ApplyDNA(umaData, true);
-                            break;
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Cannot apply dna: " + dnaEntry.Value.GetType().Name + " using key " + dnaEntry.Key);
-                        }
-                    }
+						//DynamicUMADna:: try again this time calling FixUpUMADnaToDynamicUMADna first
+						if (fixUpUMADnaToDynamicUMADna == false)
+						{
+							ApplyDNA(umaData, true);
+							break;
+						}
+						else
+						{
+							Debug.LogWarning("Cannot apply dna: " + dnaEntry.Value.GetType().Name + " using key " + dnaEntry.Key);
+						}
+					}
 				}
 			}
 
@@ -760,12 +760,12 @@ namespace UMA
 						{
 							var dna = converter.DNAType.GetConstructor(System.Type.EmptyTypes).Invoke(null) as UMADnaBase;
 							dna.dnaTypeHash = dnaTypeHash;
-                            //DynamicUMADna:: needs the DNAasset from the converter
-                            if (converter.GetType().ToString().IndexOf("DynamicDNAConverterBahaviour") > -1)
-                            {
-                                ((DynamicUMADnaBase)dna).dnaAsset = ((DynamicDNAConverterBehaviourBase)converter).dnaAsset;
-                            }
-                            umaDna.Add(dnaTypeHash, dna);
+							//DynamicUMADna:: needs the DNAasset from the converter
+							if (converter.GetType().ToString().IndexOf("DynamicDNAConverterBahaviour") > -1)
+							{
+								((DynamicUMADnaBase)dna).dnaAsset = ((DynamicDNAConverterBehaviourBase)converter).dnaAsset;
+							}
+							umaDna.Add(dnaTypeHash, dna);
 							dnaValues.Add(dna);
 						}
 					}
@@ -779,12 +779,12 @@ namespace UMA
 						{
 							var dna = slotData.asset.slotDNA.DNAType.GetConstructor(System.Type.EmptyTypes).Invoke(null) as UMADnaBase;
 							dna.dnaTypeHash = dnaTypeHash;
-                            //DynamicUMADna:: needs the DNAasset from the converter TODO are there other places where I heed to sort out this slotDNA?
-                            if (slotData.asset.slotDNA.GetType().ToString().IndexOf("DynamicDNAConverterBahaviour") > -1)
-                            {
-                                ((DynamicUMADnaBase)dna).dnaAsset = ((DynamicDNAConverterBehaviourBase)slotData.asset.slotDNA).dnaAsset;
-                            }
-                            umaDna.Add(dnaTypeHash, dna);
+							//DynamicUMADna:: needs the DNAasset from the converter TODO are there other places where I heed to sort out this slotDNA?
+							if (slotData.asset.slotDNA.GetType().ToString().IndexOf("DynamicDNAConverterBahaviour") > -1)
+							{
+								((DynamicUMADnaBase)dna).dnaAsset = ((DynamicDNAConverterBehaviourBase)slotData.asset.slotDNA).dnaAsset;
+							}
+							umaDna.Add(dnaTypeHash, dna);
 							dnaValues.Add(dna);
 						}
 					}
@@ -801,10 +801,10 @@ namespace UMA
 				{
 					foreach (var converter in raceData.dnaConverterList)
 					{
-                        //DynamicDNAConverter:: We need to SET these values using the TypeHash since 
-                        //just getting the hash of the DNAType will set the same value for all instance of a DynamicDNAConverter
-                        umaDnaConverter.Add(converter.GetDnaTypeHash(), converter.ApplyDnaAction);
-                    }
+						//DynamicDNAConverter:: We need to SET these values using the TypeHash since 
+						//just getting the hash of the DNAType will set the same value for all instance of a DynamicDNAConverter
+						umaDnaConverter.Add(converter.GetDnaTypeHash(), converter.ApplyDnaAction);
+					}
 				}
 			}
 
@@ -815,13 +815,13 @@ namespace UMA
 			public void AddDNAUpdater(DnaConverterBehaviour dnaConverter)
 			{
 				if (dnaConverter == null) return;
-                //DynamicDNAConverter:: We need to SET these values using the TypeHash since 
-                //just getting the hash of the DNAType will set the same value for all instance of a DynamicDNAConverter
-                if (!umaDnaConverter.ContainsKey(dnaConverter.GetDnaTypeHash()))
-                {
-                    umaDnaConverter.Add(dnaConverter.GetDnaTypeHash(), dnaConverter.ApplyDnaAction);
-                }
-            }
+				//DynamicDNAConverter:: We need to SET these values using the TypeHash since 
+				//just getting the hash of the DNAType will set the same value for all instance of a DynamicDNAConverter
+				if (!umaDnaConverter.ContainsKey(dnaConverter.GetDnaTypeHash()))
+				{
+					umaDnaConverter.Add(dnaConverter.GetDnaTypeHash(), dnaConverter.ApplyDnaAction);
+				}
+			}
 
 			/// <summary>
 			/// Shallow copy of UMARecipe.
@@ -1116,22 +1116,22 @@ namespace UMA
 			return umaRecipe.GetAllDna();
 		}
 
-        /// <summary>
-        /// DynamicUMADna:: Retrieve DNA by dnaTypeNameHash.
-        /// </summary>
-        /// <returns>The DNA (or null if not found).</returns>
-        /// <param name="dnaTypeNameHash">dnaTypeNameHash.</param>
-        public UMADnaBase GetDna(int dnaTypeNameHash)
-        {
-            return umaRecipe.GetDna(dnaTypeNameHash);
-        }
+		/// <summary>
+		/// DynamicUMADna:: Retrieve DNA by dnaTypeNameHash.
+		/// </summary>
+		/// <returns>The DNA (or null if not found).</returns>
+		/// <param name="dnaTypeNameHash">dnaTypeNameHash.</param>
+		public UMADnaBase GetDna(int dnaTypeNameHash)
+		{
+			return umaRecipe.GetDna(dnaTypeNameHash);
+		}
 
-        /// <summary>
-        /// Retrieve DNA by type.
-        /// </summary>
-        /// <returns>The DNA (or null if not found).</returns>
-        /// <param name="type">Type.</param>
-        public UMADnaBase GetDna(Type type)
+		/// <summary>
+		/// Retrieve DNA by type.
+		/// </summary>
+		/// <returns>The DNA (or null if not found).</returns>
+		/// <param name="type">Type.</param>
+		public UMADnaBase GetDna(Type type)
 		{
 			return umaRecipe.GetDna(type);
 		}
