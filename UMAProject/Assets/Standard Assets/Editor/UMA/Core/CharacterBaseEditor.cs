@@ -44,11 +44,12 @@ namespace UMAEditor
 				_dnaTypes[i] = entryType;
 				//DynamicUMADna:: we need to use typehashes now
 				_dnaTypeHashes[i] = entry.GetDnaTypeHash();
-				if (entryType.ToString().IndexOf("DynamicUMADna") > -1)
+				if (entry is DynamicUMADnaBase)
 				{
-					if (((DynamicUMADnaBase)entry).dnaAsset != null)
+					var dynamicDna = entry as DynamicUMADnaBase;
+					if (dynamicDna.dnaAsset != null)
 					{
-						_dnaTypeNames[i] = ((DynamicUMADnaBase)entry).dnaAsset.name + " (DynamicUMADna)";
+						_dnaTypeNames[i] = dynamicDna.dnaAsset.name + " (DynamicUMADna)";
 					}
 					else
 					{
