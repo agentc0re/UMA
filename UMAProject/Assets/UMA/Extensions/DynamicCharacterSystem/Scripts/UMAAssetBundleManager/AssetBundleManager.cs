@@ -193,7 +193,8 @@ namespace UMAAssetBundleManager
         public static void SetSourceAssetBundleURL(string absolutePath)
         {
             Debug.Log("[AssetBundleManager] SetSourceAssetBundleURL to " + absolutePath + Utility.GetPlatformName() + "/");
-            BaseDownloadingURL = absolutePath + Utility.GetPlatformName() + "/";
+			if (absolutePath != "")
+				BaseDownloadingURL = absolutePath + Utility.GetPlatformName() + "/";
         }
 
         /// <summary>
@@ -427,7 +428,10 @@ namespace UMAAssetBundleManager
 
 		static public AssetBundleLoadIndexOperation Initialize(string indexAssetBundleName, bool useJsonIndex, string jsonIndexUrl)
         {
-            AssetBundleLoadingIndicator.Instance.Show(indexAssetBundleName.ToLower() + "index", "Initializing...", "", "Initialized");
+			if (BaseDownloadingURL != "")//dont show the indicator if we are not using asset bundles - TODO we need a more comprehensive solution for this scenerio
+			{
+				AssetBundleLoadingIndicator.Instance.Show(indexAssetBundleName.ToLower() + "index", "Initializing...", "", "Initialized");
+			}
 #if UNITY_EDITOR
             Log(LogType.Info, "Simulation Mode: " + (SimulateAssetBundleInEditor ? "Enabled" : "Disabled"));
 #endif
@@ -681,7 +685,23 @@ namespace UMAAssetBundleManager
             for (int i = 0; i < dependencies.Length; i++)
                 LoadAssetBundleInternal(dependencies[i], false);
         }
+		/// <summary>
+		/// WARNING Not working right with DynamicAssetLoader yet! Unloads all AssetBundles compressed data (not the assets loaded from the bundle) to free up memory
+		/// </summary>
+		static public void UnloadAllAssetBundles()
+		{
+			List<string> bundlesToUnload = new List<string>();
+			foreach (KeyValuePair<string, LoadedAssetBundle> kp in m_LoadedAssetBundles)
+			{
+				if (kp.Key.IndexOf(Utility.GetPlatformName().ToLower() + "index") == -1)//dont try to unload the index...
+					bundlesToUnload.Add(kp.Key);
+			}
+			foreach(string bundleName in bundlesToUnload)
+			{
+				UnloadAssetBundleInternal(bundleName);
+			}
 
+		}
         /// <summary>
         /// Unloads assetbundle and its dependencies.
         /// </summary>
@@ -715,14 +735,14 @@ namespace UMAAssetBundleManager
             m_Dependencies.Remove(assetBundleName);
         }
 
-        static protected void UnloadAssetBundleInternal(string assetBundleName)
+        static protected void UnloadAssetBundleInternal(string assetBundleName, bool disregardRefrencedStatus = false)
         {
             string error;
             LoadedAssetBundle bundle = GetLoadedAssetBundle(assetBundleName, out error);
             if (bundle == null)
                 return;
 
-            if (--bundle.m_ReferencedCount == 0)
+            if (--bundle.m_ReferencedCount == 0 || disregardRefrencedStatus)
             {
                 bundle.OnUnload();
                 m_LoadedAssetBundles.Remove(assetBundleName);
