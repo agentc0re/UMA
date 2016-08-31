@@ -69,7 +69,7 @@ namespace UMA.PoseTools
 				return;
 
 			// Need to reset bones here if we want Mecanim animation
-			expressionSet.ResetBones(umaData.skeleton);
+			expressionSet.RestoreBones(umaData.skeleton);
 
 			if (gazeWeight > 0f)
 			{

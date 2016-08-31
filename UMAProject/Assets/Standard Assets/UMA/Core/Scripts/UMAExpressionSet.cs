@@ -67,10 +67,10 @@ namespace UMA.PoseTools
         }
 
         /// <summary>
-        /// Resets all the bones used by poses in the set to default position.
+		/// Restores all the bones used by poses in the set to default (post DNA) position.
         /// </summary>
         /// <param name="umaSkeleton">Skeleton to be reset.</param>
-        public void ResetBones(UMASkeleton umaSkeleton)
+        public void RestoreBones(UMASkeleton umaSkeleton)
         {
             if (umaSkeleton == null) return;
 
