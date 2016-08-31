@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
@@ -79,14 +79,18 @@ public class TestCustomizerDD : MonoBehaviour
             if(newAvatarObject.GetComponent<DynamicCharacterAvatar>() != null)
             {
                 Avatar = newAvatarObject.GetComponent<DynamicCharacterAvatar>();
-                Orbitor.SwitchTarget(Avatar.gameObject.transform);
+				if (Orbitor != null)
+					Orbitor.SwitchTarget(Avatar.gameObject.transform);
                 thisRace = Avatar.activeRace.name;
             }
             else
             {
-                //Its the Overview target object
-                Orbitor.SwitchTarget(newAvatarObject.transform);
-                Orbitor.distance = 1.5f;
+				//Its the Overview target object
+				if (Orbitor != null)
+				{
+					Orbitor.SwitchTarget(newAvatarObject.transform);
+					Orbitor.distance = 1.5f;
+				}
                 Avatar = null;
             }
         }
@@ -94,8 +98,11 @@ public class TestCustomizerDD : MonoBehaviour
         {
             if (newAvatarObject == Avatar.gameObject)
                 return;
-            Orbitor.SwitchTarget(newAvatarObject.transform);
-            Orbitor.distance = 1.5f;
+			if (Orbitor != null)
+			{
+				Orbitor.SwitchTarget(newAvatarObject.transform);
+				Orbitor.distance = 1.5f;
+			}
             Avatar = null;
         }
     }
@@ -609,8 +616,11 @@ public class TestCustomizerDD : MonoBehaviour
     /// </summary>
     public void TargetBody()
     {
-        Orbitor.distance = 1.4f;
-        Orbitor.TargetBone = "Root/Global/Position/Hips/LowerBack/Spine/Spine1";
+		if (Orbitor != null)
+		{
+			Orbitor.distance = 1.4f;
+			Orbitor.TargetBone = "Root/Global/Position/Hips/LowerBack/Spine/Spine1";
+		}
     }
 
     /// <summary>
@@ -618,8 +628,11 @@ public class TestCustomizerDD : MonoBehaviour
     /// </summary>
     public void TargetFace()
     {
-        Orbitor.distance = 0.5f;
-        Orbitor.TargetBone = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head";
+		if (Orbitor != null)
+		{
+			Orbitor.distance = 0.5f;
+			Orbitor.TargetBone = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head";
+		}
     }
 
     #region Load and Save
