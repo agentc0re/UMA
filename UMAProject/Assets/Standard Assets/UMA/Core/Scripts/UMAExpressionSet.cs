@@ -80,8 +80,9 @@ namespace UMA.PoseTools
             {
                 if (!umaSkeleton.Restore(hash))
                 {
-                    //Since this generally logs like crazy which screws everything anyway, it might be nice to provide some useful information?
-                    string boneName = "";
+					//Since this generally logs like crazy which screws everything anyway, it might be nice to provide some useful information?
+					var umaname = umaSkeleton.GetBoneGameObject(umaSkeleton.rootBoneHash).GetComponentInParent<UMAAvatarBase>().gameObject.name;
+					string boneName = "";
                     foreach (PosePair pair in posePairs)
                     {
                         if (pair.primary != null)
@@ -105,7 +106,7 @@ namespace UMA.PoseTools
                             }
                         }
                     }
-                    Debug.LogWarning("Couldn't reset bone! " + boneName);
+                    Debug.LogWarning("Couldn't reset bone! " + boneName + " on " + umaname);
                 }
             }
         }
