@@ -504,14 +504,15 @@ namespace UMA
             {
                 for (int i = 0; i < startingPose.poses.Length; i++)
                 {
-                    skeleton.SetPositionRelative(startingPose.poses[i].hash, (startingPose.poses[i].position * startingPoseWeight));
+					/*skeleton.SetPositionRelative(startingPose.poses[i].hash, (startingPose.poses[i].position * startingPoseWeight));
                     var weightedScale = startingPose.poses[i].scale;
                     weightedScale.x = (weightedScale.x * startingPoseWeight) + (1 * (1 - startingPoseWeight));
                     weightedScale.y = (weightedScale.y * startingPoseWeight) + (1 * (1 - startingPoseWeight));
                     weightedScale.z = (weightedScale.z * startingPoseWeight) + (1 * (1 - startingPoseWeight));
                     skeleton.SetScaleRelative(startingPose.poses[i].hash, weightedScale);
-                    skeleton.SetRotationRelative(startingPose.poses[i].hash, startingPose.poses[i].rotation, startingPoseWeight);
-                }
+                    skeleton.SetRotationRelative(startingPose.poses[i].hash, startingPose.poses[i].rotation, startingPoseWeight);*/
+					skeleton.Morph(startingPose.poses[i].hash, startingPose.poses[i].position, startingPose.poses[i].scale, startingPose.poses[i].rotation, startingPoseWeight);
+				}
             }
         }
 
