@@ -3327,7 +3327,7 @@ MonoBehaviour:
   loadPath: CharacterRecipes
   loadFilename: 
   loadFileOnStart: 1
-  waitForBundles: 0
+  waitForBundles: 1
   savePathType: 0
   savePath: CharacterRecipes
   saveFilename: 
@@ -3703,7 +3703,7 @@ MonoBehaviour:
   loadPath: CharacterRecipes
   loadFilename: 
   loadFileOnStart: 1
-  waitForBundles: 0
+  waitForBundles: 1
   savePathType: 0
   savePath: CharacterRecipes
   saveFilename: 
@@ -7236,7 +7236,7 @@ MonoBehaviour:
   loadPath: CharacterRecipes
   loadFilename: 
   loadFileOnStart: 1
-  waitForBundles: 0
+  waitForBundles: 1
   savePathType: 0
   savePath: CharacterRecipes
   saveFilename: 
