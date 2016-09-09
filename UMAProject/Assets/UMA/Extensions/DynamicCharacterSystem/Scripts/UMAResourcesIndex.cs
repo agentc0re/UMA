@@ -149,7 +149,6 @@ namespace UMA
 				var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
 				if (File.Exists(dataAssetPath))
 				{
-					Debug.Log("UMAResourcesIndex added an existing IndexData asset as IndexAsset");
 					var rawData = FileUtils.ReadAllText(dataAssetPath);
 					data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
 					indexAsset = AssetDatabase.LoadAssetAtPath("Assets/UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt", typeof(TextAsset));
