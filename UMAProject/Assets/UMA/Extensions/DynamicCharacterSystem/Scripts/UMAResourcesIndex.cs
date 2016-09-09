@@ -31,23 +31,23 @@ namespace UMA
 			LoadOrCreateData();
 		}
 
-		void OnEnable()
-		{
-			if (Instance == null)
-			{
-				Instance = this;
-				if (makePersistent)
+		/*void OnEnable()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+				if(makePersistent)
 					DontDestroyOnLoad(gameObject);
-			}
-			else if (Instance != this)
-			{
+            }
+            else if (Instance != this)
+            {
 				if (makePersistent)
 					Destroy(gameObject);
 				else
 					Instance = this;
-			}
-			LoadOrCreateData();
-		}
+            }
+            LoadOrCreateData();
+        }*/
 
 		void Start()
 		{
@@ -59,10 +59,15 @@ namespace UMA
 			}
 			else if (Instance != this)
 			{
-				if (makePersistent)
+				if (Instance.makePersistent)
 					Destroy(gameObject);
 				else
 					Instance = this;
+			}
+			else if (Instance == this)//OnAfterDeserialize() gets called in the editor but doesn't do anything with the makePersistent value
+			{
+				if (makePersistent)
+					DontDestroyOnLoad(gameObject);
 			}
 			LoadOrCreateData();
 		}

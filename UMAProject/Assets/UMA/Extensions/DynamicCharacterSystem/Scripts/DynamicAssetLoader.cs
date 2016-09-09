@@ -14,16 +14,19 @@ namespace UMA
 	{
 		static DynamicAssetLoader _instance;
 
-		[Tooltip("Set the server URL that assetbundles can be loaded from. Used in a live build and when the LocalAssetServer is turned off.")]
+		[Tooltip("Set the server URL that assetbundles can be loaded from. Used in a live build and when the LocalAssetServer is turned off. Requires trailing slash but NO platform name")]
 		public string remoteServerURL = "";
 		[Tooltip("Use the JSON version of the assetBundleIndex rather than the assetBundleVersion.")]
 		public bool useJsonIndex = false;
 		[Tooltip("Set the server URL for the AssetBundleIndex json data. You can use this to make a server request that could generate an index on the fly for example. Used in a live build and when the LocalAssetServer is turned off. TIP use [PLATFORM] to use the current platform name in the URL")]
 		public string remoteServerIndexURL = "";
+		public bool makePersistent;
 		[Tooltip("A list of assetbundles to preload when the game starts. After these have completed loading any GameObject in the gameObjectsToActivate field will be activated.")]
 		public List<string> assetBundlesToPreLoad = new List<string>();
 		[Tooltip("GameObjects that will be activated after the list of assetBundlesToPreLoad has finished downloading.")]
 		public List<GameObject> gameObjectsToActivate = new List<GameObject>();
+		[Tooltip("GameObjects that will be activated after Initialization completes.")]
+		public List<GameObject> gameObjectsToActivateOnInit = new List<GameObject>();
 		[Space]
 		public GameObject loadingMessageObject;
 		public Text loadingMessageText;
@@ -38,7 +41,8 @@ namespace UMA
 		bool isInitializing = false;
 		[HideInInspector]
 		public bool isInitialized = false;
-		bool gameObjectsActivated;
+		//WE DONT NEED THIS- if there is anything in the list its true and afterwards the list should be cleared
+		public bool gameObjectsActivated;
 		[Space]
 		//Default assets fields
 		public RaceData placeholderRace;//temp race based on UMAMale with a baseRecipe to generate a temp umaMale TODO: Could have a female too and search the required racename to see if it contains female...
@@ -86,49 +90,100 @@ namespace UMA
 		}
 
 		#region BASE METHODS
-		void OnEnable()
-		{
-			if (_instance == null) _instance = this;
-			if (!isInitialized)
-			{
-				StartCoroutine(Initialize());
-			}
-		}
+		/*void OnEnable()
+        {
+            if (_instance == null) _instance = this;
+            if (!isInitialized)
+            {
+                StartCoroutine(Initialize());
+            }
+        }*/
 
 		IEnumerator Start()
 		{
-			if (_instance == null) _instance = this;
-			if (!isInitialized)
+			bool destroyingThis = false;
+			if (_instance == null)
 			{
-				yield return StartCoroutine(Initialize());
+				_instance = this;
+				if (makePersistent)
+				{
+					DontDestroyOnLoad(this.gameObject);
+				}
+				if (!isInitialized)
+				{
+					yield return StartCoroutine(Initialize());
+				}
 			}
+			else if (_instance != this)
+			{
+				//copy some values over and then destroy this
+				if (_instance.makePersistent)
+				{
+					_instance.assetBundlesToPreLoad.Clear();
+					_instance.assetBundlesToPreLoad.AddRange(this.assetBundlesToPreLoad);
+					_instance.gameObjectsToActivate.Clear();
+					_instance.gameObjectsToActivate.AddRange(this.gameObjectsToActivate);
+					_instance.remoteServerIndexURL = this.remoteServerIndexURL;
+					Destroy(this.gameObject);
+					destroyingThis = true;
+				}
+				else
+				{
+					_instance = this;
+				}
+			}
+			else if (_instance == this)//sometimes things have called Instance before Start has actually happenned on this
+			{
+				if (makePersistent)
+				{
+					DontDestroyOnLoad(this.gameObject);
+				}
+				if (!isInitialized)
+				{
+					yield return StartCoroutine(Initialize());
+				}
+			}
+			/*if (!isInitialized)
+            {
+                yield return StartCoroutine(Initialize());
+            }*/
 
 			//Load any preload asset bundles if there are any
-			if (assetBundlesToPreLoad.Count > 0)
-			{
-				yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
-			}
+			if (!destroyingThis)
+				if (assetBundlesToPreLoad.Count > 0)
+				{
+					//yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));//why does this need to yeild return?
+					StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
+					assetBundlesToPreLoad.Clear();
+				}
 		}
 
 		void Update()
 		{
+			if (assetBundlesToPreLoad.Count > 0)
+			{
+				//yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));//why does this need to yeild return?
+				StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
+				assetBundlesToPreLoad.Clear();
+			}
 #if UNITY_EDITOR
 			if (AssetBundleManager.SimulateAssetBundleInEditor)
 			{
-				if (!gameObjectsActivated)
+				//if (!gameObjectsActivated)
+				// {
+				if (gameObjectsToActivate.Count > 0)
 				{
-					if (gameObjectsToActivate.Count > 0)
+					foreach (GameObject go in gameObjectsToActivate)
 					{
-						foreach (GameObject go in gameObjectsToActivate)
+						if (!go.activeSelf)
 						{
-							if (!go.activeSelf)
-							{
-								go.SetActive(true);
-							}
+							go.SetActive(true);
 						}
 					}
-					gameObjectsActivated = true;
+					gameObjectsToActivate.Clear();
 				}
+				//gameObjectsActivated = true;
+				//}
 			}
 #endif
 			if (downloadingAssets.downloadingItems.Count > 0)
@@ -140,21 +195,37 @@ namespace UMA
 				if (!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true)
 				{
 					assetBundlesDownloading = false;
-					if (!gameObjectsActivated)
+					//if (!gameObjectsActivated)
+					// {
+					if (gameObjectsToActivate.Count > 0)
 					{
-						if (gameObjectsToActivate.Count > 0)
+						foreach (GameObject go in gameObjectsToActivate)
 						{
-							foreach (GameObject go in gameObjectsToActivate)
+							if (!go.activeSelf)
 							{
-								if (!go.activeSelf)
-								{
-									go.SetActive(true);
-								}
+								go.SetActive(true);
 							}
 						}
-						gameObjectsActivated = true;
+						gameObjectsToActivate.Clear();
 					}
+					// gameObjectsActivated = true;
+					//}
 				}
+			}
+		}
+
+		public void EnableActivatables(bool andClear = false)
+		{
+			foreach (GameObject go in gameObjectsToActivate)
+			{
+				if (!go.activeSelf)
+				{
+					go.SetActive(true);
+				}
+			}
+			if (andClear)
+			{
+				gameObjectsToActivate.Clear();
 			}
 		}
 		/// <summary>
@@ -166,7 +237,8 @@ namespace UMA
 			if (_instance == null)
 			{
 				DynamicAssetLoader[] dynamicAssetLoaders = FindObjectsOfType(typeof(DynamicAssetLoader)) as DynamicAssetLoader[];
-				if (dynamicAssetLoaders[0] != null)
+				if(dynamicAssetLoaders.Length > 0)
+				//if (dynamicAssetLoaders[0] != null)
 				{
 					_instance = dynamicAssetLoaders[0];
 				}
@@ -258,6 +330,14 @@ namespace UMA
 					if (AssetBundleManager.AssetBundleIndexObject != null)
 					{
 						isInitialized = true;
+						if (gameObjectsToActivateOnInit.Count > 0)
+						{
+							for (int i = 0; i < gameObjectsToActivateOnInit.Count; i++)
+							{
+								gameObjectsToActivateOnInit[i].SetActive(true);
+							}
+							gameObjectsToActivateOnInit.Clear();
+						}
 					}
 					else
 					{
@@ -985,6 +1065,7 @@ namespace UMA
 							}
 						}
 					}
+					Debug.LogWarning("[DynamicAssetLoader] Called DCS Refresh");
 					thisDCS.Refresh();
 				}
 			}
@@ -1011,6 +1092,7 @@ namespace UMA
 			}
 			if (thisDCS)
 			{
+				Debug.LogWarning("[DynamicAssetLoader] Called DCS Refresh");
 				thisDCS.Refresh();
 			}
 		}

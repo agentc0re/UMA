@@ -34,7 +34,7 @@ namespace UMACharacterSystem
 		[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
 		public string assetBundlesForRecipesToSearch;
 
-		bool refresh = false;
+		//bool refresh = false;//Never used stuff just calls Refresh directly- though maybe they shouldnt
 		[HideInInspector]
 		public UMAContext context;
 		//This is a ditionary of asset bundles that were loaded into the library. This can be queried to store a list of active assetBundles that might be useful to preload etc
@@ -43,8 +43,8 @@ namespace UMACharacterSystem
 		[HideInInspector]
 		public bool downloadAssetsEnabled = true;
 
-
-		public override void Awake()
+		//Removed becuase they slow down loadSceneAsync- checks added to Refresh instead
+		/*public override void Awake()
 		{
 			if (initializeOnAwake)
 			{
@@ -68,7 +68,7 @@ namespace UMACharacterSystem
 					Init();
 				}
 			}
-		}
+		}*/
 
 		public override void Start()
 		{
@@ -81,23 +81,28 @@ namespace UMACharacterSystem
 
 		public override void Update()
 		{
-			if (refresh)
+			if (!initialized)
+			{
+				Init();
+			}
+			/*if (refresh)
 			{
 				Refresh();
-			}
+			}*/
 		}
 
 		public override void Init()
 		{
-			if (context == null)
-			{
-				context = UMAContext.FindInstance();
-			}
-
 			if (initialized)
 			{
 				return;
 			}
+
+			if (context == null)
+			{
+				context = UMAContext.FindInstance();
+			}
+			
 			Recipes.Clear();
 			var possibleRaces = (context.raceLibrary as DynamicRaceLibrary).GetAllRaces();
 			for (int i = 0; i < possibleRaces.Length; i++)
@@ -118,7 +123,12 @@ namespace UMACharacterSystem
 		//used after asset bundles have been loaded to add any new recipes to the dictionaries
 		public override void Refresh()
 		{
-			refresh = false;
+			//refresh = false;
+			if (!initialized)
+			{
+				Init();
+				return;
+			}
 			var possibleRaces = context.raceLibrary.GetAllRaces();
 			for (int i = 0; i < possibleRaces.Length; i++)
 			{

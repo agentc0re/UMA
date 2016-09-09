@@ -7,7 +7,6 @@ namespace UMAAssetBundleManager
 {
 	public class AssetBundleLoadingIndicator : MonoBehaviour
 	{
-		//TODO add this to UMA Version if its ok
 		public bool dontDestroyOnLoad = false;
 
 		public enum statusOpts { Idle, Downloading, Unpacking, Complete };
