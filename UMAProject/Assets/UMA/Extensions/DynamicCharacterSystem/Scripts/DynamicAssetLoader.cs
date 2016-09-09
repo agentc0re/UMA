@@ -1065,7 +1065,6 @@ namespace UMA
 							}
 						}
 					}
-					Debug.LogWarning("[DynamicAssetLoader] Called DCS Refresh");
 					thisDCS.Refresh();
 				}
 			}
@@ -1092,7 +1091,6 @@ namespace UMA
 			}
 			if (thisDCS)
 			{
-				Debug.LogWarning("[DynamicAssetLoader] Called DCS Refresh");
 				thisDCS.Refresh();
 			}
 		}
