@@ -137,6 +137,7 @@ namespace UMA
 		public void LoadOrCreateData()
 		{
 			var data = new UMAResourcesIndexData();
+			bool saveNewAsset = false;
 			if (indexAsset != null)
 			{
 				var rawData = ((TextAsset)indexAsset).text;
@@ -148,12 +149,24 @@ namespace UMA
 				var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
 				if (File.Exists(dataAssetPath))
 				{
+					Debug.Log("UMAResourcesIndex added an existing IndexData asset as IndexAsset");
 					var rawData = FileUtils.ReadAllText(dataAssetPath);
 					data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
+					indexAsset = AssetDatabase.LoadAssetAtPath("Assets/UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt", typeof(TextAsset));
 				}
+				else
+				{
+					saveNewAsset = true;
+                }
 			}
 #endif
 			Index = data;
+#if UNITY_EDITOR
+			if (saveNewAsset)
+			{
+				Save();
+            }
+#endif
 		}
 
 		/// <summary>
@@ -168,8 +181,8 @@ namespace UMA
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 			EditorUtility.SetDirty(indexAsset);
 			AssetDatabase.SaveAssets();
-			//need to refresh the actual data?
-			LoadOrCreateData();
+			//set the indexAsset to be this file
+			indexAsset = AssetDatabase.LoadAssetAtPath("Assets/UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt", typeof(TextAsset));
 #endif
 		}
 
