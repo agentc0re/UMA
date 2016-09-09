@@ -290,7 +290,14 @@ namespace UMA
 				errorString = "Switched to Simulation Mode because LocalAssetBundleServer was off and no remoteServerURL was specified in the Scenes' DynamicAssetLoader. One of these must be set in order to actually use your AssetBundles.";
 				AssetBundleManager.SimulateOverride = true;
 #endif
-				Debug.LogWarning(errorString);
+				var context = UMAContext.FindInstance();
+				if(context != null && (context.dynamicCharacterSystem != null && (context.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).dynamicallyAddFromAssetBundles)
+					|| (context.raceLibrary != null && (context.raceLibrary as DynamicRaceLibrary).dynamicallyAddFromAssetBundles)
+					|| (context.slotLibrary != null && (context.slotLibrary as DynamicSlotLibrary).dynamicallyAddFromAssetBundles)
+					|| (context.overlayLibrary != null && (context.overlayLibrary as DynamicOverlayLibrary).dynamicallyAddFromAssetBundles))
+				{
+					Debug.LogWarning(errorString);
+				}
 			}
 			return;
 
