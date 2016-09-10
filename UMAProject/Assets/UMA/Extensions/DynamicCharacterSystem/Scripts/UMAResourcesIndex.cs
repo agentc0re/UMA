@@ -13,41 +13,14 @@ namespace UMA
 	public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
 	{
 		public static UMAResourcesIndex Instance;
-		public UMAResourcesIndexData Index;
+		public UMAResourcesIndexData Index = new UMAResourcesIndexData();
 		public UnityEngine.Object indexAsset;
 		public bool enableDynamicIndexing = false;
 		public bool makePersistent = false;
 
 		public UMAResourcesIndex()
 		{
-
 		}
-
-
-
-		void Reset()
-		{
-			Debug.Log("UMARESCOURCESINDEX RESET HAPPENNED");
-			LoadOrCreateData();
-		}
-
-		/*void OnEnable()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-				if(makePersistent)
-					DontDestroyOnLoad(gameObject);
-            }
-            else if (Instance != this)
-            {
-				if (makePersistent)
-					Destroy(gameObject);
-				else
-					Instance = this;
-            }
-            LoadOrCreateData();
-        }*/
 
 		void Start()
 		{
@@ -156,7 +129,7 @@ namespace UMA
 				else
 				{
 					saveNewAsset = true;
-                }
+				}
 			}
 #endif
 			Index = data;
@@ -164,8 +137,26 @@ namespace UMA
 			if (saveNewAsset)
 			{
 				Save();
-            }
+			}
 #endif
+		}
+		public string GetIndexInfo()
+		{
+			int totalIndexedTypes = 0;
+			int totalIndexedFiles = 0;
+			if (Index.data != null)
+			{
+				totalIndexedTypes = Index.data.Length;
+				totalIndexedFiles = 0;
+				List<string> typeNames = new List<string>();
+				for (int i = 0; i < totalIndexedTypes; i++)
+				{
+					typeNames.Add(Index.data[i].type);
+					totalIndexedFiles += Index.data[i].typeFiles.Length;
+				}
+			}
+			string info = "Total files indexed: " + totalIndexedFiles + " in " + totalIndexedTypes + " Types"/*.\nIndexed Types: \n" + String.Join(", ", typeNames.ToArray())*/;
+			return info;
 		}
 
 		/// <summary>
@@ -180,6 +171,7 @@ namespace UMA
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 			EditorUtility.SetDirty(indexAsset);
 			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
 			//set the indexAsset to be this file
 			indexAsset = AssetDatabase.LoadAssetAtPath("Assets/UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt", typeof(TextAsset));
 #endif
