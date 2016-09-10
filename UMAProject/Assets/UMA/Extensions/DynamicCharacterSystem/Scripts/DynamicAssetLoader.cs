@@ -104,6 +104,7 @@ namespace UMA
 			bool destroyingThis = false;
 			if (_instance == null)
 			{
+				Debug.Log("[DynamicAssetLoader] _instance was null");
 				_instance = this;
 				if (makePersistent)
 				{
@@ -119,6 +120,7 @@ namespace UMA
 				//copy some values over and then destroy this
 				if (_instance.makePersistent)
 				{
+					Debug.Log("[DynamicAssetLoader] _instance was NOT this one and was persistent");
 					_instance.assetBundlesToPreLoad.Clear();
 					_instance.assetBundlesToPreLoad.AddRange(this.assetBundlesToPreLoad);
 					_instance.gameObjectsToActivate.Clear();
@@ -152,6 +154,7 @@ namespace UMA
 			if (!destroyingThis)
 				if (assetBundlesToPreLoad.Count > 0)
 				{
+					Debug.Log("[DynamicAssetLoader] assetBundlesToPreLoad.Count > 0");
 					//yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));//why does this need to yeild return?
 					StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
 					assetBundlesToPreLoad.Clear();
@@ -162,6 +165,7 @@ namespace UMA
 		{
 			if (assetBundlesToPreLoad.Count > 0)
 			{
+				Debug.Log("[DynamicAssetLoader] assetBundlesToPreLoad.Count > 0 IN UPDATE");
 				//yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));//why does this need to yeild return?
 				StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
 				assetBundlesToPreLoad.Clear();
@@ -190,13 +194,28 @@ namespace UMA
 				downloadingAssets.Update();
 			if (downloadingAssets.areDownloadedItemsReady == false)
 				assetBundlesDownloading = true;
+			//this is waaay over complicated- TODO work out why I thought we needed all these...
+			//Debug.LogWarning("assetBundlesDownloading  was " + assetBundlesDownloading);//was false
+			//Debug.LogWarning("downloadingAssets.areDownloadedItemsReady was " + downloadingAssets.areDownloadedItemsReady);// was true
+			//Debug.LogWarning("canCheckDownloadingBundles  was " + canCheckDownloadingBundles);//was true
 			if ((assetBundlesDownloading || downloadingAssets.areDownloadedItemsReady == false) && canCheckDownloadingBundles == true)
 			{
+				Debug.LogWarning("if ((assetBundlesDownloading || downloadingAssets.areDownloadedItemsReady == false) && canCheckDownloadingBundles == true)");
+				Debug.LogWarning("downloadingAssets.areDownloadedItemsReady was " + downloadingAssets.areDownloadedItemsReady);// was false
+				Debug.LogWarning("AssetBundleManager.AreBundlesDownloading() was " + AssetBundleManager.AreBundlesDownloading());// was false
 				if (!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true)
 				{
+					Debug.LogWarning("!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true");
 					assetBundlesDownloading = false;
+					//we only want this called from one place
+					var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+					if (thisDCS != null)
+					{
+						thisDCS.Refresh();
+					}
 					//if (!gameObjectsActivated)
 					// {
+					Debug.LogWarning("if (!gameObjectsActivated)");
 					if (gameObjectsToActivate.Count > 0)
 					{
 						foreach (GameObject go in gameObjectsToActivate)
@@ -207,27 +226,30 @@ namespace UMA
 							}
 						}
 						gameObjectsToActivate.Clear();
+						//StartCoroutine(EnableActivatables());
 					}
+
 					// gameObjectsActivated = true;
 					//}
 				}
 			}
 		}
 
-		public void EnableActivatables(bool andClear = false)
+		/*IEnumerator EnableActivatables()
 		{
-			foreach (GameObject go in gameObjectsToActivate)
+			var goToActivate = new List<GameObject>();
+			goToActivate.AddRange(gameObjectsToActivate);
+			gameObjectsToActivate.Clear();
+			yield return null;
+			foreach (GameObject go in goToActivate)
 			{
 				if (!go.activeSelf)
 				{
 					go.SetActive(true);
+					yield return null;
 				}
 			}
-			if (andClear)
-			{
-				gameObjectsToActivate.Clear();
-			}
-		}
+		}*/
 		/// <summary>
 		/// Finds the DynamicAssetLoader in the scene and treats it like a singleton.
 		/// </summary>
@@ -237,7 +259,7 @@ namespace UMA
 			if (_instance == null)
 			{
 				DynamicAssetLoader[] dynamicAssetLoaders = FindObjectsOfType(typeof(DynamicAssetLoader)) as DynamicAssetLoader[];
-				if(dynamicAssetLoaders.Length > 0)
+				if (dynamicAssetLoaders.Length > 0)
 				//if (dynamicAssetLoaders[0] != null)
 				{
 					_instance = dynamicAssetLoaders[0];
@@ -291,7 +313,7 @@ namespace UMA
 				AssetBundleManager.SimulateOverride = true;
 #endif
 				var context = UMAContext.FindInstance();
-				if(context != null && (context.dynamicCharacterSystem != null && (context.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).dynamicallyAddFromAssetBundles)
+				if (context != null && (context.dynamicCharacterSystem != null && (context.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).dynamicallyAddFromAssetBundles)
 					|| (context.raceLibrary != null && (context.raceLibrary as DynamicRaceLibrary).dynamicallyAddFromAssetBundles)
 					|| (context.slotLibrary != null && (context.slotLibrary as DynamicSlotLibrary).dynamicallyAddFromAssetBundles)
 					|| (context.overlayLibrary != null && (context.overlayLibrary as DynamicOverlayLibrary).dynamicallyAddFromAssetBundles))
@@ -583,6 +605,12 @@ namespace UMA
 			}
 			else if (assetNameHash == null && assetName == "")
 			{
+				if (UMAResourcesIndex.Instance == null)
+					Debug.Log("UMAResourcesIndex.Instance WAS NULL");
+				else if (UMAResourcesIndex.Instance.Index == null)
+					Debug.Log("UMAResourcesIndex.Instance.Index WAS NULL");
+				else if (resourcesFolderPathArray == null)
+					Debug.Log("resourcesFolderPathArray WAS NULL");
 				foreach (string path in UMAResourcesIndex.Instance.Index.GetPaths<T>(resourcesFolderPathArray))
 				{
 					T foundAsset = Resources.Load<T>(path);
@@ -730,17 +758,6 @@ namespace UMA
 			else
 			{
 #endif
-				if (AssetBundleManager.AssetBundleIndexObject == null)
-				{
-#if UNITY_EDITOR
-					Debug.LogWarning("[DynamicAssetLoader] No AssetBundleManager.AssetBundleManifestObject found. Do you need to rebuild your AssetBundles and/or upload the platform manifest bundle?");
-					AssetBundleManager.SimulateOverride = true;
-					return SimulateAddAssetsFromAssetBundlesNew<T>(ref assetBundlesUsedDict, ref assetsToReturn, bundlesToSearchArray, assetNameHash, assetName, callback);
-#else
-					Debug.LogError("[DynamicAssetLoader] No AssetBundleManager.AssetBundleManifestObject found. Do you need to rebuild your AssetBundles and/or upload the platform manifest bundle?");
-                    return false;
-#endif
-				}
 				if (AssetBundleManager.AssetBundleIndexObject == null)
 				{
 #if UNITY_EDITOR
@@ -1056,7 +1073,9 @@ namespace UMA
 						if (processed) break;
 					}
 				}
+				//We need to add the recipes from the bundle to DCS, other assets add them selves as they are requested by the recipes
 				var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+				bool dcsNeedsRefresh = false;
 				if (thisDCS != null)
 				{
 					foreach (string assetBundleName in AssetBundlesToFullyLoad)
@@ -1065,14 +1084,15 @@ namespace UMA
 						for (int ai = 0; ai < allAssetBundlePaths.Length; ai++)
 						{
 							UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(allAssetBundlePaths[ai]);
-							//We need to add the recipes from the bundle to DCS, other assets add them selves as they are requested by the recipes
 							if (obj.GetType() == typeof(UMATextRecipe))
 							{
 								thisDCS.AddRecipe(obj as UMATextRecipe);
+								dcsNeedsRefresh = true;
 							}
 						}
 					}
-					thisDCS.Refresh();
+					if (dcsNeedsRefresh)
+						thisDCS.Refresh();
 				}
 			}
 			return assetFound;
@@ -1083,22 +1103,25 @@ namespace UMA
 		public void SimulateLoadAssetBundle(string assetBundleToLoad)
 		{
 			var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleToLoad);
-			UMACharacterSystem.DynamicCharacterSystem thisDCS = null;
-			for (int i = 0; i < allAssetBundlePaths.Length; i++)
-			{
-				UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(allAssetBundlePaths[i]);
-				thisDCS = GameObject.Find("DynamicCharacterSystem").GetComponent<UMACharacterSystem.DynamicCharacterSystem>();
-				if (obj.GetType() == typeof(UMATextRecipe))
-				{
-					if (thisDCS)
-					{
-						thisDCS.AddRecipe(obj as UMATextRecipe);
-					}
-				}
-			}
+			//We need to add the recipes from the bundle to DCS, other assets add them selves as they are requested by the recipes
+			var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+			bool dcsNeedsRefresh = false;
 			if (thisDCS)
 			{
-				thisDCS.Refresh();
+				for (int i = 0; i < allAssetBundlePaths.Length; i++)
+				{
+					UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(allAssetBundlePaths[i]);
+					if (obj.GetType() == typeof(UMATextRecipe))
+					{
+						if (thisDCS)
+						{
+							thisDCS.AddRecipe(obj as UMATextRecipe);
+							dcsNeedsRefresh = true;
+						}
+					}
+				}
+				if (dcsNeedsRefresh)
+					thisDCS.Refresh();
 			}
 		}
 #endif

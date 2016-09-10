@@ -130,9 +130,11 @@ namespace UMACharacterSystem
 					requiredAssetsToCheck.Clear();
 					activeRace.data = context.raceLibrary.GetRace(activeRace.name);
 					umaRecipe = activeRace.data.baseRaceRecipe;
-					context.dynamicCharacterSystem.Refresh();
+					//context.dynamicCharacterSystem.Refresh();
 					UpdateSetSlots();
-					BuildCharacter(false);
+					//actually we dont know in this case if we are restoring DNA or not
+					//and a placeholder race should only have been used if waitforbundles is false
+					BuildCharacter(waitForBundles);
 				}
 			}
 		}
@@ -145,7 +147,7 @@ namespace UMACharacterSystem
 			var batchID = DynamicAssetLoader.Instance.GenerateBatchID();
 			if (activeRace.data == null)//activeRace.data will get the asset from the library OR add it from Resources so if it's null it means its going to be downloaded from an asset bundle OR is just wrong
 			{
-				mayRequireDownloads = true;//but we dont know if its wrong until the index is downloaded so we have to wait for that
+				mayRequireDownloads = true;//but we dont know if its wrong until the index is downloaded so we have to wait for that.
 				if (DynamicAssetLoader.Instance.downloadingAssetsContains(activeRace.name))
 				{
 					requiredAssetsToCheck.Add(activeRace.name);
@@ -213,7 +215,7 @@ namespace UMACharacterSystem
 				requiredAssetsToCheck.Clear();
 				activeRace.data = context.raceLibrary.GetRace(activeRace.name);
 				umaRecipe = activeRace.data.baseRaceRecipe;
-				context.dynamicCharacterSystem.Refresh();
+				//context.dynamicCharacterSystem.Refresh();
 				UpdateSetSlots();
 				BuildCharacter(false);
 			}
@@ -818,7 +820,7 @@ namespace UMACharacterSystem
 				ClearSlots();
 				DynamicAssetLoader.Instance.CurrentBatchID = batchID;
 				LoadDefaultWardrobe(true);//load defaultWardrobe will add anything it downloads to requiredAssetsToCheck
-				context.dynamicCharacterSystem.Refresh();
+										  //context.dynamicCharacterSystem.Refresh();
 				if (waitForBundles)
 				{
 					while (DynamicAssetLoader.Instance.downloadingAssetsContains(requiredAssetsToCheck))
@@ -828,7 +830,7 @@ namespace UMACharacterSystem
 					requiredAssetsToCheck.Clear();
 					activeRace.data = context.raceLibrary.GetRace(activeRace.name);
 					umaRecipe = activeRace.data.baseRaceRecipe;
-					context.dynamicCharacterSystem.Refresh();
+					//context.dynamicCharacterSystem.Refresh();
 					UpdateSetSlots();
 					BuildCharacter(false);
 				}
@@ -942,7 +944,7 @@ namespace UMACharacterSystem
 			if (raceString != "")
 			{
 				context.GetRace(raceString);//update the race library with this race- triggers the race to download and sets it to placeholder race if its in an assetbundle
-				context.dynamicCharacterSystem.Refresh();//Refresh Character System so it has a key in the dictionary for this race
+											//context.dynamicCharacterSystem.Refresh();//Refresh Character System so it has a key in the dictionary for this race
 			}
 			//If the user doesn't have the content and it cannot be downloaded then we get an error. So try-catch...
 			try
@@ -1006,7 +1008,7 @@ namespace UMACharacterSystem
 					requiredAssetsToCheck.Clear();
 					activeRace.data = context.raceLibrary.GetRace(activeRace.name);
 					umaRecipe = activeRace.data.baseRaceRecipe;
-					context.dynamicCharacterSystem.Refresh();
+					//context.dynamicCharacterSystem.Refresh();
 					UpdateSetSlots();
 				}
 				//
@@ -1443,6 +1445,7 @@ namespace UMACharacterSystem
 				var thisContext = UMAContext.FindInstance();
 				var thisDynamicRaceLibrary = (DynamicRaceLibrary)thisContext.raceLibrary as DynamicRaceLibrary;
 				_cachedRaceDatas = thisDynamicRaceLibrary.GetAllRaces();
+				//Debug.LogWarning("[RaceSetter] called Validate()");
 				foreach (RaceData race in _cachedRaceDatas)
 				{
 					if (race.raceName == this.name)
@@ -1486,31 +1489,38 @@ namespace UMACharacterSystem
 			{
 				List<WardrobeRecipeListItem> validRecipes = new List<WardrobeRecipeListItem>();
 				var thisDCS = UMAContext.Instance.dynamicCharacterSystem as DynamicCharacterSystem;
-				foreach (WardrobeRecipeListItem recipe in recipes)
+				if (thisDCS != null)
 				{
-					if (allowDownloadables && (raceName == "" || recipe._compatibleRaces.Contains(raceName)))
+					foreach (WardrobeRecipeListItem recipe in recipes)
 					{
-						if (thisDCS.GetRecipe(recipe._recipeName, true) != null)
+						if (allowDownloadables && (raceName == "" || recipe._compatibleRaces.Contains(raceName)))
 						{
-							recipe._recipe = thisDCS.GetRecipe(recipe._recipeName);
-							validRecipes.Add(recipe);
-						}
-
-					}
-					else
-					{
-						if (thisDCS.RecipeIndex.ContainsKey(recipe._recipeName))
-						{
-							bool recipeFound = false;
-							recipeFound = thisDCS.RecipeIndex.TryGetValue(recipe._recipeName, out recipe._recipe);
-							if (recipeFound)
+							if (thisDCS.GetRecipe(recipe._recipeName, true) != null)
 							{
-								recipe._compatibleRaces = recipe._recipe.compatibleRaces;
+								recipe._recipe = thisDCS.GetRecipe(recipe._recipeName);
 								validRecipes.Add(recipe);
 							}
 
 						}
+						else
+						{
+							if (thisDCS.RecipeIndex.ContainsKey(recipe._recipeName))
+							{
+								bool recipeFound = false;
+								recipeFound = thisDCS.RecipeIndex.TryGetValue(recipe._recipeName, out recipe._recipe);
+								if (recipeFound)
+								{
+									recipe._compatibleRaces = recipe._recipe.compatibleRaces;
+									validRecipes.Add(recipe);
+								}
+
+							}
+						}
 					}
+				}
+				else
+				{
+					Debug.LogWarning("There was no DynamicCharacterSystem set up in UMAContext");
 				}
 				return validRecipes;
 			}
