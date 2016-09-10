@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -116,15 +116,16 @@ public class DynamicOverlayLibrary : OverlayLibrary
 #endif
             AddOverlayAsset(overlay);
         }
-        StartCoroutine(CleanOverlaysFromResourcesAndBundles());
-    }
+		//This doesn't actually seem to do anything apart from slow things down
+		//StartCoroutine(CleanOverlaysFromResourcesAndBundles());
+	}
 
-    IEnumerator CleanOverlaysFromResourcesAndBundles()
+	/*IEnumerator CleanOverlaysFromResourcesAndBundles()
     {
         yield return null;
         Resources.UnloadUnusedAssets();
         yield break;
-    }
+    }*/
 
     public override OverlayData InstantiateOverlay(string name)
     {

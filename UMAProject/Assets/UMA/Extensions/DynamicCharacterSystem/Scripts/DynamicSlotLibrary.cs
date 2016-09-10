@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -114,15 +114,16 @@ public class DynamicSlotLibrary : SlotLibrary
 #endif
             AddSlotAsset(slot);
         }
-        StartCoroutine(CleanSlotsFromResourcesAndBundles());
-    }
+		//This doesn't actually seem to do anything apart from slow things down
+		//StartCoroutine(CleanSlotsFromResourcesAndBundles());
+	}
 
-    IEnumerator CleanSlotsFromResourcesAndBundles()
+	/*IEnumerator CleanSlotsFromResourcesAndBundles()
     {
         yield return null;
         Resources.UnloadUnusedAssets();
         yield break;
-    }
+    }*/
 
     public override SlotData InstantiateSlot(string name)
     {

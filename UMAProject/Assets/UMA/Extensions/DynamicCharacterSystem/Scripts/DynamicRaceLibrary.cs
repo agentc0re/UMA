@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -21,8 +21,9 @@ public class DynamicRaceLibrary : RaceLibrary
     //CharacterAvatar can query this this to find out what asset bundles were required to create itself 
     //or other scripts can use it to find out which asset bundles are being used by the Libraries at any given point.
     public Dictionary<string, List<string>> assetBundlesUsedDict = new Dictionary<string, List<string>>();
+	bool allResourcesRacesDatasAdded = false;
 #if UNITY_EDITOR
-    [HideInInspector]
+	[HideInInspector]
     List<RaceData> editorAddedAssets = new List<RaceData>();
 #endif
 
@@ -94,8 +95,12 @@ public class DynamicRaceLibrary : RaceLibrary
 
     public void UpdateDynamicRaceLibrary(bool downloadAssets, int? raceHash = null)
     {
-       DynamicAssetLoader.Instance.AddAssets<RaceData>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssets, assetBundleNamesToSearch, resourcesFolderPath, raceHash, "", AddRaces);
-    }
+		if (!downloadAssets && allResourcesRacesDatasAdded)
+			return;
+		DynamicAssetLoader.Instance.AddAssets<RaceData>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssets, assetBundleNamesToSearch, resourcesFolderPath, raceHash, "", AddRaces);
+		if (!downloadAssets && raceHash == null && Application.isPlaying)
+			allResourcesRacesDatasAdded = true;
+	}
 
     public void UpdateDynamicRaceLibrary(string raceName)
     {
@@ -116,15 +121,16 @@ public class DynamicRaceLibrary : RaceLibrary
 #endif
                 AddRace(race);
         }
-        StartCoroutine(CleanRacesFromResourcesAndBundles());
-    }
+		//This doesn't actually seem to do anything apart from slow things down
+		//StartCoroutine(CleanRacesFromResourcesAndBundles());
+	}
 
-    IEnumerator CleanRacesFromResourcesAndBundles()
+	/*IEnumerator CleanRacesFromResourcesAndBundles()
     {
         yield return null;
         Resources.UnloadUnusedAssets();
         yield break;
-    }
+    }*/
 
 #pragma warning disable 618
     //We need to override AddRace Too because if the element is not in the list anymore it causes an error...

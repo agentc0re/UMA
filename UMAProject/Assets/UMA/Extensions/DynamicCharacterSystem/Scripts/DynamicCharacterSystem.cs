@@ -159,7 +159,8 @@ namespace UMACharacterSystem
 				else
 					CharacterRecipes[characterRecipe.name] = characterRecipe.text;
 			}
-			StartCoroutine(CleanFilesFromResourcesAndBundles());
+			//This doesn't actually seem to do anything apart from slow things down
+			//StartCoroutine(CleanFilesFromResourcesAndBundles());
 		}
 
 		private void GatherRecipeFiles(string filename = "")
@@ -167,12 +168,12 @@ namespace UMACharacterSystem
 			DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundlesForRecipesToSearch, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
 		}
 
-		IEnumerator CleanFilesFromResourcesAndBundles()
+		/*IEnumerator CleanFilesFromResourcesAndBundles()
 		{
 			yield return null;
 			Resources.UnloadUnusedAssets();
 			yield break;
-		}
+		}*/
 
 		public void AddRecipesFromAB(UMATextRecipe[] uparts)
 		{
@@ -253,7 +254,8 @@ namespace UMACharacterSystem
 					}
 				}
 			}
-			StartCoroutine(CleanFilesFromResourcesAndBundles());
+			//This doesn't actually seem to do anything apart from slow things down
+			//StartCoroutine(CleanFilesFromResourcesAndBundles());
 		}
 
 		public virtual UMATextRecipe GetRecipe(string filename, bool dynamicallyAdd = true)
