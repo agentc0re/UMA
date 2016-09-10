@@ -123,9 +123,9 @@ namespace UMACharacterSystem
 					}
 				}
 			}
-			if (requiredAssetsToCheck.Count > 0)
+			if (requiredAssetsToCheck.Count > 0 && waitForBundles == false)
 			{
-				if (!DynamicAssetLoader.Instance.downloadingAssetsContains(requiredAssetsToCheck))
+				if (DynamicAssetLoader.Instance.downloadingAssetsContains(requiredAssetsToCheck) == false)
 				{
 					requiredAssetsToCheck.Clear();
 					activeRace.data = context.raceLibrary.GetRace(activeRace.name);
@@ -147,7 +147,7 @@ namespace UMACharacterSystem
 			var batchID = DynamicAssetLoader.Instance.GenerateBatchID();
 			if (activeRace.data == null)//activeRace.data will get the asset from the library OR add it from Resources so if it's null it means its going to be downloaded from an asset bundle OR is just wrong
 			{
-				mayRequireDownloads = true;//but we dont know if its wrong until the index is downloaded so we have to wait for that.
+				mayRequireDownloads = true;//but we dont know if its wrong until the index is downloaded so we have to wait for that
 				if (DynamicAssetLoader.Instance.downloadingAssetsContains(activeRace.name))
 				{
 					requiredAssetsToCheck.Add(activeRace.name);
@@ -209,7 +209,6 @@ namespace UMACharacterSystem
 			{
 				while (DynamicAssetLoader.Instance.downloadingAssetsContains(requiredAssetsToCheck))
 				{
-					Debug.Log(this.gameObject.name + " waited for DynamicAssetLoader to load " + string.Join(", ", requiredAssetsToCheck.ToArray()));
 					yield return null;
 				}
 				requiredAssetsToCheck.Clear();
@@ -593,39 +592,39 @@ namespace UMACharacterSystem
 			}
 
 			// Load all the recipes
-			if (!flagForReload)
+			/*if (!flagForReload)
+            {
+                if (flagForRebuild)
+                {
+                    flagForReload = true;
+                    flagForRebuild = false;
+                }*/
+			//set the expression set to match the new character- needs to happen before load...
+			if (activeRace.racedata != null && !RestoreDNA)
 			{
-				if (flagForRebuild)
-				{
-					flagForReload = true;
-					flagForRebuild = false;
-				}
-				//set the expression set to match the new character- needs to happen before load...
-				if (activeRace.racedata != null && !RestoreDNA)//This does NOT need to validate the race
-				{
-					SetAnimatorController();
-					SetExpressionSet();
-				}
-				Load(umaRecipe, Recipes.ToArray());
+				SetAnimatorController();
+				SetExpressionSet();
+			}
+			Load(umaRecipe, Recipes.ToArray());
 
-				// Add saved DNA
-				if (RestoreDNA)
-				{
-					umaData.umaRecipe.ClearDna();
-					foreach (UMADnaBase ud in CurrentDNA)
-					{
-						umaData.umaRecipe.AddDna(ud);
-					}
-				}
-				return null;
-			}
-			else
+			// Add saved DNA
+			if (RestoreDNA)
 			{
-				//CONFIRM THIS IS NOT NEEDED ANY MORE
-				flagForReload = false;
-				//this is used by the load function in the case where an umaRecipe is directly defined since in this case we dont know what the race of that recipe is until its loaded
-				return Recipes.ToArray();
+				umaData.umaRecipe.ClearDna();
+				foreach (UMADnaBase ud in CurrentDNA)
+				{
+					umaData.umaRecipe.AddDna(ud);
+				}
 			}
+			return null;
+			//}
+			/*else
+            {
+                //CONFIRM THIS IS NOT NEEDED ANY MORE
+                flagForReload = false;
+                //this is used by the load function in the case where an umaRecipe is directly defined since in this case we dont know what the race of that recipe is until its loaded
+                return Recipes.ToArray();
+            }*/
 		}
 
 		void RemoveHiddenSlots()
@@ -884,13 +883,13 @@ namespace UMACharacterSystem
 
 			umaRecipe.Load(umaData.umaRecipe, context);
 
-			if (flagForReload)
-			{
-				activeRace.data = umaData.umaRecipe.raceData;
-				activeRace.name = activeRace.racedata.raceName;
-				SetAnimatorController();
-				umaAdditionalSerializedRecipes = BuildCharacter();
-			}
+			/*if (flagForReload)
+            {
+                activeRace.data = umaData.umaRecipe.raceData;
+                activeRace.name = activeRace.racedata.raceName;
+                SetAnimatorController();
+                umaAdditionalSerializedRecipes = BuildCharacter();
+            }*/
 
 			umaData.AddAdditionalRecipes(umaAdditionalRecipes, context);
 			AddAdditionalSerializedRecipes(umaAdditionalSerializedRecipes);

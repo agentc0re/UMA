@@ -194,28 +194,17 @@ namespace UMA
 				downloadingAssets.Update();
 			if (downloadingAssets.areDownloadedItemsReady == false)
 				assetBundlesDownloading = true;
-			//this is waaay over complicated- TODO work out why I thought we needed all these...
-			//Debug.LogWarning("assetBundlesDownloading  was " + assetBundlesDownloading);//was false
-			//Debug.LogWarning("downloadingAssets.areDownloadedItemsReady was " + downloadingAssets.areDownloadedItemsReady);// was true
-			//Debug.LogWarning("canCheckDownloadingBundles  was " + canCheckDownloadingBundles);//was true
 			if ((assetBundlesDownloading || downloadingAssets.areDownloadedItemsReady == false) && canCheckDownloadingBundles == true)
 			{
-				Debug.LogWarning("if ((assetBundlesDownloading || downloadingAssets.areDownloadedItemsReady == false) && canCheckDownloadingBundles == true)");
-				Debug.LogWarning("downloadingAssets.areDownloadedItemsReady was " + downloadingAssets.areDownloadedItemsReady);// was false
-				Debug.LogWarning("AssetBundleManager.AreBundlesDownloading() was " + AssetBundleManager.AreBundlesDownloading());// was false
 				if (!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true)
 				{
-					Debug.LogWarning("!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true");
 					assetBundlesDownloading = false;
-					//we only want this called from one place
 					var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
 					if (thisDCS != null)
 					{
 						thisDCS.Refresh();
 					}
-					//if (!gameObjectsActivated)
-					// {
-					Debug.LogWarning("if (!gameObjectsActivated)");
+
 					if (gameObjectsToActivate.Count > 0)
 					{
 						foreach (GameObject go in gameObjectsToActivate)
@@ -226,11 +215,7 @@ namespace UMA
 							}
 						}
 						gameObjectsToActivate.Clear();
-						//StartCoroutine(EnableActivatables());
 					}
-
-					// gameObjectsActivated = true;
-					//}
 				}
 			}
 		}
