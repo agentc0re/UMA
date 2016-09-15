@@ -13,14 +13,58 @@ namespace UMA
 	public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
 	{
 		public static UMAResourcesIndex Instance;
-		public UMAResourcesIndexData Index = new UMAResourcesIndexData();
+		private UMAResourcesIndexData index = new UMAResourcesIndexData();
 		public UnityEngine.Object indexAsset;
 		public bool enableDynamicIndexing = false;
 		public bool makePersistent = false;
+		public bool initialized = false;
+		bool initializing = false;
+
+		//Index (with a capital I) need to be a property that calls LoadOrCreateData if this is not initialized
+		public UMAResourcesIndexData Index
+		{
+			get
+			{
+				if (!Application.isPlaying)
+				{
+					Instance = this;// makes no fucking difference - in fact because racelibrary is setting a 'allStartingAssetsAdded ' bool this just makes things worse...
+				}
+				if (initialized == false)
+					LoadOrCreateData();
+				return index;
+			}
+		}
+
 
 		public UMAResourcesIndex()
 		{
 		}
+
+		//Awake has to be here because if its not there is no resources index untill the actual object is viewed
+		//ACTUALLY THIS MAKES NO DIFFERENCE
+		/*void Awake()
+		{
+			if (Instance == null)
+			{
+				Instance = this;
+				if (makePersistent)
+					DontDestroyOnLoad(gameObject);
+			}
+			else if (Instance != this)
+			{
+				if (Instance.makePersistent)
+					Destroy(gameObject);
+				else
+					Instance = this;
+			}
+			else if (Instance == this)//OnAfterDeserialize() gets called in the editor but doesn't do anything with the makePersistent value
+			{
+				if (makePersistent)
+					DontDestroyOnLoad(gameObject);
+			}
+			if(!Instance.initialized && !Instance.initializing)
+			LoadOrCreateData();
+		}*/
 
 		void Start()
 		{
@@ -42,7 +86,8 @@ namespace UMA
 				if (makePersistent)
 					DontDestroyOnLoad(gameObject);
 			}
-			LoadOrCreateData();
+			if (!Instance.initialized && !Instance.initializing)
+				LoadOrCreateData();
 		}
 
 		void OnApplicationQuit()
@@ -60,6 +105,7 @@ namespace UMA
 			if (Instance == null)//make an Instance in the editor too
 			{
 				Instance = this;
+				initialized = false;//this seems to fix things
 			}
 		}
 
@@ -81,7 +127,7 @@ namespace UMA
 			{
 				thisName = ((RaceData)obj).raceName;
 			}
-			Index.AddPath(obj, thisName);
+			index.AddPath(obj, thisName);
 			Save();
 #endif
 		}
@@ -90,7 +136,7 @@ namespace UMA
 #if UNITY_EDITOR
 			if (obj == null || objName == "")
 				return;
-			Index.AddPath(obj, objName);
+			index.AddPath(obj, objName);
 			Save();
 #endif
 		}
@@ -99,7 +145,7 @@ namespace UMA
 #if UNITY_EDITOR
 			if (obj == null)
 				return;
-			Index.AddPath(obj, objNameHash);
+			index.AddPath(obj, objNameHash);
 			Save();
 #endif
 		}
@@ -109,50 +155,60 @@ namespace UMA
 		/// <returns></returns>
 		public void LoadOrCreateData()
 		{
+			if (initialized || initializing)
+				return;
+			initializing = true;
 			var data = new UMAResourcesIndexData();
 			bool saveNewAsset = false;
 			if (indexAsset != null)
 			{
+				Debug.Log("[UMAResourcesIndex] indexAsset was not null");
 				var rawData = ((TextAsset)indexAsset).text;
 				data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
 			}
 #if UNITY_EDITOR
 			else
 			{
+				Debug.Log("[UMAResourcesIndex] indexAsset was null");
 				var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
 				if (File.Exists(dataAssetPath))
 				{
+					Debug.Log("[UMAResourcesIndex] BUT we found it");
 					var rawData = FileUtils.ReadAllText(dataAssetPath);
 					data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
 					indexAsset = AssetDatabase.LoadAssetAtPath("Assets/UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt", typeof(TextAsset));
 				}
 				else
 				{
+					Debug.Log("ResourcesIndex No Index Existed");
 					saveNewAsset = true;
 				}
 			}
 #endif
-			Index = data;
+			index = data;
 #if UNITY_EDITOR
 			if (saveNewAsset)
 			{
 				Save();
 			}
+
 #endif
+			initialized = true;
+			initializing = false;
 		}
 		public string GetIndexInfo()
 		{
 			int totalIndexedTypes = 0;
 			int totalIndexedFiles = 0;
-			if (Index.data != null)
+			if (index.data != null)
 			{
-				totalIndexedTypes = Index.data.Length;
+				totalIndexedTypes = index.data.Length;
 				totalIndexedFiles = 0;
 				List<string> typeNames = new List<string>();
 				for (int i = 0; i < totalIndexedTypes; i++)
 				{
-					typeNames.Add(Index.data[i].type);
-					totalIndexedFiles += Index.data[i].typeFiles.Length;
+					typeNames.Add(index.data[i].type);
+					totalIndexedFiles += index.data[i].typeFiles.Length;
 				}
 			}
 			string info = "Total files indexed: " + totalIndexedFiles + " in " + totalIndexedTypes + " Types"/*.\nIndexed Types: \n" + String.Join(", ", typeNames.ToArray())*/;
@@ -167,7 +223,7 @@ namespace UMA
 			//Currently Editor Only. But then since you cant add any assets to Resources in a build you should not be adding anything to the index either.
 #if UNITY_EDITOR
 			var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
-			var jsonData = JsonUtility.ToJson(Index);
+			var jsonData = JsonUtility.ToJson(index);
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 			EditorUtility.SetDirty(indexAsset);
 			AssetDatabase.SaveAssets();
@@ -184,7 +240,7 @@ namespace UMA
 		/// </summary>
 		public void ClearIndex()
 		{
-			Index = new UMAResourcesIndexData();
+			index = new UMAResourcesIndexData();
 			Save();
 		}
 		/// <summary>
@@ -233,13 +289,13 @@ namespace UMA
 							thisName = ((RaceData)tempObj).raceName;
 							thisHash = UMAUtils.StringToHash(thisName);
 						}
-						Index.AddPath(tempObj, thisHash);
+						index.AddPath(tempObj, thisHash);
 						if (tempObj.GetType() != typeof(UnityEngine.GameObject))
 							Resources.UnloadAsset(tempObj);//TODO check if this is safe to do...
 					}
 				}
 			}
-			Debug.Log("[UMAResourcesIndex] Added/Updated " + Index.Count() + " assets in the Index");
+			Debug.Log("[UMAResourcesIndex] Added/Updated " + index.Count() + " assets in the Index");
 			Save();
 		}
 #endif

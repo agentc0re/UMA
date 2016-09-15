@@ -12,7 +12,7 @@ namespace UMACharacterSystem
 
 		public virtual void Start() { }
 
-		public virtual void Refresh() { }
+		public virtual void Refresh(bool forceUpdateRaceLibrary = true) { }
 
 		public virtual void Update() { }
 

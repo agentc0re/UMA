@@ -1,4 +1,3 @@
-//JUST A TEST TO SEE IF I AM DOING THIS RIGHT- this should not end up in any other branches other than DynamicCSBeta
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,6 +22,7 @@ namespace UMACharacterSystem
 		[HideInInspector]
 		[System.NonSerialized]
 		public bool initialized = false;
+		private bool isInitializing = false;
 
 		public bool dynamicallyAddFromResources;
 		[Tooltip("Limit the Resources search to the following folders (no starting slash and seperate multiple entries with a comma)")]
@@ -35,7 +35,7 @@ namespace UMACharacterSystem
 		[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
 		public string assetBundlesForRecipesToSearch;
 
-		//bool refresh = false;//Never used stuff just calls Refresh directly- though maybe they shouldnt
+		//bool refresh = false; Never used stuff just calle Refresh directly
 		[HideInInspector]
 		public UMAContext context;
 		//This is a ditionary of asset bundles that were loaded into the library. This can be queried to store a list of active assetBundles that might be useful to preload etc
@@ -44,32 +44,33 @@ namespace UMACharacterSystem
 		[HideInInspector]
 		public bool downloadAssetsEnabled = true;
 
+		//bool updatedThisFrame = false;
 		//Removed becuase they slow down loadSceneAsync- checks added to Refresh instead
 		/*public override void Awake()
-		{
-			if (initializeOnAwake)
-			{
-				if (!initialized)
-				{
-					Init();
-				}
-			}
-		}
+        {
+            if (initializeOnAwake)
+            {
+                if (!initialized)
+                {
+                    Init();
+                }
+            }
+        }*/
 
-		public override void OnEnable()
-		{
-			if (!initialized || refresh)
-			{
-				if (refresh)
-				{
-					Refresh();
-				}
-				else
-				{
-					Init();
-				}
-			}
-		}*/
+		/*public override void OnEnable()
+        {
+            if (!initialized || refresh)
+            {
+                if (refresh)
+                {
+                    Refresh();
+                }
+                else
+                {
+                    Init();
+                }
+            }
+        }*/
 
 		public override void Start()
 		{
@@ -87,23 +88,24 @@ namespace UMACharacterSystem
 				Init();
 			}
 			/*if (refresh)
-			{
-				Refresh();
-			}*/
+            {
+                Refresh();
+            }*/
 		}
 
 		public override void Init()
 		{
-			if (initialized)
+			if (initialized || isInitializing)
 			{
 				return;
 			}
-
+			Debug.LogWarning("[DCS] Init Happenned");
 			if (context == null)
 			{
 				context = UMAContext.FindInstance();
 			}
-			
+			isInitializing = true;
+
 			Recipes.Clear();
 			var possibleRaces = (context.raceLibrary as DynamicRaceLibrary).GetAllRaces();
 			for (int i = 0; i < possibleRaces.Length; i++)
@@ -118,11 +120,13 @@ namespace UMACharacterSystem
 			GatherCharacterRecipes();
 			GatherRecipeFiles();
 			initialized = true;
+			isInitializing = false;
 		}
 
 		//Refresh just adds to what is there rather than clearing it all
 		//used after asset bundles have been loaded to add any new recipes to the dictionaries
-		public override void Refresh()
+		//This is slow and should only be called when you know something has been added
+		public override void Refresh(bool forceUpdateRaceLibrary = true)
 		{
 			//refresh = false;
 			if (!initialized)
@@ -130,21 +134,42 @@ namespace UMACharacterSystem
 				Init();
 				return;
 			}
-			var possibleRaces = context.raceLibrary.GetAllRaces();
-			for (int i = 0; i < possibleRaces.Length; i++)
+			RaceData[] possibleRaces = new RaceData[0];
+			if (forceUpdateRaceLibrary)
 			{
-				//we need to check that this is not null- the user may not have downloaded it yet
-				if (possibleRaces[i] != null)
+				Debug.LogWarning("[DCS] Refresh Happenned and triggered RaceLibrary update and waited for that");
+				possibleRaces = context.raceLibrary.GetAllRaces();//if any new races are added by this then RaceLibrary will Re-Trigger this if there was anything new so dont do anything else
+			}
+			else
+			{
+				Debug.LogWarning("[DCS] Refresh Happenned AFTER RaceLibrary update or no RaceLibrary update was required");
+				possibleRaces = (context.raceLibrary as DynamicRaceLibrary).GetAllRacesBase();
+				for (int i = 0; i < possibleRaces.Length; i++)
 				{
-					if (!Recipes.ContainsKey(possibleRaces[i].raceName) && possibleRaces[i].raceName != DynamicAssetLoader.Instance.placeholderRace.raceName)
+					//we need to check that this is not null- the user may not have downloaded it yet
+					if (possibleRaces[i] != null)
 					{
-						Recipes.Add(possibleRaces[i].raceName, new Dictionary<string, List<UMATextRecipe>>());
+						if (!Recipes.ContainsKey(possibleRaces[i].raceName) && possibleRaces[i].raceName != DynamicAssetLoader.Instance.placeholderRace.raceName)
+						{
+							Recipes.Add(possibleRaces[i].raceName, new Dictionary<string, List<UMATextRecipe>>());
+						}
 					}
 				}
+				GatherCharacterRecipes();
+				GatherRecipeFiles();
 			}
-			GatherCharacterRecipes();
-			GatherRecipeFiles();
 		}
+
+		/*public void AddPossibleRace(RaceData raceToCheck)
+		{
+			if (raceToCheck != null)
+			{
+				if (!Recipes.ContainsKey(raceToCheck.raceName) && raceToCheck.raceName != DynamicAssetLoader.Instance.placeholderRace.raceName)
+				{
+					Recipes.Add(raceToCheck.raceName, new Dictionary<string, List<UMATextRecipe>>());
+				}
+			}
+		}*/
 
 		private void GatherCharacterRecipes(string filename = "")
 		{
@@ -170,11 +195,11 @@ namespace UMACharacterSystem
 		}
 
 		/*IEnumerator CleanFilesFromResourcesAndBundles()
-		{
-			yield return null;
-			Resources.UnloadUnusedAssets();
-			yield break;
-		}*/
+        {
+            yield return null;
+            Resources.UnloadUnusedAssets();
+            yield break;
+        }*/
 
 		public void AddRecipesFromAB(UMATextRecipe[] uparts)
 		{
@@ -225,11 +250,15 @@ namespace UMACharacterSystem
 								RaceRecipes[u.wardrobeSlot].Add(u);
 							}
 						}
+						/*else
+						{
+							Debug.LogWarning("[DynamicCharacterSystem] no race in dictionary for " + u.compatibleRaces[i]);
+						}*/
 						//backwards compatible race slots
 						foreach (string racekey in Recipes.Keys)
 						{
 							//here we also need to check that the race itself has a wardrobe slot that matches the one i the compatible race
-							if (context.raceLibrary.GetRace(racekey).backwardsCompatibleWith.Contains(u.compatibleRaces[i]) && context.raceLibrary.GetRace(racekey).wardrobeSlots.Contains(u.wardrobeSlot))
+							if ((context.raceLibrary as DynamicRaceLibrary).GetRace(racekey, false).backwardsCompatibleWith.Contains(u.compatibleRaces[i]) && (context.raceLibrary as DynamicRaceLibrary).GetRace(racekey, false).wardrobeSlots.Contains(u.wardrobeSlot))
 							{
 								Dictionary<string, List<UMATextRecipe>> RaceRecipes = Recipes[racekey];
 								if (!RaceRecipes.ContainsKey(u.wardrobeSlot))
@@ -251,6 +280,10 @@ namespace UMACharacterSystem
 									RaceRecipes[u.wardrobeSlot].Add(u);
 								}
 							}
+							/*else
+							{
+								Debug.LogWarning("[DynamicCharacterSystem] no backwards compatable race in dictionary for " + u.compatibleRaces[i]);
+							}*/
 						}
 					}
 				}
