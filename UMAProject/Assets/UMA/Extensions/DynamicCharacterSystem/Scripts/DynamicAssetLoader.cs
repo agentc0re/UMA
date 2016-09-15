@@ -543,16 +543,33 @@ namespace UMA
 			}
 			yield return true;
 			//If this assetBundle contains UMATextRecipes we may need to trigger some post processing...
+			//it may have downloaded some dependent bundles too so these may need processing aswell
+			var dependencies = AssetBundleManager.AssetBundleIndexObject.GetAllDependencies(bundle);
+			var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
 			if (AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(bundle, "UMATextRecipe").Length > 0)
 			{
 				if (UMAContext.Instance != null)
 				{
-					var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
 					if (thisDCS != null)
 					{
 						//DCSRefresh only needs to be called if the downloaded asset bundle contained UMATextRecipes (or character recipes) but I dont know how to check for for just that type of text asset
 						//Also it actually ONLY needs to search this bundle
 						thisDCS.Refresh(false, bundle);
+					}
+				}
+			}
+			for (int i = 0; i < dependencies.Length; i++)
+			{
+				if (AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(dependencies[i], "UMATextRecipe").Length > 0)
+				{
+					if (UMAContext.Instance != null)
+					{
+						if (thisDCS != null)
+						{
+							//DCSRefresh only needs to be called if the downloaded asset bundle contained UMATextRecipes (or character recipes) but I dont know how to check for for just that type of text asset
+							//Also it actually ONLY needs to search this bundle
+							thisDCS.Refresh(false, dependencies[i]);
+						}
 					}
 				}
 			}
