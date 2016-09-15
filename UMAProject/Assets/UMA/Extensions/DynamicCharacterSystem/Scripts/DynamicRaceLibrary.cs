@@ -115,21 +115,19 @@ public class DynamicRaceLibrary : RaceLibrary
 	}
 #endif
 	//Loading speed issue does not seem to be related to this since commenting the AddAssets calls out makes no difference!?!
-	//Maybe if downloadAssets is false (i.e. we will be adding from resources) if we have already added from resources we should just do nothing?
-	//In the editor I think we could enable this if RaceSetterEditor only called 'ClearEditorAddedAssets' if it needed too (only after a play- if at all)
 	public void UpdateDynamicRaceLibrary(bool downloadAssets, int? raceHash = null)
 	{
 		Debug.LogWarning("[DynamicRaceLibrary] UpdateDynamicRaceLibrary called");
+		if (allStartingAssetsAdded)
+		{
+			Debug.Log("[DynamicRaceLibrary] Did not update because allStartingAssetsAdded was true");
+			return;
+		}
 		//Making the race library scan everything should only happen once- at all other times a specific race should have been requested (and been added by dynamic asset loader) so it should already be here if it needs to be.
 		if (raceHash == null && Application.isPlaying && allStartingAssetsAdded == false && UMAResourcesIndex.Instance.initialized && UMAResourcesIndex.Instance.enableDynamicIndexing == false)
 		{
 			Debug.LogWarning("[DynamicRaceLibrary] UpdateDynamicRaceLibrary searched for everything- This should only happen ONCE");
 			allStartingAssetsAdded = true;
-		}
-		if (allStartingAssetsAdded)
-		{
-			Debug.Log("[DynamicRaceLibrary] Did not update because allStartingAssetsAdded was true");
-			return;
 		}
 #if UNITY_EDITOR
 		if (allAssetsAddedInEditor)
@@ -138,19 +136,13 @@ public class DynamicRaceLibrary : RaceLibrary
 			return;
 		}
 #endif
-		/*if (!downloadAssets && allAssetsAddedInEditor)//this is no good because even if we are not downloading assets we may still neet to GET them from assetbundles
-			return;*/
-		//Debug.LogWarning("[DynamicRaceLibrary] AddAssets downloadAssets = " + downloadAssets + " raceHash = "+raceHash);
 		DynamicAssetLoader.Instance.AddAssets<RaceData>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssets, assetBundleNamesToSearch, resourcesFolderPath, raceHash, "", AddRaces);
 
 #if UNITY_EDITOR
 		if (raceHash == null && !Application.isPlaying)
 		{
-			Debug.LogWarning("I DEFINED allAssetsAddedInEditor AS TRUE");
 			allAssetsAddedInEditor = true;
 		}
-		/*if (!downloadAssets && raceHash == null && Application.isPlaying)
-			allAssetsAddedInEditor = true;*/
 #endif
 	}
 
@@ -178,7 +170,6 @@ public class DynamicRaceLibrary : RaceLibrary
 			else
 #endif
 				AddRace(race);
-			//if this ACTUALLY adds a race THEN DCS needs to Refresh...
 
 		}
 		//This doesn't actually seem to do anything apart from slow things down
@@ -194,7 +185,6 @@ public class DynamicRaceLibrary : RaceLibrary
 
 #pragma warning disable 618
 	//We need to override AddRace Too because if the element is not in the list anymore it causes an error...
-	//BUT THIS WILL BE OBSOLETE raceElementList is going to be marked PRIVATE so this wont work soon...
 	override public void AddRace(RaceData race)
 	{
 		if (race == null)
