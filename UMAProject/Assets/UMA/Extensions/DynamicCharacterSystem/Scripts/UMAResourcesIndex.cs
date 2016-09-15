@@ -13,24 +13,20 @@ namespace UMA
 	public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
 	{
 		public static UMAResourcesIndex Instance;
-		private UMAResourcesIndexData index = new UMAResourcesIndexData();
+		private UMAResourcesIndexData index = null;
 		public UnityEngine.Object indexAsset;
 		public bool enableDynamicIndexing = false;
 		public bool makePersistent = false;
-		public bool initialized = false;
-		bool initializing = false;
 
 		//Index (with a capital I) need to be a property that calls LoadOrCreateData if this is not initialized
 		public UMAResourcesIndexData Index
 		{
 			get
 			{
-				if (!Application.isPlaying)
+				if (index == null)
 				{
-					Instance = this;// makes no fucking difference - in fact because racelibrary is setting a 'allStartingAssetsAdded ' bool this just makes things worse...
-				}
-				if (initialized == false)
 					LoadOrCreateData();
+				}
 				return index;
 			}
 		}
@@ -40,53 +36,27 @@ namespace UMA
 		{
 		}
 
-		//Awake has to be here because if its not there is no resources index untill the actual object is viewed
-		//ACTUALLY THIS MAKES NO DIFFERENCE
-		/*void Awake()
-		{
-			if (Instance == null)
-			{
-				Instance = this;
-				if (makePersistent)
-					DontDestroyOnLoad(gameObject);
-			}
-			else if (Instance != this)
-			{
-				if (Instance.makePersistent)
-					Destroy(gameObject);
-				else
-					Instance = this;
-			}
-			else if (Instance == this)//OnAfterDeserialize() gets called in the editor but doesn't do anything with the makePersistent value
-			{
-				if (makePersistent)
-					DontDestroyOnLoad(gameObject);
-			}
-			if(!Instance.initialized && !Instance.initializing)
-			LoadOrCreateData();
-		}*/
-
 		void Start()
 		{
 			if (Instance == null)
 			{
 				Instance = this;
-				if (makePersistent)
+				if (makePersistent && Application.isPlaying)
 					DontDestroyOnLoad(gameObject);
 			}
 			else if (Instance != this)
 			{
-				if (Instance.makePersistent)
+				if (Instance.makePersistent && Application.isPlaying)
 					Destroy(gameObject);
 				else
 					Instance = this;
 			}
 			else if (Instance == this)//OnAfterDeserialize() gets called in the editor but doesn't do anything with the makePersistent value
 			{
-				if (makePersistent)
+				if (makePersistent && Application.isPlaying)
 					DontDestroyOnLoad(gameObject);
 			}
-			if (!Instance.initialized && !Instance.initializing)
+			if (index == null)
 				LoadOrCreateData();
 		}
 
@@ -105,7 +75,6 @@ namespace UMA
 			if (Instance == null)//make an Instance in the editor too
 			{
 				Instance = this;
-				initialized = false;//this seems to fix things
 			}
 		}
 
@@ -127,7 +96,7 @@ namespace UMA
 			{
 				thisName = ((RaceData)obj).raceName;
 			}
-			index.AddPath(obj, thisName);
+			Index.AddPath(obj, thisName);
 			Save();
 #endif
 		}
@@ -136,7 +105,7 @@ namespace UMA
 #if UNITY_EDITOR
 			if (obj == null || objName == "")
 				return;
-			index.AddPath(obj, objName);
+			Index.AddPath(obj, objName);
 			Save();
 #endif
 		}
@@ -145,7 +114,7 @@ namespace UMA
 #if UNITY_EDITOR
 			if (obj == null)
 				return;
-			index.AddPath(obj, objNameHash);
+			Index.AddPath(obj, objNameHash);
 			Save();
 #endif
 		}
@@ -155,21 +124,16 @@ namespace UMA
 		/// <returns></returns>
 		public void LoadOrCreateData()
 		{
-			if (initialized || initializing)
-				return;
-			initializing = true;
 			var data = new UMAResourcesIndexData();
-			bool saveNewAsset = false;
 			if (indexAsset != null)
 			{
-				Debug.Log("[UMAResourcesIndex] indexAsset was not null");
 				var rawData = ((TextAsset)indexAsset).text;
 				data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
 			}
 #if UNITY_EDITOR
 			else
 			{
-				Debug.Log("[UMAResourcesIndex] indexAsset was null");
+				Debug.LogWarning("[UMAResourcesIndex] indexAsset was null");
 				var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
 				if (File.Exists(dataAssetPath))
 				{
@@ -180,27 +144,20 @@ namespace UMA
 				}
 				else
 				{
-					Debug.Log("ResourcesIndex No Index Existed");
-					saveNewAsset = true;
+					Debug.LogWarning("ResourcesIndex No Index Existed! Generating Index data and saving");
+					//generate the index data and save
+					index = data;//assign this so we dont get into a loop
+					IndexAllResources();
 				}
 			}
 #endif
 			index = data;
-#if UNITY_EDITOR
-			if (saveNewAsset)
-			{
-				Save();
-			}
-
-#endif
-			initialized = true;
-			initializing = false;
 		}
 		public string GetIndexInfo()
 		{
 			int totalIndexedTypes = 0;
 			int totalIndexedFiles = 0;
-			if (index.data != null)
+			if (Index.data != null)
 			{
 				totalIndexedTypes = index.data.Length;
 				totalIndexedFiles = 0;

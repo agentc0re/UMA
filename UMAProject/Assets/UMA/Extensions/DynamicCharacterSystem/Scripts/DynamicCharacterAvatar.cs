@@ -15,6 +15,10 @@ using UMAAssetBundleManager;
 
 namespace UMACharacterSystem
 {
+	//TODO when a scene that contains this component is included in an asset bundle it ends up having dependencies on some things that are defined in here
+	// namely the race data and the default animator - I think these need to have no refrence to any assets at all so that the scene looses these dependencies
+	// because the avatar is supposed to be dynamic and therefore of an undefined race and using an undefined animator. The same is true of the expressions player
+	//this need to not have an expressionSet set so again the scene does not end up dependent on the asset that contains it
 	public class DynamicCharacterAvatar : UMAAvatarBase
 	{
 		//because the character might be loaded from an asset bundle, we may want everything required to create it to happen
@@ -25,8 +29,8 @@ namespace UMACharacterSystem
 		//This will generate itself from a list available Races and set itself to the current value of activeRace.name
 		public RaceSetter activeRace;
 
-		bool flagForRebuild = false;
-		bool flagForReload = false;
+		//bool flagForRebuild = false;
+		//bool flagForReload = false;
 
 		public Dictionary<string, UMATextRecipe> WardrobeRecipes = new Dictionary<string, UMATextRecipe>();
 

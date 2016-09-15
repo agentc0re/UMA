@@ -117,22 +117,22 @@ public class DynamicRaceLibrary : RaceLibrary
 	//Loading speed issue does not seem to be related to this since commenting the AddAssets calls out makes no difference!?!
 	public void UpdateDynamicRaceLibrary(bool downloadAssets, int? raceHash = null)
 	{
-		Debug.LogWarning("[DynamicRaceLibrary] UpdateDynamicRaceLibrary called");
-		if (allStartingAssetsAdded)
+		//Debug.LogWarning("[DynamicRaceLibrary] UpdateDynamicRaceLibrary called");
+		if (allStartingAssetsAdded && raceHash == null)
 		{
-			Debug.Log("[DynamicRaceLibrary] Did not update because allStartingAssetsAdded was true");
+			//Debug.Log("[DynamicRaceLibrary] Did not do a search for everything again because allStartingAssetsAdded was true");
 			return;
 		}
 		//Making the race library scan everything should only happen once- at all other times a specific race should have been requested (and been added by dynamic asset loader) so it should already be here if it needs to be.
-		if (raceHash == null && Application.isPlaying && allStartingAssetsAdded == false && UMAResourcesIndex.Instance.initialized && UMAResourcesIndex.Instance.enableDynamicIndexing == false)
+		if (raceHash == null && Application.isPlaying && allStartingAssetsAdded == false && UMAResourcesIndex.Instance != null && UMAResourcesIndex.Instance.enableDynamicIndexing == false)
 		{
-			Debug.LogWarning("[DynamicRaceLibrary] UpdateDynamicRaceLibrary searched for everything- This should only happen ONCE");
+			//Debug.LogWarning("[DynamicRaceLibrary] UpdateDynamicRaceLibrary searched for everything- This should only happen ONCE");
 			allStartingAssetsAdded = true;
 		}
 #if UNITY_EDITOR
-		if (allAssetsAddedInEditor)
+		if (allAssetsAddedInEditor && raceHash == null)
 		{
-			Debug.Log("[DynamicRaceLibrary] Did not update because allAssetsAddedInEditor was true");
+			//Debug.Log("[DynamicRaceLibrary] Did not update because allAssetsAddedInEditor was true");
 			return;
 		}
 #endif
@@ -141,6 +141,7 @@ public class DynamicRaceLibrary : RaceLibrary
 #if UNITY_EDITOR
 		if (raceHash == null && !Application.isPlaying)
 		{
+			//Debug.LogWarning("I DEFINED allAssetsAddedInEditor AS TRUE");
 			allAssetsAddedInEditor = true;
 		}
 #endif
@@ -170,7 +171,6 @@ public class DynamicRaceLibrary : RaceLibrary
 			else
 #endif
 				AddRace(race);
-
 		}
 		//This doesn't actually seem to do anything apart from slow things down
 		//StartCoroutine(CleanRacesFromResourcesAndBundles());

@@ -35,7 +35,6 @@ namespace UMACharacterSystem
 		[Tooltip("Limit the AssetBundles search to the following bundles (no starting slash and seperate multiple entries with a comma)")]
 		public string assetBundlesForRecipesToSearch;
 
-		//bool refresh = false; Never used stuff just calle Refresh directly
 		[HideInInspector]
 		public UMAContext context;
 		//This is a ditionary of asset bundles that were loaded into the library. This can be queried to store a list of active assetBundles that might be useful to preload etc
@@ -87,10 +86,6 @@ namespace UMACharacterSystem
 			{
 				Init();
 			}
-			/*if (refresh)
-            {
-                Refresh();
-            }*/
 		}
 
 		public override void Init()
@@ -99,7 +94,6 @@ namespace UMACharacterSystem
 			{
 				return;
 			}
-			Debug.LogWarning("[DCS] Init Happenned");
 			if (context == null)
 			{
 				context = UMAContext.FindInstance();
@@ -126,9 +120,8 @@ namespace UMACharacterSystem
 		//Refresh just adds to what is there rather than clearing it all
 		//used after asset bundles have been loaded to add any new recipes to the dictionaries
 		//This is slow and should only be called when you know something has been added
-		public override void Refresh(bool forceUpdateRaceLibrary = true)
+		public override void Refresh(bool forceUpdateRaceLibrary = true, string bundleToGather = "")
 		{
-			//refresh = false;
 			if (!initialized)
 			{
 				Init();
@@ -137,12 +130,10 @@ namespace UMACharacterSystem
 			RaceData[] possibleRaces = new RaceData[0];
 			if (forceUpdateRaceLibrary)
 			{
-				Debug.LogWarning("[DCS] Refresh Happenned and triggered RaceLibrary update and waited for that");
 				possibleRaces = context.raceLibrary.GetAllRaces();//if any new races are added by this then RaceLibrary will Re-Trigger this if there was anything new so dont do anything else
 			}
 			else
 			{
-				Debug.LogWarning("[DCS] Refresh Happenned AFTER RaceLibrary update or no RaceLibrary update was required");
 				possibleRaces = (context.raceLibrary as DynamicRaceLibrary).GetAllRacesBase();
 				for (int i = 0; i < possibleRaces.Length; i++)
 				{
@@ -155,25 +146,15 @@ namespace UMACharacterSystem
 						}
 					}
 				}
-				GatherCharacterRecipes();
-				GatherRecipeFiles();
+				GatherCharacterRecipes("", bundleToGather);
+				GatherRecipeFiles("", bundleToGather);
 			}
 		}
 
-		/*public void AddPossibleRace(RaceData raceToCheck)
+		private void GatherCharacterRecipes(string filename = "", string bundleToGather = "")
 		{
-			if (raceToCheck != null)
-			{
-				if (!Recipes.ContainsKey(raceToCheck.raceName) && raceToCheck.raceName != DynamicAssetLoader.Instance.placeholderRace.raceName)
-				{
-					Recipes.Add(raceToCheck.raceName, new Dictionary<string, List<UMATextRecipe>>());
-				}
-			}
-		}*/
-
-		private void GatherCharacterRecipes(string filename = "")
-		{
-			DynamicAssetLoader.Instance.AddAssets<TextAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundlesForCharactersToSearch, resourcesCharactersFolder, null, filename, AddCharacterRecipes);
+			var assetBundleToGather = bundleToGather != "" ? bundleToGather : assetBundlesForCharactersToSearch;
+			DynamicAssetLoader.Instance.AddAssets<TextAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleToGather, resourcesCharactersFolder, null, filename, AddCharacterRecipes);
 		}
 
 		private void AddCharacterRecipes(TextAsset[] characterRecipes)
@@ -189,9 +170,10 @@ namespace UMACharacterSystem
 			//StartCoroutine(CleanFilesFromResourcesAndBundles());
 		}
 
-		private void GatherRecipeFiles(string filename = "")
+		private void GatherRecipeFiles(string filename = "", string bundleToGather = "")
 		{
-			DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundlesForRecipesToSearch, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
+			var assetBundleToGather = bundleToGather != "" ? bundleToGather : assetBundlesForRecipesToSearch;
+			DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleToGather, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
 		}
 
 		/*IEnumerator CleanFilesFromResourcesAndBundles()
@@ -250,15 +232,11 @@ namespace UMACharacterSystem
 								RaceRecipes[u.wardrobeSlot].Add(u);
 							}
 						}
-						/*else
-						{
-							Debug.LogWarning("[DynamicCharacterSystem] no race in dictionary for " + u.compatibleRaces[i]);
-						}*/
 						//backwards compatible race slots
 						foreach (string racekey in Recipes.Keys)
 						{
 							//here we also need to check that the race itself has a wardrobe slot that matches the one i the compatible race
-							if ((context.raceLibrary as DynamicRaceLibrary).GetRace(racekey, false).backwardsCompatibleWith.Contains(u.compatibleRaces[i]) && (context.raceLibrary as DynamicRaceLibrary).GetRace(racekey, false).wardrobeSlots.Contains(u.wardrobeSlot))
+							if ((context.raceLibrary as DynamicRaceLibrary).GetRace(racekey).backwardsCompatibleWith.Contains(u.compatibleRaces[i]) && (context.raceLibrary as DynamicRaceLibrary).GetRace(racekey).wardrobeSlots.Contains(u.wardrobeSlot))
 							{
 								Dictionary<string, List<UMATextRecipe>> RaceRecipes = Recipes[racekey];
 								if (!RaceRecipes.ContainsKey(u.wardrobeSlot))
@@ -280,10 +258,6 @@ namespace UMACharacterSystem
 									RaceRecipes[u.wardrobeSlot].Add(u);
 								}
 							}
-							/*else
-							{
-								Debug.LogWarning("[DynamicCharacterSystem] no backwards compatable race in dictionary for " + u.compatibleRaces[i]);
-							}*/
 						}
 					}
 				}
