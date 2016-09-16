@@ -37,7 +37,7 @@ namespace UMA
 		[HideInInspector]
 		[System.NonSerialized]
 		public bool assetBundlesDownloading;
-		bool canCheckDownloadingBundles;
+		public bool canCheckDownloadingBundles;
 		bool isInitializing = false;
 		[HideInInspector]
 		public bool isInitialized = false;
@@ -45,6 +45,7 @@ namespace UMA
 		public bool gameObjectsActivated;
 		[Space]
 		//Default assets fields
+		//TODO These should be sent by whatever requested that type of asset so that more types than this can request assets and get a placeholder back while the asset is downloading
 		public RaceData placeholderRace;//temp race based on UMAMale with a baseRecipe to generate a temp umaMale TODO: Could have a female too and search the required racename to see if it contains female...
 		public UMATextRecipe placeholderWardrobeRecipe;//empty temp wardrobe recipe
 		public SlotDataAsset placeholderSlot;//empty temp slot
@@ -55,6 +56,10 @@ namespace UMA
 		public DownloadingAssetsList downloadingAssets = new DownloadingAssetsList();
 
 		int? _currentBatchID = null;
+
+		//For SimulationMode in the editor - equivalent of AssetBundleManager.m_downloadedBundles
+		//should persist betweem scene loads but not between plays
+		List<string> simulatedDownloadedBundles = new List<string>();
 
 		/// <summary>
 		/// Gets the currentBatchID or generates a new one if it is null. Sets the currentBatch ID to a given value
@@ -104,7 +109,6 @@ namespace UMA
 			bool destroyingThis = false;
 			if (_instance == null)
 			{
-				Debug.Log("[DynamicAssetLoader] _instance was null");
 				_instance = this;
 				if (makePersistent)
 				{
@@ -154,9 +158,10 @@ namespace UMA
 			if (!destroyingThis)
 				if (assetBundlesToPreLoad.Count > 0)
 				{
-					Debug.Log("[DynamicAssetLoader] assetBundlesToPreLoad.Count > 0");
 					//yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));//why does this need to yeild return?
-					StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
+					List<string> bundlesToSend = new List<string>(assetBundlesToPreLoad.Count);
+					bundlesToSend.AddRange(assetBundlesToPreLoad);
+					StartCoroutine(LoadAssetBundlesAsync(bundlesToSend));
 					assetBundlesToPreLoad.Clear();
 				}
 		}
@@ -165,9 +170,10 @@ namespace UMA
 		{
 			if (assetBundlesToPreLoad.Count > 0)
 			{
-				Debug.Log("[DynamicAssetLoader] assetBundlesToPreLoad.Count > 0 IN UPDATE");
 				//yield return StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));//why does this need to yeild return?
-				StartCoroutine(LoadAssetBundlesAsync(assetBundlesToPreLoad));
+				List<string> bundlesToSend = new List<string>(assetBundlesToPreLoad.Count);
+				bundlesToSend.AddRange(assetBundlesToPreLoad);
+				StartCoroutine(LoadAssetBundlesAsync(bundlesToSend));
 				assetBundlesToPreLoad.Clear();
 			}
 #if UNITY_EDITOR
@@ -188,36 +194,65 @@ namespace UMA
 				}
 				//gameObjectsActivated = true;
 				//}
-			}
-#endif
-			if (downloadingAssets.downloadingItems.Count > 0)
-				downloadingAssets.Update();
-			if (downloadingAssets.areDownloadedItemsReady == false)
-				assetBundlesDownloading = true;
-			if ((assetBundlesDownloading || downloadingAssets.areDownloadedItemsReady == false) && canCheckDownloadingBundles == true)
-			{
-				if (!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true)
+				/*if (simulationModeDCSBundlesToUpdate.Count > 0)//will this be too late? Does it even need to happen when the assets have been explicitly added?
 				{
-					assetBundlesDownloading = false;
-					var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
-					if (thisDCS != null)
+					var context = UMAContext.Instance;
+					if (UMAContext.Instance != null)
 					{
-						thisDCS.Refresh();
-					}
-
-					if (gameObjectsToActivate.Count > 0)
-					{
-						foreach (GameObject go in gameObjectsToActivate)
+						var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+						if (thisDCS != null)
 						{
-							if (!go.activeSelf)
+							for(int i = 0; i < simulationModeDCSBundlesToUpdate.Count; i++)
 							{
-								go.SetActive(true);
+								thisDCS.Refresh(false,simulationModeDCSBundlesToUpdate[i]);
 							}
 						}
-						gameObjectsToActivate.Clear();
+					}
+					simulationModeDCSBundlesToUpdate.Clear();
+                }*/
+			}
+			else
+			{
+#endif
+				if (downloadingAssets.downloadingItems.Count > 0)
+					downloadingAssets.Update();
+				if (downloadingAssets.areDownloadedItemsReady == false)
+					assetBundlesDownloading = true;
+				if ((assetBundlesDownloading || downloadingAssets.areDownloadedItemsReady == false) && canCheckDownloadingBundles == true)
+				{
+					if (!AssetBundleManager.AreBundlesDownloading() && downloadingAssets.areDownloadedItemsReady == true)
+					{
+						assetBundlesDownloading = false;
+						//LoadBundleAsync should do this now- and only if the bundle has UMATextRecipes in or (TODO- maybe) TextAssets
+						//but text assets could be anything... Should we really update if just ANY text assets are found?
+						//I think if CharacterRecipes are created before buildTime they should perhaps be ScriptableObjects- of a Type- pretty much aka UMATextRecipe Assets!
+						//That way the only thing left to deal with is actual text assets created at run time and thats beyond the scope of DCS/UMA really
+						/*var context = UMAContext.Instance;
+						if (UMAContext.Instance != null)
+						{
+							var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+							if (thisDCS != null)
+							{
+								thisDCS.Refresh();//DCSRefresh only needs to be called if the downloaded asset bundle contained UMATextRecipes (or character recipes) but I dont know how to check for that
+							}
+						}*/
+
+						if (gameObjectsToActivate.Count > 0)
+						{
+							foreach (GameObject go in gameObjectsToActivate)
+							{
+								if (!go.activeSelf)
+								{
+									go.SetActive(true);
+								}
+							}
+							gameObjectsToActivate.Clear();
+						}
 					}
 				}
+#if UNITY_EDITOR
 			}
+#endif
 		}
 
 		/*IEnumerator EnableActivatables()
@@ -471,6 +506,7 @@ namespace UMA
 				{
 					if ((bundle == assetBundleName || bundle.IndexOf(assetBundleName + "/") > -1))
 					{
+						Debug.Log("Started loading of " + bundle);
 						AssetBundleLoadingIndicator.Instance.Show(bundle, loadingMsg, "", loadedMsg);
 						StartCoroutine(LoadAssetBundleAsync(bundle));
 					}
@@ -506,6 +542,37 @@ namespace UMA
 				Debug.LogError("[DynamicAssetLoader] Bundle Load Error: " + error);
 			}
 			yield return true;
+			//If this assetBundle contains UMATextRecipes we may need to trigger some post processing...
+			//it may have downloaded some dependent bundles too so these may need processing aswell
+			var dependencies = AssetBundleManager.AssetBundleIndexObject.GetAllDependencies(bundle);
+			var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+			if (AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(bundle, "UMATextRecipe").Length > 0)
+			{
+				if (UMAContext.Instance != null)
+				{
+					if (thisDCS != null)
+					{
+						//DCSRefresh only needs to be called if the downloaded asset bundle contained UMATextRecipes (or character recipes) but I dont know how to check for for just that type of text asset
+						//Also it actually ONLY needs to search this bundle
+						thisDCS.Refresh(false, bundle);
+					}
+				}
+			}
+			for (int i = 0; i < dependencies.Length; i++)
+			{
+				if (AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(dependencies[i], "UMATextRecipe").Length > 0)
+				{
+					if (UMAContext.Instance != null)
+					{
+						if (thisDCS != null)
+						{
+							//DCSRefresh only needs to be called if the downloaded asset bundle contained UMATextRecipes (or character recipes) but I dont know how to check for for just that type of text asset
+							//Also it actually ONLY needs to search this bundle
+							thisDCS.Refresh(false, dependencies[i]);
+						}
+					}
+				}
+			}
 		}
 #pragma warning restore 0219
 
@@ -513,7 +580,7 @@ namespace UMA
 
 		#region LOAD ASSETS METHODS
 		List<Type> deepResourcesScanned = new List<Type>();
-		public bool AddAssets<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, bool searchResources, bool searchBundles, bool downloadAssetsEnabled, string bundlesToSearch = "", string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+		public bool AddAssets<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, bool searchResources, bool searchBundles, bool downloadAssetsEnabled, string bundlesToSearch = "", string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null, bool forceDownloadAll = false) where T : UnityEngine.Object
 		{
 			bool found = false;
 			List<T> assetsToReturn = new List<T>();
@@ -530,12 +597,16 @@ namespace UMA
 					if ((assetName != "" || assetNameHash != null) && found)
 						doDeepSearch = false;
 				}
+				else
+				{
+					Debug.LogWarning("[DynamicAssetLoader] UMAResourcesIndex.Instance WAS NULL");
+				}
 			}
 			//if we can and want to search asset bundles
 			if ((AssetBundleManager.AssetBundleIndexObject != null || AssetBundleManager.SimulateAssetBundleInEditor == true) || Application.isPlaying == false)
 				if (searchBundles && (found == false || (assetName == "" && assetNameHash == null)))
 				{
-					bool foundHere = AddAssetsFromAssetBundles<T>(ref assetBundlesUsedDict, ref assetsToReturn, downloadAssetsEnabled, bundlesToSearchArray, assetNameHash, assetName);
+					bool foundHere = AddAssetsFromAssetBundles<T>(ref assetBundlesUsedDict, ref assetsToReturn, downloadAssetsEnabled, bundlesToSearchArray, assetNameHash, assetName, callback, forceDownloadAll);
 					found = foundHere == true ? true : found;
 					if ((assetName != "" || assetNameHash != null) && found)
 						doDeepSearch = false;
@@ -556,10 +627,10 @@ namespace UMA
 			return found;
 		}
 
-		public bool AddAssets<T>(bool searchResources, bool searchBundles, bool downloadAssetsEnabled, string bundlesToSearch = "", string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+		public bool AddAssets<T>(bool searchResources, bool searchBundles, bool downloadAssetsEnabled, string bundlesToSearch = "", string resourcesFolderPath = "", int? assetNameHash = null, string assetName = "", Action<T[]> callback = null, bool forceDownloadAll = false) where T : UnityEngine.Object
 		{
 			var dummyDict = new Dictionary<string, List<string>>();
-			return AddAssets<T>(ref dummyDict, searchResources, searchBundles, downloadAssetsEnabled, bundlesToSearch, resourcesFolderPath, assetNameHash, assetName, callback);
+			return AddAssets<T>(ref dummyDict, searchResources, searchBundles, downloadAssetsEnabled, bundlesToSearch, resourcesFolderPath, assetNameHash, assetName, callback, forceDownloadAll);
 		}
 
 		public bool AddAssetsFromResourcesIndex<T>(ref List<T> assetsToReturn, string[] resourcesFolderPathArray, int? assetNameHash = null, string assetName = "") where T : UnityEngine.Object
@@ -733,12 +804,12 @@ namespace UMA
 		/// <param name="assetNameHash"></param>
 		/// <param name="assetName"></param>
 		/// <param name="callback"></param>
-		public bool AddAssetsFromAssetBundles<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, ref List<T> assetsToReturn, bool downloadAssetsEnabled, string[] bundlesToSearchArray, int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+		public bool AddAssetsFromAssetBundles<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, ref List<T> assetsToReturn, bool downloadAssetsEnabled, string[] bundlesToSearchArray, int? assetNameHash = null, string assetName = "", Action<T[]> callback = null, bool forceDownloadAll = false) where T : UnityEngine.Object
 		{
 #if UNITY_EDITOR
 			if (AssetBundleManager.SimulateAssetBundleInEditor)
 			{
-				return SimulateAddAssetsFromAssetBundlesNew<T>(ref assetBundlesUsedDict, ref assetsToReturn, bundlesToSearchArray, assetNameHash, assetName, callback);
+				return SimulateAddAssetsFromAssetBundlesNew<T>(ref assetBundlesUsedDict, ref assetsToReturn, bundlesToSearchArray, assetNameHash, assetName, callback, forceDownloadAll);
 			}
 			else
 			{
@@ -819,7 +890,7 @@ namespace UMA
 								}
 								else
 								{
-									if (error != "")
+									if (error != "" || error != null)
 									{
 										Debug.LogWarning(error);
 									}
@@ -841,7 +912,7 @@ namespace UMA
 								{
 									assetNameHash = AssetBundleManager.AssetBundleIndexObject.GetAssetHashFromName(assetBundleNamesArray[i], assetName, typeString);
 								}
-								T target = downloadingAssets.AddDownloadItem<T>(CurrentBatchID, assetName, assetNameHash, assetBundleNamesArray[i]/*, requestingUMA*/);
+								T target = downloadingAssets.AddDownloadItem<T>(CurrentBatchID, assetName, assetNameHash, assetBundleNamesArray[i], callback/*, requestingUMA*/);
 								if (target != null)
 								{
 									assetFound = true;
@@ -862,14 +933,39 @@ namespace UMA
 					}
 					else //we are just loading in all assets of type from the downloaded bundles- only realistically possible when the bundles have been downloaded already because otherwise this would trigger the download of all possible assetbundles that contain anything of type T...
 					{
+						//the problem is that later this asks for get loaded asset bundle and that ALWAYS checks dependencies
+						//so rather than make this break is we dont ask for dependencies, we need a version of GetLoadedAssetBundle that DOESNT check dependencies
 						if (AssetBundleManager.IsAssetBundleDownloaded(assetBundleNamesArray[i]))
 						{
+							//Debug.LogWarning(typeof(T).ToString() + " asked for all assets of type in " + assetBundleNamesArray[i]);
 							string[] assetsInBundle = AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(assetBundleNamesArray[i], typeString);
 							if (assetsInBundle.Length > 0)
 							{
 								foreach (string asset in assetsInBundle)
 								{
-									T target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(asset);
+									//sometimes this errors out if the bundle is downloaded but not LOADED
+									T target = null;
+									try
+									{
+										target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(asset);
+									}
+									catch
+									{
+										Debug.LogWarning("SOMETHING WENT WRONG");
+										var thiserror = "";
+										AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out thiserror);
+										if (thiserror != "" && thiserror != null)
+											Debug.LogWarning("GetLoadedAssetBundle error was " + thiserror);
+										else if (AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out thiserror).m_AssetBundle == null)
+										{
+											//The problem is here the bundle is downloaded but not LOADED
+											Debug.LogWarning("Bundle was ok but m_AssetBundle was null");
+										}
+										else if (AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(asset) == null)
+										{
+											Debug.LogWarning("Load Asset screwed up T was " + typeof(T).ToString() + " asset was " + asset);
+										}
+									}
 									if (target == null && typeof(T) == typeof(SlotDataAsset))
 									{
 										target = (T)AssetBundleManager.GetLoadedAssetBundle(assetBundleNamesArray[i], out error).m_AssetBundle.LoadAsset<T>(asset + "_Slot");
@@ -889,10 +985,49 @@ namespace UMA
 									}
 									else
 									{
-										if (error != "")
+										if (error != "" || error != null)
 										{
 											Debug.LogWarning(error);
 										}
+									}
+								}
+							}
+						}
+						else if (forceDownloadAll && downloadAssetsEnabled)//if its not downloaded but we are forcefully downloading any bundles that contain a type of asset make it download and add the temp asset to the downloading assets list
+						{
+							string[] assetsInBundle = AssetBundleManager.AssetBundleIndexObject.GetAllAssetsOfTypeInBundle(assetBundleNamesArray[i], typeString);
+							if (assetsInBundle.Length > 0)
+							{
+								Debug.Log("[DynamicAssetLoader] forceDownloadAll was true for " + typeString + " and found in " + assetBundleNamesArray[i]);
+								for (int aib = 0; aib < assetsInBundle.Length; aib++)
+								{
+									//Here we return a temp asset and wait for the bundle to download
+									//We dont want to create multiple downloads of the same bundle so check its not already downloading
+									if (AssetBundleManager.AreBundlesDownloading(assetBundleNamesArray[i]) == false)
+									{
+										LoadAssetBundle(assetBundleNamesArray[i]);
+									}
+									else
+									{
+										//do nothing its already downloading
+									}
+									var thisAssetName = assetsInBundle[aib];
+									var thisAssetNameHash = AssetBundleManager.AssetBundleIndexObject.GetAssetHashFromName(assetBundleNamesArray[i], thisAssetName, typeString);
+									T target = downloadingAssets.AddDownloadItem<T>(CurrentBatchID, thisAssetName, thisAssetNameHash, assetBundleNamesArray[i], callback/*, requestingUMA*/);
+									if (target != null)
+									{
+										//assetFound = true;
+										if (!assetBundlesUsedDict.ContainsKey(assetBundleNamesArray[i]))
+										{
+											assetBundlesUsedDict[assetBundleNamesArray[i]] = new List<string>();
+										}
+										if (!assetBundlesUsedDict[assetBundleNamesArray[i]].Contains(thisAssetName))
+										{
+											assetBundlesUsedDict[assetBundleNamesArray[i]].Add(thisAssetName);
+										}
+										assetsToReturn.Add(target);
+										/*if (assetName != "")
+											break;*/
 									}
 								}
 							}
@@ -905,10 +1040,11 @@ namespace UMA
 					string assetIsIn = assetIsInArray.Length > 0 ? " but it was in " + assetIsInArray[0] : ". Do you need to reupload you platform manifest and index?";
 					Debug.LogWarning("Dynamic" + typeof(T).Name + "Library (" + typeString + ") could not load " + assetName + " from any of the AssetBundles searched" + assetIsIn);
 				}
-				if (assetsToReturn.Count > 0 && callback != null)
-				{
-					callback(assetsToReturn.ToArray());
-				}
+				//AddAssetsFromAssetBundles was not sending the callback before- we only need it now to populate the dynamicCallback field
+				/*if (assetsToReturn.Count > 0 && callback != null)
+                {
+                    callback(assetsToReturn.ToArray());
+                }*/
 
 				return assetFound;
 #if UNITY_EDITOR
@@ -925,10 +1061,11 @@ namespace UMA
 		/// <param name="assetNameHash"></param>
 		/// <param name="assetName"></param>
 		/// <param name="callback"></param>
-		bool SimulateAddAssetsFromAssetBundlesNew<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, ref List<T> assetsToReturn, string[] bundlesToSearchArray, int? assetNameHash = null, string assetName = "", Action<T[]> callback = null) where T : UnityEngine.Object
+		bool SimulateAddAssetsFromAssetBundlesNew<T>(ref Dictionary<string, List<string>> assetBundlesUsedDict, ref List<T> assetsToReturn, string[] bundlesToSearchArray, int? assetNameHash = null, string assetName = "", Action<T[]> callback = null, bool forceDownloadAll = false) where T : UnityEngine.Object
 		{
 			Type typeParameterType = typeof(T);
 			var typeString = typeParameterType.FullName;
+			int currentSimulatedDownloadedBundlesCount = simulatedDownloadedBundles.Count;
 			if (assetNameHash != null)
 			{
 				// We could load all assets of type, iterate over them and get the hash and see if it matches...But then that would be as slow as loading from resources was
@@ -956,6 +1093,7 @@ namespace UMA
 				assetBundleNamesArray = allAssetBundleNames;
 			}
 			bool assetFound = false;
+			///a list of all the assets any assets we load depend on
 			List<string> dependencies = new List<string>();
 			for (int i = 0; i < assetBundleNamesArray.Length; i++)
 			{
@@ -964,6 +1102,9 @@ namespace UMA
 				string[] possiblePaths = new string[0];
 				if (assetName != "")
 				{
+					//This is a compromise for the sake of speed that assumes slot/overlay/race assets have the same slotname/overlayname/racename as their actual asset
+					//if we dont do this we have to load all the assets of that type and check their name which is really slow
+					//I think its worth having this compromise because this does not happen when the local server is on or the assets are *actually* downloaded
 					//if this is looking for SlotsDataAssets then the asset name has _Slot after it usually even if the slot name doesn't have that-but the user might have renamed it so cover both cases
 					if (typeof(T) == typeof(SlotDataAsset))
 					{
@@ -986,10 +1127,15 @@ namespace UMA
 				}
 				else
 				{
-					//Ideally we should load all the dependent assets too but when we are simulating we dont have access 
-					//to this data because its in the manifest, which is not there, otherwise we would not be simulating in the first place
-					if (!Application.isPlaying)
+					//if the application is not playing we want to load ALL the assets from the bundle this asset will be in
+					if (!Application.isPlaying /*|| typeof(T) == typeof(UMATextRecipe)*/)//addin a check for type of UMATextRecipe jus makes this load all he textt recipes- not just the ones that should be there
 					{
+						possiblePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
+					}
+					else if (simulatedDownloadedBundles.Contains(assetBundleNamesArray[i]) || forceDownloadAll)
+					{
+						//DCS.Refresh calls for assets without sending a name and in reality this just checks bundles that are already downloaded
+						//this mimics that behaviour
 						possiblePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
 					}
 				}
@@ -1008,21 +1154,118 @@ namespace UMA
 							assetBundlesUsedDict[assetBundleNamesArray[i]].Add(assetName);
 						}
 						assetsToReturn.Add(target);
-						//if the application is not playing we want to load ALL the assets from the bundle this asset will be in
-						if (Application.isPlaying)
+						//Add the bundle this asset was in to the simulatedDownloadedBundles list if its not already there
+						if (!simulatedDownloadedBundles.Contains(assetBundleNamesArray[i]))
+							simulatedDownloadedBundles.Add(assetBundleNamesArray[i]);
+						//Find the dependencies for all the assets in this bundle because AssetBundleManager would automatically download those bundles too
+						//Dont bother finding dependencies when something is just trying to load all asset of type
+						if (Application.isPlaying && assetName != "" && forceDownloadAll == false)
 						{
-							var thisAssetBundlesAssets = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
-							for (int ii = 0; ii < thisAssetBundlesAssets.Length; ii++)
+							//var thisAssetBundlesAssets = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
+							// for (int ii = 0; ii < thisAssetBundlesAssets.Length; ii++)
+							//{
+							//Actually using AssetDatabase.GetDependencies TOTALLY DESTROYS performance
+							var thisDependencies = AssetDatabase.GetDependencies(path, false);
+							for (int depi = 0; depi < thisDependencies.Length; depi++)
 							{
-								if (!dependencies.Contains(thisAssetBundlesAssets[ii]) && thisAssetBundlesAssets[ii] != path)
+								if (!dependencies.Contains(thisDependencies[depi]))
 								{
-									dependencies.Add(thisAssetBundlesAssets[ii]);
+									dependencies.Add(thisDependencies[depi]);
 								}
 							}
+							//Debug.Log("[DynamicAssetLoader] asset " + assetName + " had " + dependencies.Count + " dependencies");
+							//}
 						}
 						if (assetName != "")
 							break;
 					}
+				}
+			}
+			/*if (!assetFound && assetName != "")
+            {
+                Debug.LogWarning("Dynamic" + typeString + "Library could not simulate the loading of " + assetName + " from any AssetBundles");
+            }
+            if (assetsToReturn.Count > 0 && callback != null)
+            {
+                callback(assetsToReturn.ToArray());
+            }*/
+			//LOOKS LIKE THIS MAY BE CAUSING AN INFINITE LOOP
+			if (dependencies.Count > 0 && assetName != "" && forceDownloadAll == false)
+			{
+				//we need to load ALL the assets from every Assetbundle that has a dependency in it.
+				List<string> AssetBundlesToFullyLoad = new List<string>();
+				for (int i = 0; i < assetBundleNamesArray.Length; i++)
+				{
+					//if anything in the dependencies list is in this asset bundle AssetBundleManager would have loaded this bundle aswell
+					/*for (int di = 0; di < dependencies.Count; di++)
+					{
+						Debug.Log("[DynamicAssetLoader] checking if " + dependencies[di] + " is in " + assetBundleNamesArray[i]);
+						//check if tthis asset bundle contains that dependency
+						if(AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(assetBundleNamesArray[i], dependencies[di]).Length > 0)
+						{
+							if (!AssetBundlesToFullyLoad.Contains(assetBundleNamesArray[i]))
+								AssetBundlesToFullyLoad.Add(assetBundleNamesArray[i]);
+							//Add this bundle to the simulatedDownloadedBundles list if its not already there because that would have been downloaded too
+							if (!simulatedDownloadedBundles.Contains(assetBundleNamesArray[i]))
+								simulatedDownloadedBundles.Add(assetBundleNamesArray[i]);
+							//if any dependencies are in the bundle we can sttop checking this bundle and move on
+							Debug.Log("[DynamicAssetLoader] dependency " + dependencies[di] + " will cause download of " + assetBundleNamesArray[i]);
+							break;
+						}
+					}*/
+					var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
+					bool processed = false;
+					for (int ii = 0; ii < allAssetBundlePaths.Length; ii++)
+					{
+						for (int di = 0; di < dependencies.Count; di++)
+						{
+							if (allAssetBundlePaths[ii] == dependencies[di])
+							{
+								if (!AssetBundlesToFullyLoad.Contains(assetBundleNamesArray[i]))
+									AssetBundlesToFullyLoad.Add(assetBundleNamesArray[i]);
+								//Add this bundle to the simulatedDownloadedBundles list if its not already there because that would have been downloaded too
+								if (!simulatedDownloadedBundles.Contains(assetBundleNamesArray[i]))
+									simulatedDownloadedBundles.Add(assetBundleNamesArray[i]);
+								processed = true;
+								break;
+							}
+						}
+						if (processed) break;
+					}
+				}
+				//We need to add the recipes from the bundle to DCS, other assets add them selves as they are requested by the recipes
+				//Actually RaceLibrary will call DCS.Refresh if it adds a new race so as long as the above assets are loaded BEFORE this happens DCS will find them
+				//ACTUALLY I dont think this needs to happen- apart from maybe in the editor when the game is not running
+				//It doent have anything to do with DCS though
+				var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
+				if (thisDCS != null)
+				{
+					foreach (string assetBundleName in AssetBundlesToFullyLoad)
+					{
+						//THIS DOESNT WORK
+						/*if (typeof(T) == typeof(RaceData))//With DCS if a new race is added it needs to scan any new bundles for recipes for that race
+						{
+							if(!simulationModeDCSBundlesToUpdate.Contains(assetBundleName))
+								simulationModeDCSBundlesToUpdate.Add(assetBundleName);
+						}*/
+						var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
+						for (int ai = 0; ai < allAssetBundlePaths.Length; ai++)
+						{
+							UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(allAssetBundlePaths[ai]);
+							if (obj.GetType() == typeof(UMATextRecipe) && typeof(T) == typeof(UMATextRecipe))
+							{
+								//I think the reason why this is not working right is that DCS may not have the race in its dictionary
+								//thisDCS.AddRecipe(obj as UMATextRecipe);
+								//doDCSSimulationRefresh = true;
+								//assetsToReturn.Add(obj as T);
+							}
+						}
+					}
+					/*if (doDCSSimulationRefresh)//makes no difference to werewolf not getting initial wardrobe in simulation mode
+					{
+						thisDCS.Refresh();
+						doDCSSimulationRefresh = false;
+					}*/
 				}
 			}
 			if (!assetFound && assetName != "")
@@ -1033,51 +1276,20 @@ namespace UMA
 			{
 				callback(assetsToReturn.ToArray());
 			}
-			if (dependencies.Count > 0)
+			//Racedata will trigger an update of DCS itself if it added a race DCS needs to know about
+			//Other assets may have caused psuedo downloads of bundles DCS should check for UMATextRecipes
+			//Effectively this mimics DynamicAssetLoader loadAssetBundleAsyncs call of DCS.Refresh
+			//- but without loading all the assets to check if any of them are UMATextRecipes because that is too slow
+			if (currentSimulatedDownloadedBundlesCount != simulatedDownloadedBundles.Count && typeof(T) != typeof(RaceData) && assetName != "")
 			{
-				//we need to load ALL the assets from every Assetbundle that has a dependency in it.
-				List<string> AssetBundlesToFullyLoad = new List<string>();
-				for (int i = 0; i < assetBundleNamesArray.Length; i++)
-				{
-					var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNamesArray[i]);
-					bool processed = false;
-					for (int ii = 0; ii < allAssetBundlePaths.Length; ii++)
-					{
-						for (int di = 0; di < dependencies.Count; di++)
-						{
-							if (allAssetBundlePaths[ii] == dependencies[di])
-							{
-								if (!AssetBundlesToFullyLoad.Contains(assetBundleNamesArray[i]))
-								{
-									AssetBundlesToFullyLoad.Add(assetBundleNamesArray[i]);
-								}
-								processed = true;
-								break;
-							}
-						}
-						if (processed) break;
-					}
-				}
-				//We need to add the recipes from the bundle to DCS, other assets add them selves as they are requested by the recipes
 				var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
-				bool dcsNeedsRefresh = false;
 				if (thisDCS != null)
 				{
-					foreach (string assetBundleName in AssetBundlesToFullyLoad)
+					//but it only needs to add stuff from tthe bundles that were added
+					for (int i = currentSimulatedDownloadedBundlesCount; i < simulatedDownloadedBundles.Count; i++)
 					{
-						var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
-						for (int ai = 0; ai < allAssetBundlePaths.Length; ai++)
-						{
-							UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(allAssetBundlePaths[ai]);
-							if (obj.GetType() == typeof(UMATextRecipe))
-							{
-								thisDCS.AddRecipe(obj as UMATextRecipe);
-								dcsNeedsRefresh = true;
-							}
-						}
+						thisDCS.Refresh(false, simulatedDownloadedBundles[i]);
 					}
-					if (dcsNeedsRefresh)
-						thisDCS.Refresh();
 				}
 			}
 			return assetFound;
@@ -1085,8 +1297,20 @@ namespace UMA
 #endif
 
 #if UNITY_EDITOR
+		/// <summary>
+		/// Mimics the check dynamicAssetLoader does when an actual LoadBundleAsync happens 
+		/// where it checks if the asset has any UMATextRecipes in it and if it does makes DCS.Refresh to get them
+		/// </summary>
+		/// <param name="assetBundleToLoad"></param>
+		/// TODO this would also download dependent bundles but AssetDatabase.GetDependencies is REALLY slow
 		public void SimulateLoadAssetBundle(string assetBundleToLoad)
 		{
+			bool bundleAlreadySimulated = true;
+			if (!simulatedDownloadedBundles.Contains(assetBundleToLoad))
+			{
+				simulatedDownloadedBundles.Add(assetBundleToLoad);
+				bundleAlreadySimulated = false;
+			}
 			var allAssetBundlePaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleToLoad);
 			//We need to add the recipes from the bundle to DCS, other assets add them selves as they are requested by the recipes
 			var thisDCS = UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem;
@@ -1098,15 +1322,15 @@ namespace UMA
 					UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(allAssetBundlePaths[i]);
 					if (obj.GetType() == typeof(UMATextRecipe))
 					{
-						if (thisDCS)
-						{
-							thisDCS.AddRecipe(obj as UMATextRecipe);
+						if (bundleAlreadySimulated == false)
 							dcsNeedsRefresh = true;
-						}
+						break;
 					}
 				}
 				if (dcsNeedsRefresh)
-					thisDCS.Refresh();
+				{
+					thisDCS.Refresh(false, assetBundleToLoad);
+				}
 			}
 		}
 #endif

@@ -70,7 +70,7 @@ namespace UMA.PoseTools
 		/// Restores all the bones used by poses in the set to default (post DNA) position.
         /// </summary>
         /// <param name="umaSkeleton">Skeleton to be reset.</param>
-        public void RestoreBones(UMASkeleton umaSkeleton)
+        public void RestoreBones(UMASkeleton umaSkeleton, bool logErrors = false)
         {
             if (umaSkeleton == null) return;
 
@@ -80,33 +80,36 @@ namespace UMA.PoseTools
             {
                 if (!umaSkeleton.Restore(hash))
                 {
-					//Since this generally logs like crazy which screws everything anyway, it might be nice to provide some useful information?
-					var umaname = umaSkeleton.GetBoneGameObject(umaSkeleton.rootBoneHash).GetComponentInParent<UMAAvatarBase>().gameObject.name;
-					string boneName = "";
-                    foreach (PosePair pair in posePairs)
-                    {
-                        if (pair.primary != null)
-                        {
-                            foreach (UMABonePose.PoseBone bone in pair.primary.poses)
-                            {
-                                if (bone.hash == hash)
-                                {
-                                    boneName = bone.bone;
-                                }
-                            }
-                        }
-                        if (pair.inverse != null)
-                        {
-                            foreach (UMABonePose.PoseBone bone in pair.inverse.poses)
-                            {
-                                if (bone.hash == hash)
-                                {
-                                    boneName = bone.bone;
-                                }
-                            }
-                        }
-                    }
-                    Debug.LogWarning("Couldn't reset bone! " + boneName + " on " + umaname);
+					if (logErrors)
+					{
+						//Since this generally logs like crazy which screws everything anyway, it might be nice to provide some useful information?
+						var umaname = umaSkeleton.GetBoneGameObject(umaSkeleton.rootBoneHash).GetComponentInParent<UMAAvatarBase>().gameObject.name;
+						string boneName = "";
+						foreach (PosePair pair in posePairs)
+						{
+							if (pair.primary != null)
+							{
+								foreach (UMABonePose.PoseBone bone in pair.primary.poses)
+								{
+									if (bone.hash == hash)
+									{
+										boneName = bone.bone;
+									}
+								}
+							}
+							if (pair.inverse != null)
+							{
+								foreach (UMABonePose.PoseBone bone in pair.inverse.poses)
+								{
+									if (bone.hash == hash)
+									{
+										boneName = bone.bone;
+									}
+								}
+							}
+						}
+						Debug.LogWarning("Couldn't reset bone! " + boneName + " on " + umaname);
+					}
                 }
             }
         }

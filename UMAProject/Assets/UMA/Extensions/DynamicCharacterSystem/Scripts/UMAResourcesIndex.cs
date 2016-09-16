@@ -13,10 +13,24 @@ namespace UMA
 	public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
 	{
 		public static UMAResourcesIndex Instance;
-		public UMAResourcesIndexData Index = new UMAResourcesIndexData();
+		private UMAResourcesIndexData index = null;
 		public UnityEngine.Object indexAsset;
 		public bool enableDynamicIndexing = false;
 		public bool makePersistent = false;
+
+		//Index (with a capital I) need to be a property that calls LoadOrCreateData if this is not initialized
+		public UMAResourcesIndexData Index
+		{
+			get
+			{
+				if (index == null)
+				{
+					LoadOrCreateData();
+				}
+				return index;
+			}
+		}
+
 
 		public UMAResourcesIndex()
 		{
@@ -27,22 +41,23 @@ namespace UMA
 			if (Instance == null)
 			{
 				Instance = this;
-				if (makePersistent)
+				if (makePersistent && Application.isPlaying)
 					DontDestroyOnLoad(gameObject);
 			}
 			else if (Instance != this)
 			{
-				if (Instance.makePersistent)
+				if (Instance.makePersistent && Application.isPlaying)
 					Destroy(gameObject);
 				else
 					Instance = this;
 			}
 			else if (Instance == this)//OnAfterDeserialize() gets called in the editor but doesn't do anything with the makePersistent value
 			{
-				if (makePersistent)
+				if (makePersistent && Application.isPlaying)
 					DontDestroyOnLoad(gameObject);
 			}
-			LoadOrCreateData();
+			if (index == null)
+				LoadOrCreateData();
 		}
 
 		void OnApplicationQuit()
@@ -110,7 +125,6 @@ namespace UMA
 		public void LoadOrCreateData()
 		{
 			var data = new UMAResourcesIndexData();
-			bool saveNewAsset = false;
 			if (indexAsset != null)
 			{
 				var rawData = ((TextAsset)indexAsset).text;
@@ -119,26 +133,25 @@ namespace UMA
 #if UNITY_EDITOR
 			else
 			{
+				Debug.LogWarning("[UMAResourcesIndex] indexAsset was null");
 				var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
 				if (File.Exists(dataAssetPath))
 				{
+					Debug.Log("[UMAResourcesIndex] BUT we found it");
 					var rawData = FileUtils.ReadAllText(dataAssetPath);
 					data = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
 					indexAsset = AssetDatabase.LoadAssetAtPath("Assets/UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt", typeof(TextAsset));
 				}
 				else
 				{
-					saveNewAsset = true;
+					Debug.LogWarning("ResourcesIndex No Index Existed! Generating Index data and saving");
+					//generate the index data and save
+					index = data;//assign this so we dont get into a loop
+					IndexAllResources();
 				}
 			}
 #endif
-			Index = data;
-#if UNITY_EDITOR
-			if (saveNewAsset)
-			{
-				Save();
-			}
-#endif
+			index = data;
 		}
 		public string GetIndexInfo()
 		{
@@ -146,13 +159,13 @@ namespace UMA
 			int totalIndexedFiles = 0;
 			if (Index.data != null)
 			{
-				totalIndexedTypes = Index.data.Length;
+				totalIndexedTypes = index.data.Length;
 				totalIndexedFiles = 0;
 				List<string> typeNames = new List<string>();
 				for (int i = 0; i < totalIndexedTypes; i++)
 				{
-					typeNames.Add(Index.data[i].type);
-					totalIndexedFiles += Index.data[i].typeFiles.Length;
+					typeNames.Add(index.data[i].type);
+					totalIndexedFiles += index.data[i].typeFiles.Length;
 				}
 			}
 			string info = "Total files indexed: " + totalIndexedFiles + " in " + totalIndexedTypes + " Types"/*.\nIndexed Types: \n" + String.Join(", ", typeNames.ToArray())*/;
@@ -167,7 +180,7 @@ namespace UMA
 			//Currently Editor Only. But then since you cant add any assets to Resources in a build you should not be adding anything to the index either.
 #if UNITY_EDITOR
 			var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
-			var jsonData = JsonUtility.ToJson(Index);
+			var jsonData = JsonUtility.ToJson(index);
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 			EditorUtility.SetDirty(indexAsset);
 			AssetDatabase.SaveAssets();
@@ -184,7 +197,7 @@ namespace UMA
 		/// </summary>
 		public void ClearIndex()
 		{
-			Index = new UMAResourcesIndexData();
+			index = new UMAResourcesIndexData();
 			Save();
 		}
 		/// <summary>
@@ -233,13 +246,13 @@ namespace UMA
 							thisName = ((RaceData)tempObj).raceName;
 							thisHash = UMAUtils.StringToHash(thisName);
 						}
-						Index.AddPath(tempObj, thisHash);
+						index.AddPath(tempObj, thisHash);
 						if (tempObj.GetType() != typeof(UnityEngine.GameObject))
 							Resources.UnloadAsset(tempObj);//TODO check if this is safe to do...
 					}
 				}
 			}
-			Debug.Log("[UMAResourcesIndex] Added/Updated " + Index.Count() + " assets in the Index");
+			Debug.Log("[UMAResourcesIndex] Added/Updated " + index.Count() + " assets in the Index");
 			Save();
 		}
 #endif

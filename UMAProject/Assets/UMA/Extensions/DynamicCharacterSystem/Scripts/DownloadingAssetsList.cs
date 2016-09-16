@@ -43,7 +43,7 @@ namespace UMA
 		/// <param name="requiredAssetName"></param>
 		/// <param name="containingBundle"></param>
 		/// <returns></returns>
-		public T AddDownloadItem<T>(int batchID, string requiredAssetName, int? requiredAssetNameHash, string containingBundle, UMAAvatarBase requestingUma = null) where T : UnityEngine.Object
+		public T AddDownloadItem<T>(int batchID, string requiredAssetName, int? requiredAssetNameHash, string containingBundle, Delegate callback = null/*, UMAAvatarBase requestingUma = null*/) where T : UnityEngine.Object
 		{
 			T thisTempAsset = null;
 			if (downloadingItems.Find(item => item.requiredAssetName == requiredAssetName) == null)
@@ -107,7 +107,7 @@ namespace UMA
 					}
 					thisTempAsset.name = requiredAssetName;
 				}
-				var thisDlItem = new DownloadingAssetItem(batchID, requiredAssetName, thisTempAsset, containingBundle/*, requestingUma*/);
+				var thisDlItem = new DownloadingAssetItem(batchID, requiredAssetName, thisTempAsset, containingBundle, callback/*, requestingUma*/);
 				downloadingItems.Add(thisDlItem);
 				if (!downloadingItemsDict.ContainsKey(batchID))
 				{
@@ -136,11 +136,13 @@ namespace UMA
 		}
 		/// <summary>
 		/// Removes a list of downloadingAssetItems from the downloadingItems List
+		/// TODO: This should be generic too. The downloadingItem needs to store the UnityAction and do that when the download completes (like DynamicAssetLoader does when the download is started and the temp asset is returned)
 		/// </summary>
 		/// <param name="assetName"></param>
-		public IEnumerator RemoveDownload(List<DownloadingAssetItem> itemsToRemove, string onlyUpdateType = "")
+		public IEnumerator RemoveDownload(List<DownloadingAssetItem> itemsToRemove /*, string onlyUpdateType = ""*/)
 		{
-			Dictionary<UMAAvatarBase, List<string>> updatedUMAs = new Dictionary<UMAAvatarBase, List<string>>();
+			//Not used any more UMAs check the status of stuff they asked for themselves
+			//Dictionary<UMAAvatarBase, List<string>> updatedUMAs = new Dictionary<UMAAvatarBase, List<string>>();
 			foreach (DownloadingAssetItem item in itemsToRemove)
 			{
 				item.isBeingRemoved = true;
@@ -222,12 +224,22 @@ namespace UMA
 						UMATextRecipe downloadedRecipe = loadedBundleAB.LoadAsset<UMATextRecipe>(item.requiredAssetName);
 						(UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).AddRecipe(downloadedRecipe);
 					}
-					//TODO WE NEED TO ADD THIS TO DCA ASWELL
+					//TODO what should be happening is that the requested animator - if in assetbundle- is added to the assets that the UMA is waiting for
 					/*else if (item.tempAsset.GetType() == typeof(RuntimeAnimatorController) && item.requestingUma != null)
                     {
                         var downloadedController = loadedBundleAB.LoadAsset<RuntimeAnimatorController>(item.requiredAssetName);
                         (item.requestingUma as UMACharacterSystem.DynamicCharacterAvatar).raceAnimationControllers.SetAnimator(downloadedController);
                     }*/
+					else if (item.dynamicCallback != null)
+					{
+						//get the asset as whatever the type of the tempAsset is
+						//send this as an array to the dynamicCallback
+						Debug.LogWarning("[DynamicAssetList] used item.DynamicCallback - item.tempAsset.GetType() was " + item.tempAsset.GetType());
+						var downloadedAsset = loadedBundleAB.LoadAsset(item.requiredAssetName, item.tempAsset.GetType());
+						var downloadedAssetArray = Array.CreateInstance(item.tempAsset.GetType(), 1);
+						downloadedAssetArray.SetValue(downloadedAsset, 0);
+						item.dynamicCallback.DynamicInvoke(downloadedAssetArray);
+					}
 					if (error != "" && error != null)
 					{
 						Debug.LogError(error);
@@ -242,20 +254,21 @@ namespace UMA
 			{
 				if (dlDictKp.Value.Count == 0)
 				{
+					/* //UMA now check the status of what they asked for themselves- Only DynamicCharacterAvatar does this though so if you are using assetBundles you now MUST use a DynamicCharacterAvatar (or derived)
 					if (updatedUMAs.Count > 0)
-					{
-						foreach (KeyValuePair<UMAAvatarBase, List<string>> kp in updatedUMAs)
-						{
-							if (kp.Key as UMACharacterSystem.DynamicCharacterAvatar)// TODO check how this works with derived classes
-							{
+                    {
+                        foreach (KeyValuePair<UMAAvatarBase, List<string>> kp in updatedUMAs)
+                        {
+                            if (kp.Key as UMACharacterSystem.DynamicCharacterAvatar)// TODO check how this works with derived classes
+                            {
 								//removed
 							}
-							else
-							{
-								kp.Key.umaData.Dirty(true, true, true);
-							}
-						}
-					}
+                            else
+                            {
+                                kp.Key.umaData.Dirty(true, true, true);
+                            }
+                        }
+                    }*/
 					dlDictsToRemove.Add(dlDictKp.Key);
 				}
 			}
@@ -314,7 +327,7 @@ namespace UMA
 						{
 							canProcessBatch = false;
 						}
-						if (error != "")
+						if (error != "")//May need to check if error != null too
 						{
 							//AssetBundleManager already logs the error
 						}
