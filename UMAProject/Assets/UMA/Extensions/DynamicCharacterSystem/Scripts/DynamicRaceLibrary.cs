@@ -136,6 +136,7 @@ public class DynamicRaceLibrary : RaceLibrary
 			return;
 		}
 #endif
+        if (DynamicAssetLoader.Instance != null)
 		DynamicAssetLoader.Instance.AddAssets<RaceData>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssets, assetBundleNamesToSearch, resourcesFolderPath, raceHash, "", AddRaces);
 
 #if UNITY_EDITOR

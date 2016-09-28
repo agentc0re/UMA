@@ -72,13 +72,13 @@ namespace UMA
 
 		public void OnAfterDeserialize()
 		{
-			if (Instance == null)//make an Instance in the editor too
+			if (Instance == null)//make an Instance in the editor too 
 			{
 				Instance = this;
 			}
 		}
 
-		public void Add(UnityEngine.Object obj)
+		public void Add(UnityEngine.Object obj, bool bulkAdd = false)
 		{
 #if UNITY_EDITOR
 			if (obj == null)
@@ -97,25 +97,26 @@ namespace UMA
 				thisName = ((RaceData)obj).raceName;
 			}
 			Index.AddPath(obj, thisName);
-			Save();
+            if (!bulkAdd) Save();
 #endif
 		}
-		public void Add(UnityEngine.Object obj, string objName)
+
+        public void Add(UnityEngine.Object obj, string objName, bool bulkAdd = false)
 		{
 #if UNITY_EDITOR
 			if (obj == null || objName == "")
 				return;
 			Index.AddPath(obj, objName);
-			Save();
+            if (!bulkAdd) Save();
 #endif
 		}
-		public void Add(UnityEngine.Object obj, int objNameHash)
+        public void Add(UnityEngine.Object obj, int objNameHash, bool bulkAdd = false)
 		{
 #if UNITY_EDITOR
 			if (obj == null)
 				return;
 			Index.AddPath(obj, objNameHash);
-			Save();
+			if (!bulkAdd) Save();
 #endif
 		}
 		/// <summary>

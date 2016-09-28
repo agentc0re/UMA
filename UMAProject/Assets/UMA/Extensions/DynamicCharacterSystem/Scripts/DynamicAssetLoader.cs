@@ -735,6 +735,7 @@ namespace UMA
 				}
 				if (found == false)
 				{
+                    
 					for (int i = 0; i < foundAssets.Length; i++)
 					{
 						if (assetNameHash != null)
@@ -755,8 +756,8 @@ namespace UMA
 							if (foundHash == assetNameHash)
 							{
 								if (UMAResourcesIndex.Instance != null)
-									UMAResourcesIndex.Instance.Add(foundAssets[i], foundHash);
-								assetsToReturn.Add(foundAssets[i]);
+									UMAResourcesIndex.Instance.Add(foundAssets[i], foundHash, true);
+								assetsToReturn.Add(foundAssets[i]); 
 								found = true;
 							}
 						}
@@ -778,7 +779,7 @@ namespace UMA
 							if (foundName == assetName)
 							{
 								if (UMAResourcesIndex.Instance != null)
-									UMAResourcesIndex.Instance.Add(foundAssets[i], foundName);
+									UMAResourcesIndex.Instance.Add(foundAssets[i], foundName, true);
 								assetsToReturn.Add(foundAssets[i]);
 								found = true;
 							}
@@ -787,11 +788,15 @@ namespace UMA
 						else
 						{
 							if (UMAResourcesIndex.Instance != null)
-								UMAResourcesIndex.Instance.Add(foundAssets[i]);
+								UMAResourcesIndex.Instance.Add(foundAssets[i], true);
 							assetsToReturn.Add(foundAssets[i]);
 							found = true;
 						}
 					}
+                    if (found)
+                    {
+                        UMAResourcesIndex.Instance.Save();
+                    }
 				}
 			}
 			return found;

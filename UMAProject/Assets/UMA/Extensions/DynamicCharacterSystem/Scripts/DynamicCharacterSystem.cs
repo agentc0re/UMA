@@ -104,14 +104,15 @@ namespace UMACharacterSystem
 			var possibleRaces = (context.raceLibrary as DynamicRaceLibrary).GetAllRaces();
 			for (int i = 0; i < possibleRaces.Length; i++)
 			{
-				//we need to check that this is not null- the user may not have downloaded it yet
-				if (possibleRaces[i] != null && possibleRaces[i].raceName != DynamicAssetLoader.Instance.placeholderRace.raceName)
-				{
-					Recipes.Add(possibleRaces[i].raceName, new Dictionary<string, List<UMATextRecipe>>());
-				}
-			}
+                //we need to check that this is not null- the user may not have downloaded it yet
+                if (possibleRaces[i] == null)
+                    continue;
+                if (DynamicAssetLoader.Instance != null && possibleRaces[i].raceName == DynamicAssetLoader.Instance.placeholderRace.raceName)
+                    continue;
+                Recipes.Add(possibleRaces[i].raceName, new Dictionary<string, List<UMATextRecipe>>());
+            }
 
-			GatherCharacterRecipes();
+            GatherCharacterRecipes();
 			GatherRecipeFiles();
 			initialized = true;
 			isInitializing = false;
@@ -147,14 +148,16 @@ namespace UMACharacterSystem
 					}
 				}
 				GatherCharacterRecipes("", bundleToGather);
-				GatherRecipeFiles("", bundleToGather);
+				GatherRecipeFiles("", bundleToGather); 
 			}
 		}
 
 		private void GatherCharacterRecipes(string filename = "", string bundleToGather = "")
 		{
+            // JRRM - find slowdown
 			var assetBundleToGather = bundleToGather != "" ? bundleToGather : assetBundlesForCharactersToSearch;
-			DynamicAssetLoader.Instance.AddAssets<TextAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleToGather, resourcesCharactersFolder, null, filename, AddCharacterRecipes);
+           if (DynamicAssetLoader.Instance != null)
+			    DynamicAssetLoader.Instance.AddAssets<TextAsset>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleToGather, resourcesCharactersFolder, null, filename, AddCharacterRecipes);
 		}
 
 		private void AddCharacterRecipes(TextAsset[] characterRecipes)
@@ -172,8 +175,10 @@ namespace UMACharacterSystem
 
 		private void GatherRecipeFiles(string filename = "", string bundleToGather = "")
 		{
+            // JRRM
 			var assetBundleToGather = bundleToGather != "" ? bundleToGather : assetBundlesForRecipesToSearch;
-			DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleToGather, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
+            if (DynamicAssetLoader.Instance != null)
+			    DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResources, dynamicallyAddFromAssetBundles, downloadAssetsEnabled, assetBundleToGather, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
 		}
 
 		/*IEnumerator CleanFilesFromResourcesAndBundles()
