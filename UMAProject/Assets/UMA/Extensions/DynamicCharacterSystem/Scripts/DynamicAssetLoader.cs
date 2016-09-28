@@ -617,7 +617,7 @@ namespace UMA
 			//if enabled and we have not found anything yet or we are getting all items of a type do a deep resources search (slow)
 			if (searchResources && ((found == false && doDeepSearch) || doDeepSearch == true))
 			{
-				Debug.Log("DID DEEP RESOURCES SEARCH");
+				//Debug.Log("DID DEEP RESOURCES SEARCH");
 				bool foundHere = AddAssetsFromResources<T>(ref assetsToReturn, resourcesFolderPathArray, assetNameHash, assetName);
 				found = foundHere == true ? true : found;
 				if (assetName == "" && assetNameHash == null && deepResourcesScanned.Contains(typeof(T)) == false)

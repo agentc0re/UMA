@@ -212,7 +212,7 @@ public class DynamicRaceLibrary : RaceLibrary
 		}
 		if (currentNumRaces != raceElementList.Length)
 		{
-			if (UMAContext.Instance.dynamicCharacterSystem != null)
+			if (UMAContext.Instance != null && UMAContext.Instance.dynamicCharacterSystem != null)
 			{
 				(UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).Refresh(false);
 			}

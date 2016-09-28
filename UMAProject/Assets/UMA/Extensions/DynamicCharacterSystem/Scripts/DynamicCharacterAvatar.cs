@@ -272,7 +272,7 @@ namespace UMACharacterSystem
 					}
 					if (!raceFound)
 					{
-						Debug.Log("No race found for " + gameObject.name);
+						Debug.Log("No base recipe found for race " + activeRace.name);
 						activeRace.name = availableRaces[0].raceName;
 						activeRace.data = availableRaces[0];
 						umaRecipe = activeRace.racedata.baseRaceRecipe;
