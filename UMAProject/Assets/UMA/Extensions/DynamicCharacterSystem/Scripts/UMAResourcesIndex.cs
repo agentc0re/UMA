@@ -1,18 +1,19 @@
 using UnityEngine;
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using System.IO;
 
-namespace UMA
+namespace UMA 
 {
 	[System.Serializable]
 	public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
 	{
-		public static UMAResourcesIndex Instance;
+        string dataAssetPath;
+        public static UMAResourcesIndex Instance;
 		private static UMAResourcesIndexData index = null;
 		public bool enableDynamicIndexing = false;
 		public bool makePersistent = false;
@@ -37,7 +38,8 @@ namespace UMA
 
 		void Start()
 		{
-			if (Instance == null)
+            dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Resources/UMAResourcesIndex.txt");
+            if (Instance == null)
 			{
 				Instance = this;
 				if (makePersistent && Application.isPlaying)
@@ -124,17 +126,25 @@ namespace UMA
 		/// <returns></returns>
 		public void LoadOrCreateData()
 		{
-            var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
+#if UNITY_EDITOR
+
             if (File.Exists(dataAssetPath))
             {
                 var rawData = FileUtils.ReadAllText(dataAssetPath);
                 index = JsonUtility.FromJson<UMAResourcesIndexData>(rawData);
+                return;
             }
-            else
+#else
+            TextAsset textIndex = Resources.Load<TextAsset>("UMAResourcesIndex.txt");
+            if (textIndex != null)
             {
-                index = new UMAResourcesIndexData();
-                IndexAllResources();
+                index = JsonUtility.FromJson<UMAResourcesIndexData>(textIndex.text);
+                return;
             }
+#endif
+            // Not found anywhere
+            index = new UMAResourcesIndexData();
+            IndexAllResources();
         }
 
         public string GetIndexInfo()
@@ -157,14 +167,11 @@ namespace UMA
 		}
 
 		/// <summary>
-		/// Saves any updates to the index to the data file
+		/// Saves any updates to the index to the data file. This only happens in the editor.
 		/// </summary>
 		public void Save()
 		{
-			//Currently Editor Only. But then since you cant add any assets to Resources in a build you should not be adding anything to the index either.
-
 #if UNITY_EDITOR
-			var dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Scripts/UMAResourcesIndex.txt");
 			var jsonData = JsonUtility.ToJson(index);
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 #endif
