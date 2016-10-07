@@ -12,7 +12,7 @@ namespace UMA
 	[System.Serializable]
 	public class UMAResourcesIndex : MonoBehaviour, ISerializationCallbackReceiver
 	{
-        string dataAssetPath;
+        static string dataAssetPath;
         public static UMAResourcesIndex Instance;
 		private static UMAResourcesIndexData index = null;
 		public bool enableDynamicIndexing = false;
@@ -34,11 +34,11 @@ namespace UMA
 
 		public UMAResourcesIndex()
 		{
-		}
 
-		void Start()
+        }
+
+        void Start()
 		{
-            dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Resources/UMAResourcesIndex.txt");
             if (Instance == null)
 			{
 				Instance = this;
@@ -127,6 +127,7 @@ namespace UMA
 		public void LoadOrCreateData()
 		{
 #if UNITY_EDITOR
+            dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Resources/UMAResourcesIndex.txt");
 
             if (File.Exists(dataAssetPath))
             {
@@ -172,7 +173,8 @@ namespace UMA
 		public void Save()
 		{
 #if UNITY_EDITOR
-			var jsonData = JsonUtility.ToJson(index);
+            dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Resources/UMAResourcesIndex.txt");
+            var jsonData = JsonUtility.ToJson(index);
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 #endif
         }
@@ -193,6 +195,7 @@ namespace UMA
 		// slight issue here is that UMABonePose assets dont have a hash and expressions are called the same thing for every race (so we only end up with one set indexed). But since they are refrerenced in an expressionset this seems to work ok anyway.
 		public void IndexAllResources()
 		{
+            Debug.Log("Indexing all resources");
 			if (Application.isPlaying)
 			{
 				Debug.Log("You can only create a full Resources index while the application is not playing.");
