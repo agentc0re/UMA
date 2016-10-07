@@ -45,6 +45,7 @@ public class DynamicDNAConverterBehaviourEditor : Editor
 	private Editor thisDUDA = null;
 	public string createDnaAssetName = "";
 	//
+	[System.NonSerialized]
 	public bool initialized = false;
 
 	private void Init()

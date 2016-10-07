@@ -163,6 +163,8 @@ public class DynamicRaceLibrary : RaceLibrary
 				if (!editorAddedAssets.Contains(race))
 				{
 					editorAddedAssets.Add(race);
+					if (UMAContext.Instance == null)
+						UMAContext.FindInstance();
 					if (UMAContext.Instance.dynamicCharacterSystem != null)
 					{
 						(UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).Refresh(false);
@@ -213,6 +215,8 @@ public class DynamicRaceLibrary : RaceLibrary
 		}
 		if (currentNumRaces != raceElementList.Length)
 		{
+			if (UMAContext.Instance == null)
+				UMAContext.FindInstance();
 			if (UMAContext.Instance != null && UMAContext.Instance.dynamicCharacterSystem != null)
 			{
 				(UMAContext.Instance.dynamicCharacterSystem as UMACharacterSystem.DynamicCharacterSystem).Refresh(false);
