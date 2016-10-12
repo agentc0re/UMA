@@ -920,6 +920,18 @@ namespace UMAEditor
 
 			bool changed = OnColorGUI();
 
+            // Edit the rect
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Rect");
+            Rect Save = _overlayData.rect;
+            _overlayData.rect = EditorGUILayout.RectField(_overlayData.rect);
+            if (Save.x != _overlayData.rect.x || Save.y != _overlayData.rect.y || Save.width != _overlayData.rect.width || Save.height != _overlayData.rect.height)
+            {
+                changed = true;
+            }
+            GUILayout.EndHorizontal();
+            // End rect edit
+
 			GUILayout.BeginHorizontal();
 			foreach (var texture in _textures)
 			{

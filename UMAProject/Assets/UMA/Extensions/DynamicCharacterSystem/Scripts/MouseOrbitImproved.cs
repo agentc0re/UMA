@@ -26,6 +26,7 @@ public class MouseOrbitImproved : MonoBehaviour
     public float distanceMin = .5f;
     public float distanceMax = 15f;
     public Vector3 Offset;
+    public bool AlwaysOn = false;
 
     [Tooltip("use this to enable the user to orbit the camera around the character on touchscreen devices")]
     public bool singleTouchOrbiting = true;
@@ -128,7 +129,7 @@ public class MouseOrbitImproved : MonoBehaviour
         //DOS Modified tweaked this to be selectable
         if (Input.GetMouseButton((int)mouseButtonToUse) && Input.touchCount == 0)
         {
-            x += Input.GetAxis("Mouse X") * xSpeed/* * distance */ * 0.04f;
+            x += Input.GetAxis("Mouse X") * xSpeed * 0.04f;
             y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
         }
         else if (Input.touchCount == 1 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) == false)
@@ -138,7 +139,7 @@ public class MouseOrbitImproved : MonoBehaviour
             y -= touchZero.deltaPosition.y * (ySpeed / 5) * 0.02f;
         }
 
-        if (EventSystem.current.currentSelectedGameObject == null)
+        if (EventSystem.current.currentSelectedGameObject == null || AlwaysOn == true)
         {
             if (Input.touchCount == 2)
             {
@@ -193,9 +194,10 @@ public class MouseOrbitImproved : MonoBehaviour
 
     public static float ClampAngle(float angle, float min, float max)
     {
-        if (angle < -360F)
+        // These must be "while" loops. It's possible at low framerate that we have moved more than 360 degrees.
+        while (angle < -360F)
             angle += 360F;
-        if (angle > 360F)
+        while (angle > 360F)
             angle -= 360F;
         return Mathf.Clamp(angle, min, max);
     }

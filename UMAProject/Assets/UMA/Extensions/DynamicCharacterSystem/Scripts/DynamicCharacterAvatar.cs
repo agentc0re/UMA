@@ -89,8 +89,42 @@ namespace UMACharacterSystem
 			private set { base.umaRace = value; }
 		}
 
+        /// <summary>
+        /// This returns all the recipes for the current race of the avatar.
+        /// </summary>
+        public Dictionary<string, List<UMATextRecipe>> AvailableRecipes
+        {
+            get
+            {
+                return (context.dynamicCharacterSystem as DynamicCharacterSystem).Recipes[RaceData.raceName];
+            }
+        }
 
-		public override void Start()
+        public List<string> CurrentWardrobeSlots
+        {
+            get
+            {
+                return RaceData.wardrobeSlots;
+            }
+        }
+
+        public OverlayColorData[] CurrentSharedColors
+        {
+            get
+            {
+                return umaData.umaRecipe.sharedColors;
+            }
+        }
+
+        public List<ColorValue> ActiveColors
+        {
+            get
+            {
+                return characterColors.Colors;
+            }
+        }
+
+        public override void Start()
 		{
 			StopAllCoroutines();
 			base.Start();
