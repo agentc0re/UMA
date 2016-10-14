@@ -8,6 +8,7 @@ public class SlotHandler : MonoBehaviour
     public DynamicCharacterAvatar Avatar;
     public GameObject WardrobePanel;
     public GameObject WardrobeButtonPrefab;
+    public GameObject LabelPrefab;
     public string SlotName;
 
 
@@ -26,26 +27,23 @@ public class SlotHandler : MonoBehaviour
         // Cleanup old buttons
         Cleanup();
 
-        // Add a "Take off" button
-        /*
-        GameObject go = GameObject.Instantiate(WardrobeButtonPrefab);
-        WardrobeHandler wh = go.GetComponent<WardrobeHandler>();
-        wh.Setup(Avatar, null, SlotName);
-        Text txt = go.GetComponentInChildren<Text>();
-        txt.text = "Remove";
-        go.transform.SetParent(WardrobePanel.transform);
-        */
+        AddLabel(SlotName);
         AddButton("Remove", SlotName);
 
         // Find all the wardrobe items for the current slot, and create a button for them.
         foreach (UMATextRecipe utr in SlotRecipes)
         {
+            
             AddButton(utr.name, SlotName, utr);
-         /*   go = GameObject.Instantiate(WardrobeButtonPrefab);
-            wh = go.GetComponent<WardrobeHandler>();
-            wh.Setup(Avatar, utr, SlotName);
-            go.transform.SetParent(WardrobePanel.transform); */
         }
+    }
+
+    private void AddLabel(string theText)
+    {
+        GameObject go = GameObject.Instantiate(LabelPrefab);
+        go.transform.SetParent(WardrobePanel.transform);
+        Text txt = go.GetComponentInChildren<Text>();
+        txt.text = theText;
     }
 
     private void AddButton(string theText, string SlotName, UMATextRecipe utr = null)

@@ -12,6 +12,7 @@ public class AvailableColorsHandler : MonoBehaviour
     public GameObject ColorPanel;
     public GameObject ColorButtonPrefab;
     public string ColorName;
+    public GameObject LabelPrefab;
 
     public void Setup(DynamicCharacterAvatar avatar, string colorName, GameObject colorPanel)
     {
@@ -41,12 +42,20 @@ public class AvailableColorsHandler : MonoBehaviour
     {
         Cleanup();
 
+        AddLabel(ColorName);
         foreach(OverlayColorData ocd in Colors)
         {
             AddButton(ocd);
         }
     }
 
+    private void AddLabel(string theText)
+    {
+        GameObject go = GameObject.Instantiate(LabelPrefab);
+        go.transform.SetParent(ColorPanel.transform);
+        Text txt = go.GetComponentInChildren<Text>();
+        txt.text = theText;
+    }
 
     private void AddButton(OverlayColorData ocd)
     {

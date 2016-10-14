@@ -123,6 +123,8 @@ MonoBehaviour:
   WardrobePanel: {fileID: 0}
   WardrobeButtonPrefab: {fileID: 1000011315908274, guid: de4b511078f3ff7418945ae868d38601,
     type: 2}
+  LabelPrefab: {fileID: 1000013383796510, guid: 74c2d576c3198124aa40860244423d2d,
+    type: 2}
   SlotName: 
 --- !u!114 &114000010893832294
 MonoBehaviour:
@@ -188,7 +190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
+  m_MinWidth: 128
   m_MinHeight: 23
   m_PreferredWidth: -1
   m_PreferredHeight: -1

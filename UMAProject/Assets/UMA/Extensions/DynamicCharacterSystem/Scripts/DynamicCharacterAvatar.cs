@@ -1398,14 +1398,26 @@ namespace UMACharacterSystem
 			smr.localBounds = new Bounds(smr.localBounds.center + BoundsOffset, smr.localBounds.size);
 		}
 
-		#region Possibly Obsolete functions
+        public List<DnaSetter> GetDNA()
+        {
+            List<DnaSetter> dna = new List<DnaSetter>();
 
-		public UMADnaBase[] GetAllDNA()
+            foreach (UMADnaBase db in umaData.GetAllDna())
+            {
+                for (int i=0;i<db.Count;i++)
+                {
+                    dna.Add(new DnaSetter(db.Names[i], db.Values[i], i, db));
+                }    
+            }
+            return dna;
+        }
+
+	    public UMADnaBase[] GetAllDNA()
 		{
 			return umaData.GetAllDna();
 		}
-
-		public UMADnaHumanoid GetDNAValues()
+	/*
+        public UMADnaHumanoid GetDNAValues()
 		{
 			UMADnaHumanoid humanDNA = umaData.GetDna<UMADnaHumanoid>();
 			return humanDNA;
@@ -1432,9 +1444,7 @@ namespace UMACharacterSystem
 			UMADnaHumanoid humanDNA = umaData.GetDna<UMADnaHumanoid>();
 			humanDNA.Values = values;
 			umaData.ApplyDNA();
-		}
-
-		#endregion
+		} */
 
 		#region special classes
 
@@ -1781,6 +1791,83 @@ namespace UMACharacterSystem
 			}
 		}
 
+       /* public class DnaSetter
+        {
+            public string Name; // The name of the DNA.
+            public float Value; // Current value of the DNA.
+
+            protected int OwnerIndex;    // position of DNA in index, created at initialization
+            protected UMADnaBase Owner;  // owning DNA class. Used to set the DNA by index
+
+            /// <summary>
+            /// Construct a DnaSetter
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="value"></param>
+            /// <param name="ownerIndex"></param>
+            /// <param name="owner"></param>
+            public DnaSetter(string name, float value, int ownerIndex, UMADnaBase owner)
+            {
+                Name = name;
+                Value = value;
+                OwnerIndex = ownerIndex;
+                Owner = owner;
+            }
+
+            /// <summary>
+            /// Set the current DNA value. You will need to rebuild the character to see 
+            /// the results change.
+            /// </summary>
+            public void Set()
+            {
+                Owner.SetValue(OwnerIndex, Value);
+            }
+        } */
 		#endregion
 	}
+
+    public class DnaSetter
+    {
+        public string Name; // The name of the DNA.
+        public float Value; // Current value of the DNA.
+
+        protected int OwnerIndex;    // position of DNA in index, created at initialization
+        protected UMADnaBase Owner;  // owning DNA class. Used to set the DNA by index
+
+        /// <summary>
+        /// Construct a DnaSetter
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="ownerIndex"></param>
+        /// <param name="owner"></param>
+        public DnaSetter(string name, float value, int ownerIndex, UMADnaBase owner)
+        {
+            Name = name;
+            Value = value;
+            OwnerIndex = ownerIndex;
+            Owner = owner;
+        }
+
+        /// <summary>
+        /// Set the current DNA value. You will need to rebuild the character to see 
+        /// the results change.
+        /// </summary>
+        public void Set(float val)
+        {
+            Value = val;
+            Owner.SetValue(OwnerIndex, val);
+        }
+
+        /// <summary>
+        /// Set the current DNA value. You will need to rebuild the character to see 
+        /// the results change.
+        /// </summary>
+        public void Set()
+        {
+            Owner.SetValue(OwnerIndex, Value);
+        }
+    }
+
+
 }

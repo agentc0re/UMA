@@ -11,13 +11,23 @@ public class SampleCode : MonoBehaviour {
     public GameObject SlotPanel;
     public GameObject WardrobePanel;
     public GameObject ColorPrefab;
-    public GameObject HelpText;
+    public GameObject DnaPrefab;
+    public GameObject LabelPrefab;
+    public GameObject GeneralHelpText;
+    public GameObject WardrobeHelpText;
+    public GameObject ColorsHelpText;
+    public GameObject DnaHelpText;
 
     /// <summary>
-    /// Remove any buttons from the panels
+    /// Remove any controls from the panels
     /// </summary>
     private void Cleanup()
     {
+        GeneralHelpText.SetActive(false);
+        DnaHelpText.SetActive(false);
+        WardrobeHelpText.SetActive(false);
+        ColorsHelpText.SetActive(false);
+
         foreach (Transform t in SlotPanel.transform)
         {
             GameObject.Destroy(t.gameObject);
@@ -30,19 +40,78 @@ public class SampleCode : MonoBehaviour {
 
     public void HelpClick()
     {
-        if (HelpText.activeSelf)
+        if (GeneralHelpText.activeSelf)
         {
-            HelpText.SetActive(false);
+            GeneralHelpText.SetActive(false);
         }
         else
         {
             Cleanup();
-            HelpText.SetActive(true);
+            GeneralHelpText.SetActive(true);
         }
     }
-    
+
+    public void WardrobeHelpClick()
+    {
+        if (WardrobeHelpText.activeSelf)
+        {
+            WardrobeHelpText.SetActive(false);
+        }
+        else
+        {
+            Cleanup();
+            WardrobeHelpText.SetActive(true);
+        }
+    }
+
+    public void ColorsHelpClick()
+    {
+        if (ColorsHelpText.activeSelf)
+        {
+            ColorsHelpText.SetActive(false);
+        }
+        else
+        {
+            Cleanup();
+            ColorsHelpText.SetActive(true);
+        }
+    }
+
+    public void DNAHelpClick()
+    {
+        if (DnaHelpText.activeSelf)
+        {
+            DnaHelpText.SetActive(false);
+        }
+        else
+        {
+            Cleanup();
+            DnaHelpText.SetActive(true);
+        }
+    }
     /// <summary>
-    /// Colors button event handler
+    /// DNA Button event Handler
+    /// </summary>
+    public void DnaClick()
+    {
+        Cleanup();
+        List<DnaSetter> AllDNA = Avatar.GetDNA();
+        foreach(DnaSetter ds in AllDNA)
+        {
+            // create a button. 
+            // set set the dna setter on it.
+            GameObject go = GameObject.Instantiate(DnaPrefab);
+            DNAHandler ch = go.GetComponent<DNAHandler>();
+            ch.Setup(Avatar, ds, WardrobePanel);
+
+            Text txt = go.GetComponentInChildren<Text>();
+            txt.text = ds.Name;
+            go.transform.SetParent(SlotPanel.transform);
+        }
+    }
+
+    /// <summary>
+    /// Colors Button event handler
     /// </summary>
     public void ColorsClick()
     {
@@ -69,7 +138,6 @@ public class SampleCode : MonoBehaviour {
     {
         Cleanup();
 
-        List<string> Slots = Avatar.CurrentWardrobeSlots;
         Dictionary<string, List<UMATextRecipe>> recipes = Avatar.AvailableRecipes;
 
         foreach (string s in recipes.Keys)
