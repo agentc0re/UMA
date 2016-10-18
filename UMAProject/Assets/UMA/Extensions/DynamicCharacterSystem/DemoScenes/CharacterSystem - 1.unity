@@ -424,8 +424,8 @@ GameObject:
   m_Component:
   - 224: {fileID: 135518293}
   - 222: {fileID: 135518296}
-  - 114: {fileID: 135518295}
   - 114: {fileID: 135518294}
+  - 114: {fileID: 135518295}
   m_Layer: 5
   m_Name: GeneralHelpText
   m_TagString: Untagged
@@ -443,7 +443,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
+  m_Children:
+  - {fileID: 255716616}
   m_Father: {fileID: 1846544174}
   m_RootOrder: 3
   m_AnchorMin: {x: 0, y: 0}
@@ -473,45 +474,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 135518292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38235295, g: 0.38235295, b: 0.38235295, a: 0.453}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 0
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "<b><color=#ffff00>Welcome to the UMA Dynamic Character Avatar System</color></b>
-    \n\nAt the heart of the system is the <b><color=#ffff00>DynamicCharacterAvatar</color></b>
-    object.\n\n<i>A DynamicCharacterAvatar can be of any Race or Sex, and can be changed
-    on the fly. The Wardrobe specifies what the avatar is wearing. The Wardrobe Slots
-    are defined on the race. The system manages the wardrobe so the avatar only has
-    one wardrobe item per slot.\n\nWardrobe parts are simply recipes. They can contain
-    as many UMA slots and overlays as needed, and these are all merged into the base
-    race recipe as needed.\n</i>\n\nTo create a recipe, right click in your project,
-    and select \"Create / UMA Text Recipe\".\n\nSet the type of recipe to \"Wardrobe\".
-    Set the wardrobe slot (Where it goes on the model). Set the races that can use
-    the wardrobe item, and then define the recipe like normal by adding Slots and
-    Overlays.\n\nA wardrobe item can <b>suppress</b> other wardrobe items (For example,
-    putting on a long robe, can hide the clothing in the legs slot).\n\nA wardrobe
-    item can also <b>hide</b> some of the UMA slots that make up the base model. For
-    example, putting on gloves can hide the hands (so they don't poke through)."
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!222 &135518296
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -938,6 +919,109 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.ScrollRect+ScrollRectEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!1 &255716615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 255716616}
+  - 222: {fileID: 255716619}
+  - 114: {fileID: 255716618}
+  - 114: {fileID: 255716617}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &255716616
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 255716615}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 135518293}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 3, y: -3}
+  m_SizeDelta: {x: -5, y: -5}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &255716617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 255716615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &255716618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 255716615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "<b><color=#ffff00>Welcome to the UMA Dynamic Character Avatar System</color></b>
+    \n\nAt the heart of the system is the <b><color=#ffff00>DynamicCharacterAvatar</color></b>
+    object.\n\n<i>A DynamicCharacterAvatar can be of any Race or Sex, and can be changed
+    on the fly. The Wardrobe specifies what the avatar is wearing. The Wardrobe Slots
+    are defined on the race. The system manages the wardrobe so the avatar only has
+    one wardrobe item per slot.\n\nWardrobe parts are simply recipes. They can contain
+    as many UMA slots and overlays as needed, and these are all merged into the base
+    race recipe as needed.\n</i>\n\nTo create a recipe, right click in your project,
+    and select \"Create / UMA Text Recipe\".\n\nSet the type of recipe to \"Wardrobe\".
+    Set the wardrobe slot (Where it goes on the model). Set the races that can use
+    the wardrobe item, and then define the recipe like normal by adding Slots and
+    Overlays.\n\nA wardrobe item can <b>suppress</b> other wardrobe items (For example,
+    putting on a long robe, can hide the clothing in the legs slot).\n\nA wardrobe
+    item can also <b>hide</b> some of the UMA slots that make up the base model. For
+    example, putting on gloves can hide the hands (so they don't poke through)."
+--- !u!222 &255716619
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 255716615}
 --- !u!1 &373894533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1493,8 +1577,8 @@ GameObject:
   m_Component:
   - 224: {fileID: 823496009}
   - 222: {fileID: 823496012}
-  - 114: {fileID: 823496011}
   - 114: {fileID: 823496010}
+  - 114: {fileID: 823496011}
   m_Layer: 5
   m_Name: ColorsHelpText
   m_TagString: Untagged
@@ -1512,7 +1596,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
+  m_Children:
+  - {fileID: 2017448184}
   m_Father: {fileID: 1846544174}
   m_RootOrder: 5
   m_AnchorMin: {x: 0, y: 0}
@@ -1542,41 +1627,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 823496008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38235295, g: 0.38235295, b: 0.38235295, a: 0.453}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 0
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "<b><color=#ffff00>Shared Colors</color></b>\n\n<i>A DynamicCharacterAvatar
-    has Shared Colors. These colors are defined in the various recipes (for the base
-    race model, as well as any wardrobe items), and used across all items. To add
-    a Shared Color, use the Shared Color editor in the recipe editor, then assign
-    the shared color to an Overlay in the recipe.\n</i>\n\nIn this sample code:\n\nCurrent
-    shared colors are retrieved from the DynamicCharacterAvater using the \"CurrentSharedColors\"
-    property in the SampleCode class, in the ColorsClick event handler:\n\n       foreach(UMA.OverlayColorData
-    ocd in Avatar.CurrentSharedColors )\n\nThe <b><color=#ffff88>shared colors</color></b>
-    are changed in the \"ColorHandler\" class:\n\n        Avatar.SetColor(ColorName,
-    ColorValue);\r // this sets a shared color's value on the avatar\n        Avatar.UpdateColors(true);
-    \                       // This applies the colors to the textures\n\n"
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!222 &823496012
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2547,8 +2616,8 @@ GameObject:
   m_Component:
   - 224: {fileID: 1244586307}
   - 222: {fileID: 1244586310}
-  - 114: {fileID: 1244586309}
   - 114: {fileID: 1244586308}
+  - 114: {fileID: 1244586309}
   m_Layer: 5
   m_Name: WardrobeHelpText
   m_TagString: Untagged
@@ -2566,7 +2635,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
+  m_Children:
+  - {fileID: 1754034717}
   m_Father: {fileID: 1846544174}
   m_RootOrder: 4
   m_AnchorMin: {x: 0, y: 0}
@@ -2596,42 +2666,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 1244586306}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38235295, g: 0.38235295, b: 0.38235295, a: 0.453}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 0
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "<b><color=#ffff00>Wardrobe</color></b>\n\n<i>A DynamicCharacterAvatar can
-    be of any Race or Sex, and can be changed on the fly. The Wardrobe specifies what
-    the avatar is wearing. The Wardrobe Slots are defined on the race. The wardrobe
-    not only contains clothing, but also face overlays, complexion, hair, etc. The
-    system manages the wardrobe so the avatar only has one wardrobe item per slot.\n\nWardrobe
-    parts are simply recipes. They can contain as many UMA slots and overlays as needed,
-    and these are all merged into the base race recipe as needed.\n</i>\n\nIn this
-    sample code:\n\nThe <b><color=#ffff88>wardrobe</color></b> is changed in the \"WardrobeHandler\"
-    class:\n\n        Avatar.SetSlot(Recipe);\r                      // This is your
-    precreated slot recipe\n        Avatar.BuildCharacter();\r                     //
-    this rebuilds the recipe for the character\n        Avatar.ForceUpdate(true, true,
-    true); // this rebuilds the UMA avatar from the recipe"
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!222 &1244586310
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3207,6 +3260,105 @@ Texture2D:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1509218970
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1509218971}
+  - 222: {fileID: 1509218974}
+  - 114: {fileID: 1509218973}
+  - 114: {fileID: 1509218972}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1509218971
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1509218970}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1770519437}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 5, y: -5}
+  m_SizeDelta: {x: -11, y: -9}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1509218972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1509218970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1509218973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1509218970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "<b><color=#ffff00>DNA</color></b>\n\n<i>A DynamicCharacterAvatar's DNA
+    can be adjusted on the fly. The DNA defines things like Nose position, Ear Size,
+    etc. DNA can come from multiple sources, but this is all handled internally. DNA
+    is set via a DNASetter, that is specific to the avatar. \n</i>\n\nIn this sample
+    code:\n\nThe <b><color=#ffff88>DNASetters</color></b> are pulled from the avatar,
+    and used to setup the buttons and sliders in the SampleCode class:\n\n        List<DnaSetter>
+    AllDNA = Avatar.GetDNA(); // This gets a list of the DNA.\n\nThe <b><color=#ffff88>DNASetter</color></b>
+    is used to adjust the DNA and apply the change in the DNASliderHandler class:\n\n
+    \       DNA.Set(value);\r\n        Avatar.ForceUpdate(true);\n\nOnce the DNA value
+    is set, the Avatar is updated to use the new value. This does not interrupt the
+    current animation."
+--- !u!222 &1509218974
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1509218970}
 --- !u!1 &1615809862
 GameObject:
   m_ObjectHideFlags: 0
@@ -3573,6 +3725,106 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 1
+--- !u!1 &1754034716
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1754034717}
+  - 222: {fileID: 1754034720}
+  - 114: {fileID: 1754034719}
+  - 114: {fileID: 1754034718}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1754034717
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1754034716}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1244586307}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 6, y: -5}
+  m_SizeDelta: {x: -12, y: -9}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1754034718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1754034716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1754034719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1754034716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "<b><color=#ffff00>Wardrobe</color></b>\n\n<i>A DynamicCharacterAvatar can
+    be of any Race or Sex, and can be changed on the fly. The Wardrobe specifies what
+    the avatar is wearing. The Wardrobe Slots are defined on the race. The wardrobe
+    not only contains clothing, but also face overlays, complexion, hair, etc. The
+    system manages the wardrobe so the avatar only has one wardrobe item per slot.\n\nWardrobe
+    parts are simply recipes. They can contain as many UMA slots and overlays as needed,
+    and these are all merged into the base race recipe as needed.\n</i>\n\nIn this
+    sample code:\n\nThe <b><color=#ffff88>wardrobe</color></b> is changed in the \"WardrobeHandler\"
+    class:\n\n        Avatar.SetSlot(Recipe);\r                      // This is your
+    precreated slot recipe\n        Avatar.BuildCharacter();\r                     //
+    this rebuilds the recipe for the character\n        Avatar.ForceUpdate(true, true,
+    true); // this rebuilds the UMA avatar from the recipe"
+--- !u!222 &1754034720
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1754034716}
 --- !u!1 &1770519436
 GameObject:
   m_ObjectHideFlags: 0
@@ -3582,8 +3834,8 @@ GameObject:
   m_Component:
   - 224: {fileID: 1770519437}
   - 222: {fileID: 1770519440}
-  - 114: {fileID: 1770519439}
   - 114: {fileID: 1770519438}
+  - 114: {fileID: 1770519439}
   m_Layer: 5
   m_Name: 'DNAHelpText '
   m_TagString: Untagged
@@ -3601,7 +3853,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
+  m_Children:
+  - {fileID: 1509218971}
   m_Father: {fileID: 1846544174}
   m_RootOrder: 6
   m_AnchorMin: {x: 0, y: 0}
@@ -3631,41 +3884,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 1770519436}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38235295, g: 0.38235295, b: 0.38235295, a: 0.453}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 0
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "<b><color=#ffff00>DNA</color></b>\n\n<i>A DynamicCharacterAvatar's DNA
-    can be adjusted on the fly. The DNA defines things like Nose position, Ear Size,
-    etc. DNA can come from multiple sources, but this is all handled internally. DNA
-    is set via a DNASetter, that is specific to the avatar. \n</i>\n\nIn this sample
-    code:\n\nThe <b><color=#ffff88>DNASetters</color></b> are pulled from the avatar,
-    and used to setup the buttons and sliders in the SampleCode class:\n\n        List<DnaSetter>
-    AllDNA = Avatar.GetDNA(); // This gets a list of the DNA.\n\nThe <b><color=#ffff88>DNASetter</color></b>
-    is used to adjust the DNA and apply the change in the DNASliderHandler class:\n\n
-    \       DNA.Set(value);\r\n        Avatar.ForceUpdate(true);\n\nOnce the DNA value
-    is set, the Avatar is updated to use the new value. This does not interrupt the
-    current animation."
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!222 &1770519440
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4109,6 +4346,105 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1983033409}
+--- !u!1 &2017448183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 2017448184}
+  - 222: {fileID: 2017448187}
+  - 114: {fileID: 2017448186}
+  - 114: {fileID: 2017448185}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2017448184
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2017448183}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 823496009}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 6, y: -5}
+  m_SizeDelta: {x: -12, y: -9}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2017448185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2017448183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1573420865, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &2017448186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2017448183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "<b><color=#ffff00>Shared Colors</color></b>\n\n<i>A DynamicCharacterAvatar
+    has Shared Colors. These colors are defined in the various recipes (for the base
+    race model, as well as any wardrobe items), and used across all items. To add
+    a Shared Color, use the Shared Color editor in the recipe editor, then assign
+    the shared color to an Overlay in the recipe.\n</i>\n\nIn this sample code:\n\nCurrent
+    shared colors are retrieved from the DynamicCharacterAvater using the \"CurrentSharedColors\"
+    property in the SampleCode class, in the ColorsClick event handler:\n\n       foreach(UMA.OverlayColorData
+    ocd in Avatar.CurrentSharedColors )\n\nThe <b><color=#ffff88>shared colors</color></b>
+    are changed in the \"ColorHandler\" class:\n\n        Avatar.SetColor(ColorName,
+    ColorValue);\r // this sets a shared color's value on the avatar\n        Avatar.UpdateColors(true);
+    \                       // This applies the colors to the textures\n\n"
+--- !u!222 &2017448187
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2017448183}
 --- !u!1 &2077885938
 GameObject:
   m_ObjectHideFlags: 0
