@@ -2,8 +2,12 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
+#if UNITY_5_5_OR_NEWER
+using UnityEngine.Profiling;
+#endif
+
 using System;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,11 +19,11 @@ using UMAAssetBundleManager;
 
 namespace UMACharacterSystem
 {
-	//TODO when a scene that contains this component is included in an asset bundle it ends up having dependencies on some things that are defined in here
-	// namely the race data and the default animator - I think these need to have no refrence to any assets at all so that the scene looses these dependencies
-	// because the avatar is supposed to be dynamic and therefore of an undefined race and using an undefined animator. The same is true of the expressions player
-	//this need to not have an expressionSet set so again the scene does not end up dependent on the asset that contains it
-	public class DynamicCharacterAvatar : UMAAvatarBase
+    //TODO when a scene that contains this component is included in an asset bundle it ends up having dependencies on some things that are defined in here
+    // namely the race data and the default animator - I think these need to have no refrence to any assets at all so that the scene looses these dependencies
+    // because the avatar is supposed to be dynamic and therefore of an undefined race and using an undefined animator. The same is true of the expressions player
+    //this need to not have an expressionSet set so again the scene does not end up dependent on the asset that contains it
+    public class DynamicCharacterAvatar : UMAAvatarBase
 	{
 		//because the character might be loaded from an asset bundle, we may want everything required to create it to happen
 		//but for it to still not be shown immediately
@@ -880,7 +884,7 @@ namespace UMACharacterSystem
 			yield break;
 		}
 
-		#region LoadSaveFunctions
+#region LoadSaveFunctions
 
 		/// <summary>
 		/// Returns a Standard UMATextRecipe string that can be used with NON-CharacterAvatar UMAs. For saving a recipe that will also save the Avatars current wardrobe slots (i.e. for use with another CharacterAvatar) use DoSave instead.
@@ -1391,7 +1395,7 @@ namespace UMACharacterSystem
 			yield break;
 		}
 
-		#endregion
+#endregion
 		public void AvatarCreated()
 		{
 			SkinnedMeshRenderer smr = this.gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
@@ -1415,38 +1419,9 @@ namespace UMACharacterSystem
 	    public UMADnaBase[] GetAllDNA()
 		{
 			return umaData.GetAllDna();
-		}
-	/*
-        public UMADnaHumanoid GetDNAValues()
-		{
-			UMADnaHumanoid humanDNA = umaData.GetDna<UMADnaHumanoid>();
-			return humanDNA;
-		}
-
-		public string GetDNA()
-		{
-			UMADnaHumanoid humanDNA = umaData.GetDna<UMADnaHumanoid>();
-			string[] array2 = Array.ConvertAll(humanDNA.Values, element => element.ToString());
-			return string.Join(",", array2);
-		}
-
-		public void SetDNA(string DNA)
-		{
-			string[] strvals = DNA.Split(',');
-			float[] values = new float[strvals.Length];
-			for (int i = 0; i < strvals.Length; i++)
-			{
-				if (String.IsNullOrEmpty(strvals[i]))
-					values[i] = 0.0f;
-				else
-					values[i] = Convert.ToSingle(strvals[i]);
-			}
-			UMADnaHumanoid humanDNA = umaData.GetDna<UMADnaHumanoid>();
-			humanDNA.Values = values;
-			umaData.ApplyDNA();
-		} */
-
-		#region special classes
+		} 
+	
+#region special classes
 
 		[Serializable]
 		public class RaceSetter
@@ -1791,7 +1766,7 @@ namespace UMACharacterSystem
 			}
 		}
 
-		#endregion
+#endregion
 	}
 
     /// <summary>
