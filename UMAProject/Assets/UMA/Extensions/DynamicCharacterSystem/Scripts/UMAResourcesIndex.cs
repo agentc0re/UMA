@@ -127,7 +127,7 @@ namespace UMA
 		public void LoadOrCreateData()
 		{
 #if UNITY_EDITOR
-            dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Resources/UMAResourcesIndex.txt");
+            dataAssetPath = GetIndexPath();
 
             if (File.Exists(dataAssetPath))
             {
@@ -166,14 +166,25 @@ namespace UMA
 			string info = "Total files indexed: " + totalIndexedFiles + " in " + totalIndexedTypes + " Types"/*.\nIndexed Types: \n" + String.Join(", ", typeNames.ToArray())*/;
 			return info;
 		}
+#if UNITY_EDITOR
 
-		/// <summary>
-		/// Saves any updates to the index to the data file. This only happens in the editor.
-		/// </summary>
-		public void Save()
+        private string GetIndexPath()
+        {
+            if (!string.IsNullOrEmpty(dataAssetPath))
+            {
+                return dataAssetPath;
+            }
+            return AssetDatabase.GetAssetPath(Resources.Load("UMAResourcesIndex"));
+        }
+#endif
+
+        /// <summary>
+        /// Saves any updates to the index to the data file. This only happens in the editor.
+        /// </summary>
+        public void Save()
 		{
 #if UNITY_EDITOR
-            dataAssetPath = System.IO.Path.Combine(Application.dataPath, "UMA/Extensions/DynamicCharacterSystem/Resources/UMAResourcesIndex.txt");
+            dataAssetPath = GetIndexPath();
             var jsonData = JsonUtility.ToJson(index);
 			FileUtils.WriteAllText(dataAssetPath, jsonData);
 #endif
