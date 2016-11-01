@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 166765684}
-  m_IndirectSpecularColor: {r: 0.34597096, g: 0.35381928, b: 0.37306303, a: 1}
+  m_IndirectSpecularColor: {r: 0.34601545, g: 0.35387874, b: 0.37315515, a: 1}
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -2675,7 +2675,7 @@ MonoBehaviour:
     type: 2}
   AposeAnimatorController: {fileID: 9100000, guid: 66af5264f1619114db5f72f979ce14bd,
     type: 2}
-  MovementAnimatorController: {fileID: 9100000, guid: f0ae291110d799142ba94baf538f376c,
+  MovementAnimatorController: {fileID: 9100000, guid: ae859d58fdf844b73863d3833f955cdf,
     type: 2}
   targetUMA: {fileID: 363062547}
   guideUMA: {fileID: 0}
@@ -3398,6 +3398,11 @@ MonoBehaviour:
     m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   CharacterUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  RecipeUpdated:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
@@ -8381,6 +8386,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  RecipeUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   hide: 0
   activeRace:
     name: ToonFemale
@@ -10502,6 +10512,11 @@ MonoBehaviour:
     m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   CharacterUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  RecipeUpdated:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UMA.UMADataEvent, Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral,
