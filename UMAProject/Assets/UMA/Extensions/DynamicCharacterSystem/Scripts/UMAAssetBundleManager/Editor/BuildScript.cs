@@ -143,12 +143,7 @@ namespace UMAAssetBundleManager
 			if (levels.Length == 0)
 			{
 				Debug.LogWarning("There were no Scenes in you Build Settings. Adding the current active Scene.");
-#if UNITY_5_3_OR_NEWER
 				levels = new string[1] { UnityEngine.SceneManagement.SceneManager.GetActiveScene().path };
-#else
-                levels = new string[1] { EditorApplication.currentScene };
-#endif
-				//return;
 			}
 			string targetName = GetBuildTargetName(EditorUserBuildSettings.activeBuildTarget);
 			if (targetName == null)
