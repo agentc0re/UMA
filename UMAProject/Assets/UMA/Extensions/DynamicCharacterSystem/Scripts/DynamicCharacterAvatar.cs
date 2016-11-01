@@ -522,6 +522,21 @@ namespace UMACharacterSystem
 				this.gameObject.GetComponent<Animator>().runtimeAnimatorController = controllerToUse;
 			}
 		}
+
+        /// <summary>
+        /// Gets the color from the current shared colors.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        public OverlayColorData GetColor(string Name)
+        {
+            OverlayColorData ocd;
+
+            if (characterColors.GetColor(Name, out ocd))
+                return ocd;
+            return null;
+        }
+
 		/// <summary>
 		/// Sets the given color name to the given OverlayColorData optionally updating the texture (default:true)
 		/// </summary>
