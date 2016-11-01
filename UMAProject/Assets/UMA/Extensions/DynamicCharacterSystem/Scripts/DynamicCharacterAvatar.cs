@@ -25,9 +25,14 @@ namespace UMACharacterSystem
     //this need to not have an expressionSet set so again the scene does not end up dependent on the asset that contains it
     public class DynamicCharacterAvatar : UMAAvatarBase
 	{
-		//because the character might be loaded from an asset bundle, we may want everything required to create it to happen
-		//but for it to still not be shown immediately
-		[Tooltip("If checked will turn off the SkinnedMeshRenderer after the character has been created to hide it. If not checked will turn it on again.")]
+
+        /// <summary>
+        /// Callback event when the character recipe is updated. Use this to tweak the resulting recipe BEFORE the UMA is actually generated
+        /// </summary>
+        public UMADataEvent RecipeUpdated;
+        //because the character might be loaded from an asset bundle, we may want everything required to create it to happen
+        //but for it to still not be shown immediately
+        [Tooltip("If checked will turn off the SkinnedMeshRenderer after the character has been created to hide it. If not checked will turn it on again.")]
 		public bool hide = false;
 
 		//This will generate itself from a list available Races and set itself to the current value of activeRace.name
@@ -954,7 +959,10 @@ namespace UMACharacterSystem
 			RemoveHiddenSlots();
 			UpdateColors();
 
-			if (umaRace != umaData.umaRecipe.raceData)
+            //New event that allows for tweaking the resulting recipe before the character is actually generated
+            RecipeUpdated.Invoke(umaData);
+
+            if (umaRace != umaData.umaRecipe.raceData)
 			{
 				UpdateNewRace();
 			}
