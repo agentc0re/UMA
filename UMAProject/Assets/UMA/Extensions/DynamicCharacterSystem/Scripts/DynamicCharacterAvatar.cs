@@ -1443,37 +1443,20 @@ namespace UMACharacterSystem
 		}
 
         /// <summary>
-        /// This returns a Dictionary of DnaSetters that allow you to lookup DNA by name
-        /// it dynamically constructs the dictionary, because the DNA can change when races
-        /// change, so use it sparingly.
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<string,DnaSetter> GetDNALookup()
-        {
-            List<DnaSetter> dna = GetDNA();
-            Dictionary<string, DnaSetter> dc = new Dictionary<string, DnaSetter>();
-            foreach(DnaSetter dns in dna)
-            {
-                dc.Add(dns.Name, dns);
-            }
-            return dc;
-        }
-
-        /// <summary>
         /// get all of the DNA for the current character, and return it as a list of DnaSetters.
         /// Each DnaSetter will track the DNABase that it came from, and the character that it is attached
         /// to. To modify the DNA on the character, use the Set function on the Setter.
         /// </summary>
         /// <returns></returns>
-        public List<DnaSetter> GetDNA()
+        public Dictionary<string,DnaSetter> GetDNA()
         {
-            List<DnaSetter> dna = new List<DnaSetter>();
+            Dictionary<string,DnaSetter> dna = new Dictionary<string,DnaSetter>();
 
             foreach (UMADnaBase db in umaData.GetAllDna())
             {
                 for (int i=0;i<db.Count;i++)
                 {
-                    dna.Add(new DnaSetter(db.Names[i], db.Values[i], i, db));
+                    dna.Add(db.Names[i], new DnaSetter(db.Names[i], db.Values[i], i, db));
                 }    
             }
             return dna;
@@ -1876,6 +1859,14 @@ namespace UMACharacterSystem
         public void Set()
         {
             Owner.SetValue(OwnerIndex, Value);
+        }
+
+		/// <summary>
+        /// Gets the current DNA value.
+        /// </summary>
+        public float Get()
+        {
+            return Owner.GetValue(OwnerIndex); 
         }
     }
 }

@@ -95,17 +95,17 @@ public class SampleCode : MonoBehaviour {
     public void DnaClick()
     {
         Cleanup();
-        List<DnaSetter> AllDNA = Avatar.GetDNA();
-        foreach(DnaSetter ds in AllDNA)
+        Dictionary<string,DnaSetter> AllDNA = Avatar.GetDNA();
+        foreach( KeyValuePair<string, DnaSetter> ds in AllDNA)
         {
             // create a button. 
             // set set the dna setter on it.
             GameObject go = GameObject.Instantiate(DnaPrefab);
             DNAHandler ch = go.GetComponent<DNAHandler>();
-            ch.Setup(Avatar, ds, WardrobePanel);
+            ch.Setup(Avatar, ds.Value, WardrobePanel);
 
             Text txt = go.GetComponentInChildren<Text>();
-            txt.text = ds.Name;
+            txt.text = ds.Value.Name;
             go.transform.SetParent(SlotPanel.transform);
         }
     }
@@ -180,10 +180,10 @@ public class SampleCode : MonoBehaviour {
         }
 
         // Set Random DNA 
-        List<DnaSetter> setters = Avatar.GetDNA();
-        foreach(DnaSetter dna in setters)
+        Dictionary<string,DnaSetter> setters = Avatar.GetDNA();
+        foreach(KeyValuePair<string, DnaSetter> dna in setters)
         {
-            dna.Set(0.35f + (Random.value * 0.3f));
+            dna.Value.Set(0.35f + (Random.value * 0.3f));
         }
 
         // Set Random Colors for Skin and Hair
