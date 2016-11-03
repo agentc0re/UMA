@@ -25,7 +25,6 @@ namespace UMACharacterSystem
     //this need to not have an expressionSet set so again the scene does not end up dependent on the asset that contains it
     public class DynamicCharacterAvatar : UMAAvatarBase
 	{
-
         /// <summary>
         /// Callback event when the character recipe is updated. Use this to tweak the resulting recipe BEFORE the UMA is actually generated
         /// </summary>
@@ -35,8 +34,26 @@ namespace UMACharacterSystem
         [Tooltip("If checked will turn off the SkinnedMeshRenderer after the character has been created to hide it. If not checked will turn it on again.")]
 		public bool hide = false;
 
-		//This will generate itself from a list available Races and set itself to the current value of activeRace.name
-		public RaceSetter activeRace;
+
+        /// <summary>
+        /// Set this before initialization to determine the active race. This can be set in the inspector
+        /// using the activeRace dropdown.
+        /// </summary>
+        public string RacePreset
+        {
+            get
+            {
+                return activeRace.name;
+            }
+            set
+            {
+                activeRace.name = value;
+            }
+        }
+
+        //This will generate itself from a list available Races and set itself to the current value of activeRace.name
+        [Tooltip("Selects the race to used. When initialized, the Avatar will use the base recipe from the RaceData selected.")]
+        public RaceSetter activeRace;
 
 		//bool flagForRebuild = false;
 		//bool flagForReload = false;
