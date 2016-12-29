@@ -9,9 +9,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c4834e6077abe64e968f9f87c9ac70a, type: 3}
-  m_Name: Beard-3
+  m_Name: Beard-2
   m_EditorClassIdentifier: 
-  overlayName: MaleBeard03
+  overlayName: Beard-2
   overlayType: 0
   rect:
     serializedVersion: 2
@@ -21,9 +21,9 @@ MonoBehaviour:
     height: 512
   alphaMask: {fileID: 0}
   textureList:
-  - {fileID: 2800000, guid: c822ebdcf1e9f4ea3ba74f8d9103876b, type: 3}
-  - {fileID: 2800000, guid: 09a1dfc8fbb1147c2afb36b5c2ba8ebd, type: 3}
-  - {fileID: 2800000, guid: b01f10afaca2142209e116e496a8d621, type: 3}
+  - {fileID: 2800000, guid: 50fd7bdf5bb124084af695f5f932709b, type: 3}
+  - {fileID: 2800000, guid: 43f2ca917c7784aaebd610597a5b03a4, type: 3}
+  - {fileID: 2800000, guid: 20989ab7f7fcc4fd29424f7ca3ad427f, type: 3}
   tags: []
   material: {fileID: 11400000, guid: 8e29dbac5d2e82f44a759a7e2cc568ab, type: 2}
   OcclusionEntries: []
