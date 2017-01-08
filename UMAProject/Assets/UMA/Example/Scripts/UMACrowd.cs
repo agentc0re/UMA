@@ -70,11 +70,14 @@ public class UMACrowd : MonoBehaviour
 	{
         Color skinColor;
         Color HairColor;
-
+        Color Shine = Color.black;
 
         if (SkinColors != null)
         {
-            skinColor = SkinColors.colors[Random.Range(0, SkinColors.colors.Length)].color;
+            OverlayColorData ocd = SkinColors.colors[Random.Range(0, SkinColors.colors.Length)];
+
+            skinColor = ocd.color;
+            Shine = ocd.channelAdditiveMask[2];
         }
         else
         {
@@ -91,7 +94,7 @@ public class UMACrowd : MonoBehaviour
         }
 
         var keywordsLookup = new HashSet<string>(keywords);
-		UMACrowdRandomSet.Apply(umaData, race, skinColor, HairColor, keywordsLookup, GetSlotLibrary(), GetOverlayLibrary());
+		UMACrowdRandomSet.Apply(umaData, race, skinColor, HairColor, Shine, keywordsLookup, GetSlotLibrary(), GetOverlayLibrary());
 	}
 
 	void DefineSlots()
@@ -433,7 +436,7 @@ public class UMACrowd : MonoBehaviour
 	public static void RandomizeShape(UMAData umaData)
 	{
 		UMADnaHumanoid umaDna = umaData.umaRecipe.GetDna<UMADnaHumanoid>();
-		umaDna.height = Random.Range(0.3f, 0.5f);
+		umaDna.height = Random.Range(0.4f, 0.5f);
 		umaDna.headSize = Random.Range(0.485f, 0.515f);
 		umaDna.headWidth = Random.Range(0.4f, 0.6f);
 
@@ -472,8 +475,8 @@ public class UMACrowd : MonoBehaviour
 		if (umaDna.lowerWeight > 1.0) { umaDna.lowerWeight = 1.0f; }
 		if (umaDna.lowerWeight < 0.0) { umaDna.lowerWeight = 0.0f; }
 
-		umaDna.belly = umaDna.upperWeight;
-		umaDna.legsSize = Random.Range(0.4f, 0.6f);
+		umaDna.belly = umaDna.upperWeight * Random.Range(0.0f,1.0f);
+		umaDna.legsSize = Random.Range(0.45f, 0.6f);
 		umaDna.gluteusSize = Random.Range(0.4f, 0.6f);
 
 		umaDna.earsSize = Random.Range(0.3f, 0.8f);
