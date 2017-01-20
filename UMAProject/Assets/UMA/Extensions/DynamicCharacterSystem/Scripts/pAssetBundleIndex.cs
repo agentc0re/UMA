@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -27,6 +27,19 @@ namespace UMAAssetBundleManager
 							assetWardrobeSlot = (obj as UMATextRecipe).wardrobeSlot;
 							assetWardrobeHides = (obj as UMATextRecipe).Hides;
 						}
+					}
+				}
+				else if (assetType == "UMAWardrobeCollection")
+				{
+					assetWardrobeCompatibleWith = (obj as UMAWardrobeCollection).compatibleRaces;
+					if (assetWardrobeCompatibleWith.Count > 0)
+					{
+						bool hasActiveSets = false;
+						for (int i = 0; i < assetWardrobeCompatibleWith.Count; i++)
+							if ((obj as UMAWardrobeCollection).wardrobeCollection[assetWardrobeCompatibleWith[i]].Count > 0)
+								hasActiveSets = true;
+						if (hasActiveSets)
+							assetWardrobeSlot = "FullOutfit";
 					}
 				}
 			}
@@ -59,6 +72,17 @@ namespace UMAAssetBundleManager
 		public List<string> AssetWardrobeCompatibleWith(string assetBundleName, string assetName)
 		{
 			var thisIndexAsset = GetAssetBundleIndexItem(assetBundleName, assetName, "UMATextRecipe");
+			return thisIndexAsset.assetWardrobeCompatibleWith;
+		}
+		//Wardrobe Collection specific data search functions...
+		public string AssetWardrobeCollectionSlot(string assetBundleName, string assetName)
+		{
+			AssetBundleIndexItem thisIndexAsset = GetAssetBundleIndexItem(assetBundleName, assetName, "UMAWardrobeCollection");
+			return thisIndexAsset.assetWardrobeSlot;
+		}
+		public List<string> AssetWardrobeCollectionCompatibleWith(string assetBundleName, string assetName)
+		{
+			AssetBundleIndexItem thisIndexAsset = GetAssetBundleIndexItem(assetBundleName, assetName, "UMAWardrobeCollection");
 			return thisIndexAsset.assetWardrobeCompatibleWith;
 		}
 

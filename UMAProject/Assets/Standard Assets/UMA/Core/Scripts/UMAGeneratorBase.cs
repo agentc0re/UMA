@@ -162,7 +162,8 @@ namespace UMA
 						snapshot.SaveAnimatorState(animator);
 						Object.Destroy(animator.avatar);
 						SetAvatar(umaData, animator);
-						snapshot.RestoreAnimatorState(animator);
+						if(animator.runtimeAnimatorController != null)
+							snapshot.RestoreAnimatorState(animator);
 					}
 
 					umaTransform.SetParent(oldParent, false);
@@ -242,7 +243,7 @@ namespace UMA
 		/// <param name="umaData">UMA data.</param>
 		public static Avatar CreateGenericAvatar(UMAData umaData)
 		{
-			Avatar res = AvatarBuilder.BuildGenericAvatar(umaData.umaRoot, umaData.umaRecipe.GetRace().genericRootMotionTransformName);
+			Avatar res = AvatarBuilder.BuildGenericAvatar(umaData.gameObject, umaData.umaRecipe.GetRace().genericRootMotionTransformName);
 			return res;
 		}
 
