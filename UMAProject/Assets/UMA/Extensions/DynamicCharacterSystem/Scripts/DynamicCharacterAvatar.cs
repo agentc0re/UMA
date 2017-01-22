@@ -128,6 +128,19 @@ namespace UMACharacterSystem
 		[System.NonSerialized]
 		public List<string> assetBundlesUsedbyCharacter = new List<string>();
 
+#if UNITY_EDITOR
+		[Tooltip("Show placeholder model or not.")]
+		public bool showPlaceholder = true;
+		public enum PreviewModel {Male, Female, Custom}
+		[Tooltip("What model to show as placeholder.")]
+		public PreviewModel previewModel;
+		[Tooltip("Custom mesh to show as a placeholder.")]
+		public GameObject customModel;
+		[Tooltip("Custom rotation of the placeholder.")]
+		public Vector3 customRotation;
+		[Tooltip("What color to give the placeholder.")]
+		public Color previewColor = Color.grey;
+#endif
 		#endregion
 
 		#region PRIVATE FIELDS //Can we use the convention of starting these with a lower case letter
@@ -147,7 +160,12 @@ namespace UMACharacterSystem
 		//or if an external script has already overridden these and so we should just build with the settings as they are (i.e. just call BuildCharacter)
 		//Should be set to FALSE by any method that actually changes settings without calling ImportSettings
 		private bool _isFirstSettingsBuild = true;
-
+#if UNITY_EDITOR	
+		private PreviewModel lastPreviewModel;
+		private GameObject lastCustomModel;
+		private Material mat;
+		private Mesh previewMesh;
+#endif
 		#endregion
 
 		#region PROPERTIES //Can we use the convention of strting these with an uppercase letter
@@ -329,6 +347,55 @@ namespace UMACharacterSystem
 				}
 			}
 		}
+
+#if UNITY_EDITOR
+		void OnDrawGizmos()
+		{
+			// Build Shader
+			if (!mat)
+			{
+				Shader shader = Shader.Find ("Hidden/Internal-Colored");
+				mat = new Material (shader);
+				mat.hideFlags = HideFlags.HideAndDontSave;
+			}
+			
+			if(showPlaceholder)
+			{
+				// Check for mesh Change
+				if(!previewMesh || lastPreviewModel != previewModel || customModel != lastCustomModel)
+					LoadMesh();
+				
+				mat.color = previewColor;
+				if(!Application.isPlaying && previewMesh)
+				{
+					Quaternion rotation = Quaternion.Euler(-90,180,0);
+					if(previewModel == PreviewModel.Custom)
+						rotation = Quaternion.Euler(customRotation);
+					mat.SetPass(0);
+					Graphics.DrawMeshNow(previewMesh, Matrix4x4.TRS(transform.position, transform.rotation * rotation, new Vector3(0.88f,0.88f,0.88f)));	
+				}
+				lastPreviewModel = previewModel;
+				lastCustomModel = customModel;
+			}
+		}
+		
+		void LoadMesh()
+		{
+			GameObject model = null;
+			
+			if(previewModel == PreviewModel.Custom)
+				model = customModel;
+			else
+			{
+				string modelPath = "Male/Male_Unified.fbx";
+				if(previewModel == PreviewModel.Female)
+					modelPath = "Female/Female_Unified.fbx";
+				model = UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/UMA/Content/UMA/Humanoid/FBX/" + modelPath, typeof(GameObject)) as GameObject;
+			}
+			if(model != null)
+				previewMesh = model.GetComponentInChildren<SkinnedMeshRenderer>().sharedMesh;
+		}
+#endif
 
 		IEnumerator BuildFromComponentSettingsCO()
 		{
@@ -2178,13 +2245,20 @@ namespace UMACharacterSystem
 			}
 			ClearSlots();
 			umaRecipe = null;
-			umaData.umaRecipe = null;
+			umaData.umaRecipe.ClearDna();
+			umaData.umaRecipe.SetSlots(new SlotData[0]);
+			umaData.umaRecipe.sharedColors = new OverlayColorData[0];
 			animationController = null;
-			if (gameObject.GetComponent<Animator>())
-			{
-				gameObject.GetComponent<Animator>().runtimeAnimatorController = null;
-			}
-			if (gameObject.GetComponent<UMAExpressionPlayer>())
+
+            /*
+            *For now, we are not going to clean this up as it resets the avatar rotation, but only in Unity 5.5 +
+            if (gameObject.GetComponent<Animator>())
+            {
+                gameObject.GetComponent<Animator>().runtimeAnimatorController = null;
+            }
+            */
+
+            if (gameObject.GetComponent<UMAExpressionPlayer>())
 			{
 				gameObject.GetComponent<UMAExpressionPlayer>().expressionSet = null;
 				gameObject.GetComponent<UMAExpressionPlayer>().enabled = false;

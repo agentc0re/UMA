@@ -84,7 +84,14 @@ namespace UMACharacterSystem
                     continue;
                 if (DynamicAssetLoader.Instance != null && possibleRaces[i].raceName == DynamicAssetLoader.Instance.placeholderRace.raceName)
                     continue;
-                Recipes.Add(possibleRaces[i].raceName, new Dictionary<string, List<UMATextRecipe>>());
+                if (Recipes.ContainsKey(possibleRaces[i].raceName))
+                {
+                    Debug.LogWarning("Warning: multiple races found for key:" + possibleRaces[i].raceName);
+                }
+                else
+                {
+                    Recipes.Add(possibleRaces[i].raceName, new Dictionary<string, List<UMATextRecipe>>());
+                }
             }
 
             GatherCharacterRecipes();
@@ -209,7 +216,7 @@ namespace UMACharacterSystem
 				bool found = false;
 				DynamicAssetLoader.Instance.debugOnFail = false;
 				//if the user has updated their wardrobe recipes
-				if (EditorPrefs.GetBool("UMAWardrobeRecipesUpdated"))
+				if (EditorPrefs.GetBool(Application.dataPath + ":UMAWardrobeRecipesUpdated"))
 					found = DynamicAssetLoader.Instance.AddAssets<UMAWardrobeRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResourcesNow, dynamicallyAddFromAssetBundles, downloadAssetsEnabledNow, assetBundleToGather, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
 				else
 					found = DynamicAssetLoader.Instance.AddAssets<UMATextRecipe>(ref assetBundlesUsedDict, dynamicallyAddFromResourcesNow, dynamicallyAddFromAssetBundles, downloadAssetsEnabledNow, assetBundleToGather, resourcesRecipesFolder, null, filename, AddRecipesFromAB);
